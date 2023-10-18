@@ -12,7 +12,7 @@ describe('Users (E2E)', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    app.useGlobalPipes(new ValidationPipe()); // Use the same validation pipe as in the main application
+    app.useGlobalPipes(new ValidationPipe());
     await app.init();
   });
 
@@ -25,11 +25,11 @@ describe('Users (E2E)', () => {
     };
 
     const response = await request(app.getHttpServer())
-      .post('/users') // Assuming your endpoint for creating users is '/users'
+      .post('/users') // Assuming endpoint for creating users is '/users'
       .send(userDto)
-      .expect(201); // Assuming you return status 201 (Created) upon successful user creation
+      .expect(201); // Assuming return status 201 (Created) upon successful user creation
 
-    expect(response.body).toMatchObject(userDto); // Assuming your endpoint returns the created user data
+    expect(response.body).toMatchObject(userDto); // Assuming endpoint returns the created user data
   });
 
   afterEach(async () => {

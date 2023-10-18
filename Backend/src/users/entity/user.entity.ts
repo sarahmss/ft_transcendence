@@ -4,7 +4,7 @@ import { IsAlphanumeric, IsEmail } from 'class-validator';
 @Entity()
 export class User {
     @PrimaryGeneratedColumn("uuid")
-    userId: string;
+    id: number;
 
     @IsAlphanumeric()
     @Column({unique: true, nullable: false, default: "Player"})
