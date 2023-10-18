@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, NotFoundException } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User } from './entity/user.entity';
+import { User } from '../entity/user.entity';
 
 @Controller('users')
 export class UsersController {
@@ -12,10 +12,10 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  //get user by id
-  @Get(':id')
-  async findOne(@Param('id') userId: string): Promise<User> {
-    const user = await this.usersService.findOne(id);
+  //get user by userId
+  @Get(':userId')
+  async findOne(@Param('userId') userId: string): Promise<User> {
+    const user = await this.usersService.findById(userId);
     if (!user) {
       throw new NotFoundException('User does not exist!');
     } else {
@@ -29,20 +29,21 @@ export class UsersController {
     return this.usersService.create(user);
   }
 
+
   //update user
-  @Put(':id')
-  async update (@Param('id') userId: string, @Body() user: User): Promise<any> {
-    return this.usersService.update(id, user);
+  @Put(':userId')
+  async update (@Param('userId') userId: string, @Body() user: User): Promise<any> {
+    return this.usersService.update(userId, user);
   }
 
   //delete user
-  @Delete(':id')
-  async delete(@Param('id') userId: string): Promise<any> {
+  @Delete(':userId')
+  async delete(@Param('userId') userId: string): Promise<any> {
     //handle error if user does not exist
-    const user = await this.usersService.findOne(id);
+    const user = await this.usersService.findById(userId);
     if (!user) {
       throw new NotFoundException('User does not exist!');
     }
-    return this.usersService.delete(id);
+    return this.usersService.delete(userId);
   }
 }
