@@ -1,6 +1,6 @@
 all:
 	@echo "Running Postgres service..."
-	@docker compose up 
+	@docker compose up
 
 db:
 	@echo "Running Postgres service in detached mode..."
@@ -30,6 +30,10 @@ list-volumes:
 
 list-networks:
 	@docker network ls
+
+clean-db:
+	@echo "Cleaning database..."
+	@docker-compose -f ./docker-compose.yml down -v
 
 clean: down
 	@-docker rmi -f `docker images -qa`
