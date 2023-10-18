@@ -21,6 +21,12 @@ export class UsersController {
     } else {
       return user;
     }
+}
+
+  //  defining a POST /users/register endpoint to register a new user
+  @Post('register')
+  register(@Body('username') username: string, @Body('password') password: string) {
+    return this.usersService.register(username, password);
   }
 
   //create user

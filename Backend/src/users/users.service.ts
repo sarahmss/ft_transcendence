@@ -1,5 +1,5 @@
 import { Injectable,
-	NotFoundException,
+	UnauthorizedException,
 	UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -40,6 +40,15 @@ export class UsersService {
     user.password = password; //make sure to hash the password before storing it
 
     return this.usersRepository.save(user);
+  }
+
+  async validateUser(userName: string, password: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ userName });
+
+    if (!user || user.password !== password) { // make sure to hash the password and compare the hashed values
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    return user;
   }
 
   async update(userId: string, user: Partial<User>): Promise<User> {
