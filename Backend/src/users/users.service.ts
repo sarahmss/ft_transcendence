@@ -4,6 +4,7 @@ import { Injectable,
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {User} from '../entity/user.entity';
+import {UpdateUserDto} from "./dto/user.dto";
 
 @Injectable()
 export class UsersService {
@@ -13,16 +14,40 @@ export class UsersService {
   ) {}
 
   async findAll(): Promise<User[]> {
-    return this.usersRepository.find();
+    return this.usersRepository.find({
+		select: ["userId", "userName", "email", "profilePicture"]
+	});
   }
 
   async findById(userId: string): Promise<User> {
-    return this.usersRepository.findOne({ where: { userId } });
+	try {
+		return await this.usersRepository.findOneByOrFail({userId});
+	} catch (error) {
+		throw new NotFoundException(error.message)
+	}
+}
+
+  async findByUserName(userName: string): Promise<User> {
+	try {
+		return await this.usersRepository.findOneByOrFail({ userName });
+	} catch (error) {
+		throw new NotFoundException(error.message)
+	}
   }
 
-  async findByUsername(userName: string): Promise<User> {
-    return this.usersRepository.findOneBy({ userName });
-  }
+  async isNotUnique(userName: string) {
+    if (!userName) {
+		return false;
+	  }
+	  const name = await this.usersRepository.findOne({
+		where: { userName: userName },
+	  });
+	  if (name) {
+		return true;
+	  }
+	  return false;
+	}
+
 
   async create(user: Partial<User>): Promise<User> {
     const newuser = this.usersRepository.create(user);
@@ -33,7 +58,7 @@ export class UsersService {
     const existingUser = await this.usersRepository.findOneBy({ userName });
 
     if (existingUser) {
-      throw new UnprocessableEntityException('Username already exists');
+      throw new UnprocessableEntityException('UserName already exists');
     }
 	const user = new User();
     user.userName = userName;
@@ -42,10 +67,15 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  async update(userId: string, user: Partial<User>): Promise<User> {
-    await this.usersRepository.update(userId, user);
-    return this.usersRepository.findOne({ where: { userId } });
-  }
+  async update(userId: string, userDto: UpdateUserDto): Promise<User> {
+	const user = await this.findById(userId);
+	const invalidUpdate = await this.isNotUnique(userDto.userName);
+	if (invalidUpdate){
+		throw new UnprocessableEntityException();
+	}
+	this.usersRepository.merge(user, userDto);
+	return this.usersRepository.save(user);
+}
 
   async delete(userId: string): Promise<void> {
     await this.usersRepository.delete(userId);

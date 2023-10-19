@@ -1,4 +1,4 @@
-import { IsNotEmpty, MinLength, MaxLength, IsEmail, Matches, IsEmpty, IsOptional, Equals, IsAlphanumeric } from "class-validator";
+import { IsNotEmpty, MinLength, MaxLength, IsEmail, Matches, IsEmpty, IsOptional, IsUrl, IsAlphanumeric } from "class-validator";
 import { Identical } from "./identical.decorators";
 import { ApiProperty } from "@nestjs/swagger";
 
@@ -32,3 +32,19 @@ export class CreateUserDto {
         passwordConfirm: string;
 
 }
+
+export class UpdateUserDto {
+	@IsOptional()
+	@IsNotEmpty()
+	@MinLength(3)
+	userName: string;
+
+    @IsNotEmpty()
+    @IsEmail()
+    @IsOptional()
+    email: string;
+
+	@IsOptional()
+	@IsUrl({ require_tld: false })
+	profilePicture: string;
+  }
