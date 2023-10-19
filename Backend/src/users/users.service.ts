@@ -1,11 +1,9 @@
 import { Injectable,
-	UnauthorizedException,
+	NotFoundException,
 	UnprocessableEntityException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import {User} from '../entity/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
-
 
 @Injectable()
 export class UsersService {
@@ -26,8 +24,8 @@ export class UsersService {
     return this.usersRepository.findOneBy({ userName });
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    const newuser = this.usersRepository.create(createUserDto);
+  async create(user: Partial<User>): Promise<User> {
+    const newuser = this.usersRepository.create(user);
     return this.usersRepository.save(newuser);
   }
 
@@ -42,15 +40,6 @@ export class UsersService {
     user.password = password; //make sure to hash the password before storing it
 
     return this.usersRepository.save(user);
-  }
-
-  async validateUser(userName: string, password: string): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ userName });
-
-    if (!user || user.password !== password) { // make sure to hash the password and compare the hashed values
-      throw new UnauthorizedException('Invalid credentials');
-    }
-    return user;
   }
 
   async update(userId: string, user: Partial<User>): Promise<User> {

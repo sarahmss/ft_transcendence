@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Put, Param, Delete, NotFoundException } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '../entity/user.entity';
-import { CreateUserDto } from './dto/create-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -22,18 +21,12 @@ export class UsersController {
     } else {
       return user;
     }
-}
-
-  //  defining a POST /users/register endpoint to register a new user
-  @Post('register')
-  register(@Body('username') username: string, @Body('password') password: string) {
-    return this.usersService.register(username, password);
   }
 
   //create user
   @Post()
-  async create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.usersService.create(createUserDto);
+  async create(@Body() user: User): Promise<User> {
+    return this.usersService.create(user);
   }
 
 

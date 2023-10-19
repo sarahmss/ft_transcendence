@@ -1,4 +1,4 @@
-import { IsNotEmpty, MinLength, MaxLength, IsEmail, Matches, IsAlphanumeric } from "class-validator";
+import { IsNotEmpty, MinLength, MaxLength, IsEmail, Matches, IsEmpty, IsOptional, Equals, IsAlphanumeric } from "class-validator";
 import { Identical } from "./identical.decorators";
 import { ApiProperty } from "@nestjs/swagger";
 
