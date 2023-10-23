@@ -1,83 +1,187 @@
 import { Injectable,
 	NotFoundException,
-	UnprocessableEntityException } from '@nestjs/common';
+	UnprocessableEntityException,
+	Inject} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import {User} from '../entity/user.entity';
-import {UpdateUserDto} from "./dto/user.dto";
-
+import { Repository, Not } from 'typeorm';
+import { User } from '../entity/user.entity';
+import { UpdateUserDto } from "./dto/user.dto";
+import { status } from "../helpers/types.helper"
+import { retry } from 'rxjs';
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-  ) {}
 
-  async findAll(): Promise<User[]> {
-    return this.usersRepository.find({
+	constructor(
+		@InjectRepository(User)
+		private readonly usersRepository: Repository<User>,
+	) {}
+
+	/********************************* FIND ******************************/
+	async findAll(): Promise<User[]> {
+		return this.usersRepository.find({
 		select: ["userId", "userName", "email", "profilePicture"]
 	});
-  }
-
-  async findById(userId: string): Promise<User> {
-	try {
-		return await this.usersRepository.findOneByOrFail({userId});
-	} catch (error) {
-		throw new NotFoundException(error.message)
 	}
-}
 
-  async findByUserName(userName: string): Promise<User> {
-	try {
-		return await this.usersRepository.findOneByOrFail({ userName });
-	} catch (error) {
-		throw new NotFoundException(error.message)
+	async findById(userId: string): Promise<User> {
+		return this.usersRepository.findOneBy({ userId });
 	}
-  }
 
-  async isNotUnique(userName: string) {
-    if (!userName) {
+	async findByIdOrFail(userId: string): Promise<User> {
+		return this.usersRepository.findOneByOrFail({ userId });
+	}
+
+	async findByUserName(userName: string): Promise<User> {
+		return this.usersRepository.findOneBy({ userName});
+	}
+
+	async findByExternalId(externalId: number): Promise<User> {
+		return this.usersRepository.findOneBy({ externalId });
+	}
+
+	/********************************* GET ******************************/
+
+	async getUser(userId: string)
+	{
+		const user = await this.checkUser(userId);
+		return {
+			userId: user.userId,
+			userName: user.userName,
+			email: user.email,
+			externalId: user.externalId,
+			profilePicture: user.profilePicture,
+			status: user.status,
+			hasTwoFactorAuth: user.hasTwoFactorAuth,
+		};
+	}
+
+	async getUserProfile(userId: string)
+	{
+		const user = await this.checkUser(userId);
+		return {
+			userName: user.userName,
+			profilePicture: user.profilePicture,
+			status: user.status,
+		};
+	}
+
+	async getUserStatus(userId: string): Promise<status>
+	{
+		const user = await this.checkUser(userId);
+		return user.status;
+	}
+
+	async getUserPassword(userId: string): Promise<string>
+	{
+		const user = await this.checkUser(userId);
+		return user.password;
+	}
+
+	/********************************* SET ******************************/
+
+	private async setStatus(userId:string, status: status): Promise<User> {
+		const user = await this.checkUser(userId);
+		user.status = status;
+		return this.usersRepository.save(user);
+	}
+
+	async setStatusOn(userId: string): Promise<User> {
+		return this.setStatus(userId, status.ON);
+	}
+
+	async setStatusOff(userId: string): Promise<User> {
+		return this.setStatus(userId, status.OFF);
+	}
+
+	async setStatusPlaying(userId: string): Promise<User> {
+		return this.setStatus(userId, status.PLAYING);
+	}
+
+	async setPassword(userId: string, password: string): Promise<User> {
+		const user = await this.checkUser(userId);
+		user.password = password;
+		return this.usersRepository.save(user);
+	}
+
+	async SetTwoFactorAuthOn(userId: string) {
+		const user = await this.checkUser(userId);
+		user.hasTwoFactorAuth = true;
+		this.usersRepository.save(user);
+	}
+
+	async SetTwoFactorAuthOff(userId: string) {
+		const user = await this.checkUser(userId);
+		user.hasTwoFactorAuth = false;
+		this.usersRepository.save(user);
+	}
+	/********************************* CHECK ******************************/
+
+	private async checkUser(userId: string) {
+		const user = await this.findById(userId);
+		if (!user) {
+			throw new NotFoundException();
+		}
+		return user;
+	}
+
+	async validateIntraUser(IntraUser: IntraUserData) {
+		const user = await this.findByExternalId(IntraUser.externalId);
+		if (user){
+			return user;
+		}
+		return this.create(IntraUser);
+	}
+
+	async isNotUnique(userName: string) {
+		if (!userName) {
+			return false;
+		}
+		const user = await this.findByUserName(userName)
+		if (user.userName) {
+			return true;
+		}
 		return false;
-	  }
-	  const name = await this.usersRepository.findOne({
-		where: { userName: userName },
-	  });
-	  if (name) {
-		return true;
-	  }
-	  return false;
 	}
 
+	/********************************* TOOLS ******************************/
 
-  async create(user: Partial<User>): Promise<User> {
-    const newuser = this.usersRepository.create(user);
-    return this.usersRepository.save(newuser);
-  }
+	async createIntraUser(userData: IntraUser): Promise<User> {
+		let picture = userData.profilePicture;
+		if (picture == null) {
+			picture = TEMP_PROFILE_PICTURE;
+		}
+		const newUser: User = this.usersRepository.create({
+			userName: userData.userName,
+			email: userData.email,
+			externalId: userData.external_id,
+			profilePicture: picture,
+		});
+		return this.usersRepository.save(newUser);
+		}
 
-  async register(userName: string, password: string): Promise<User> {
-    const existingUser = await this.usersRepository.findOneBy({ userName });
+		async update(userId: string, userDto: UpdateUserDto): Promise<User> {
+			const user = await this.checkUser(userId);
+			const invalidUpdate = await this.isNotUnique(userDto.userName);
+			if (invalidUpdate){
+				throw new UnprocessableEntityException();
+			}
+			this.usersRepository.merge(user, userDto);
+			return this.usersRepository.save(user);
+		}
 
-    if (existingUser) {
-      throw new UnprocessableEntityException('UserName already exists');
-    }
-	const user = new User();
-    user.userName = userName;
-    user.password = password; //make sure to hash the password before storing it
+		async delete(userId: string): Promise<void> {
+			const user = await this.checkUser(userId);
+			await this.usersRepository.delete(user.userId);
+		}
 
-    return this.usersRepository.save(user);
-  }
+		async create(user: Partial<User>): Promise<User> {
+			user = await this.checkUser(user.userId);
+			const invalidUpdate = await this.isNotUnique(user.userName);
+			if (invalidUpdate){
+				throw new UnprocessableEntityException();
+			}
+			const newuser = this.usersRepository.create(user);
+			return this.usersRepository.save(newuser);
+		}
 
-  async update(userId: string, userDto: UpdateUserDto): Promise<User> {
-	const user = await this.findById(userId);
-	const invalidUpdate = await this.isNotUnique(userDto.userName);
-	if (invalidUpdate){
-		throw new UnprocessableEntityException();
-	}
-	this.usersRepository.merge(user, userDto);
-	return this.usersRepository.save(user);
-}
-
-  async delete(userId: string): Promise<void> {
-    await this.usersRepository.delete(userId);
-  }
 }

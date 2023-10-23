@@ -1,7 +1,16 @@
-import { IsNotEmpty, MinLength, MaxLength, IsEmail, Matches, IsEmpty, IsOptional, IsUrl, IsAlphanumeric } from "class-validator";
+import { IsNotEmpty,
+		MinLength,
+		MaxLength,
+		IsEmail,
+		Matches,
+		IsEmpty,
+		IsOptional,
+		IsUrl,
+		IsAlphanumeric } from "class-validator";
 import { Identical } from "./identical.decorators";
 import { ApiProperty } from "@nestjs/swagger";
-
+import { MessagesHelper } from "src/helpers/messages.helpers";
+import { RegExHelper } from "src/helpers/regex.helper";
 export class CreateUserDto {
     @IsNotEmpty()
     @MinLength(3)
@@ -18,16 +27,12 @@ export class CreateUserDto {
     @IsNotEmpty()
 	@MinLength(8)
 	@MaxLength(32)
-	@Matches(/((?=.*\d)(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-		message: "password is too weak !! [insert: uppercase, lowercase, number and special character]",
-	})
+	@Matches(RegExHelper.password, { message: MessagesHelper.PASSWORD_VALID})
 	@ApiProperty({description: "not empty with : uppercase, lowercase, number and special character"})
 	password: string;
 
     @IsNotEmpty()
-    @Identical("password", {
-        message: "The passwords entered are not identical",
-    })
+    @Identical("password", {message: MessagesHelper.PASSWORD_CONFIRM})
     @ApiProperty({description: "not empty"})
         passwordConfirm: string;
 
