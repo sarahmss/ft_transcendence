@@ -1,7 +1,8 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { IntraGuard } from './guards/intra.guards';
-import { Response, Request} from 'express';
+import { Response } from 'express';
+import { UserRequest } from '../helpers/types.helper'
 
 @Controller('auth')
 export class AuthController {
@@ -16,7 +17,7 @@ export class AuthController {
 	@Get('redirect')
 	@UseGuards(IntraGuard)
 	intraRedirect(@Res() response: Response,
-				@Req() request: Request) {
+				@Req() request: UserRequest) {
 		this.authService.login(response, request.user);
 	}
 
@@ -28,7 +29,7 @@ export class AuthController {
 	@Get('logout')
 	async logoutUser(@Res() response: Response) {
 		await this.authService.logout(response).then(() => response.redirect(
-													process.env.FRONT_HOST));
+													process.env.FRONT_URL));
 	}
 
 }

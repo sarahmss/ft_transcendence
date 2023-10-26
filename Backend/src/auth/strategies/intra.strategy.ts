@@ -9,24 +9,21 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 export class IntraStrategy extends PassportStrategy(Strategy, "42") {
 	constructor() {
 		super({
-			clientID: process.env.INTRA_CLIENT_ID,
-			clientSecret: process.env.INTRA_CLIENT_SECRET,
-			callbackURL: process.env.INTRA_CALLBACK_URL,
+			clientID: process.env.FORTYTWO_CLIENT_ID,
+			clientSecret: process.env.FORTYTWO_CLIENT_SECRET,
+			callbackURL: process.env.AUTH_CALLBACK,
 			scope: ["public"],
 		});
 	}
 
-	async validate(
-		accessToken: string,
-		refreshToken: string,
-		profile: UserProfile,
+	async validate( accessToken: string, refreshToken: string, pfl: UserProfile,
 	): Promise<IntraUserData> {
-		const { id, userName, emails, profilePicture } = profile;
+		const { id, userName, emails, profilePicture } = pfl;
 		const user: IntraUserData = {
 			externalId: id,
 			userName: userName,
 			email: emails[0].value,
-			profilPicture: profilePicture[0].value,
+			profilePicture: profilePicture[0].value,
 		};
 		if (!user) {
 			throw new HttpException(MessagesHelper.INTRA_USER_NOT_FOUND,

@@ -28,5 +28,5 @@ export class User {
 	profilePicture: string;
 
 	@Column({ default: false, nullable: false})
-	hasTwoFactorAuth: boolean;
+	has2FaAuth: boolean;
 }

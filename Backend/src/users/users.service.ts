@@ -7,7 +7,7 @@ import { Repository, Not } from 'typeorm';
 import { User } from '../entity/user.entity';
 import { UpdateUserDto } from "./dto/user.dto";
 import { status } from "../helpers/types.helper"
-import { retry } from 'rxjs';
+import { IntraUserData, UserHelper } from '../helpers/types.helper';
 @Injectable()
 export class UsersService {
 
@@ -51,7 +51,7 @@ export class UsersService {
 			externalId: user.externalId,
 			profilePicture: user.profilePicture,
 			status: user.status,
-			hasTwoFactorAuth: user.hasTwoFactorAuth,
+			hasTwoFactorAuth: user.has2FaAuth,
 		};
 	}
 
@@ -71,7 +71,7 @@ export class UsersService {
 		return user.status;
 	}
 
-	async getUserPassword(userId: string): Promise<string>
+	async getUserSecret(userId: string): Promise<string>
 	{
 		const user = await this.checkUser(userId);
 		return user.password;
@@ -97,7 +97,7 @@ export class UsersService {
 		return this.setStatus(userId, status.PLAYING);
 	}
 
-	async setPassword(userId: string, password: string): Promise<User> {
+	async setUserSecret(userId: string, password: string): Promise<User> {
 		const user = await this.checkUser(userId);
 		user.password = password;
 		return this.usersRepository.save(user);
@@ -105,13 +105,13 @@ export class UsersService {
 
 	async SetTwoFactorAuthOn(userId: string) {
 		const user = await this.checkUser(userId);
-		user.hasTwoFactorAuth = true;
+		user.has2FaAuth = true;
 		this.usersRepository.save(user);
 	}
 
 	async SetTwoFactorAuthOff(userId: string) {
 		const user = await this.checkUser(userId);
-		user.hasTwoFactorAuth = false;
+		user.has2FaAuth = false;
 		this.usersRepository.save(user);
 	}
 	/********************************* CHECK ******************************/
@@ -145,15 +145,15 @@ export class UsersService {
 
 	/********************************* TOOLS ******************************/
 
-	async createIntraUser(userData: IntraUser): Promise<User> {
+	async createIntraUser(userData: IntraUserData): Promise<User> {
 		let picture = userData.profilePicture;
 		if (picture == null) {
-			picture = TEMP_PROFILE_PICTURE;
+			picture = UserHelper.TEMP_PROFILE_PICTURE;
 		}
 		const newUser: User = this.usersRepository.create({
 			userName: userData.userName,
 			email: userData.email,
-			externalId: userData.external_id,
+			externalId: userData.externalId,
 			profilePicture: picture,
 		});
 		return this.usersRepository.save(newUser);
