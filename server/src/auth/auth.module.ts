@@ -6,19 +6,19 @@ import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from 'src/users/users.module';
 import { IntraStrategy } from './strategies/intra.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
-// import { 2FaAuthController } from './2fa/2fa-auth.controller';
-// import { 2FaAuthService } from './2fa/2fa-auth.service';
+import { TwoFaAuthController } from './2fa/2fa-auth.controller';
+import { TwoFaAuthService } from './2fa/2fa-auth.service';
 
 @Module({
 	imports: [
 		UsersModule,
 		PassportModule,
 		JwtModule.register({
-			secret: 'secret',
-			signOptions: { expiresIn: '155520000s' }
+			secret: process.env.JWT_SECRET,
+			signOptions: { expiresIn: '7d' }
 		})
 	],
-	providers: [AuthService, IntraStrategy, JwtStrategy],
-	controllers: [AuthController]
+	providers: [AuthService, IntraStrategy, JwtStrategy, TwoFaAuthService],
+	controllers: [AuthController, TwoFaAuthController]
 })
 export class AuthModule {}

@@ -8,7 +8,7 @@ import { UserRequest } from '../helpers/types.helper'
 	export class AuthMiddleware implements NestMiddleware {
 	constructor(private readonly authService: AuthService) {}
 
-	async use(request: UserRequest, response: Response, next: NextFunction) {
+	async use(request: UserRequest, next: NextFunction) {
 		try {
 			const token = request.headers['authorization'].split(' ')[1];
 			const decodedToken = this.authService.IsValidJwt(token);

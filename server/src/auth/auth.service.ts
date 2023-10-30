@@ -15,8 +15,8 @@ export class AuthService {
 		if (user.has2FaAuth) {
 			return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
 		}
-		const payload = { id: user.userId };
-		response.cookie('accessToken', this.jwtService.sign(payload), {
+		const userId = { id: user.userId };
+		response.cookie('accessToken', this.jwtService.sign(userId), {
 			sameSite: 'Lax',
 		});
 		return response.redirect(process.env.FRONT_URL);

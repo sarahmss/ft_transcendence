@@ -11,18 +11,21 @@ services:
       - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - transcendence
 
   server:
     container_name: server
     build:
       context: ./server
+      dockerfile: Dockerfile
+    image: server
     depends_on:
       - postgres
     env_file:
       - .env
     ports:
-      - '3000:3000'
-    image: smodesto/nestapp:1.0.0
+      - '5000:5000'
     environment:
       - DB_TYPE=${DB_TYPE}
       - PG_USER=${PG_USER}
@@ -30,6 +33,25 @@ services:
       - PG_DB=${PG_DB}
       - PG_PORT=${PG_PORT}
       - PG_HOST=${PG_HOST}
+    networks:
+      - transcendence
+
+  client:
+    container_name: client
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    image: react
+    ports:
+      - '3000:3000'
+    depends_on:
+      - server
+    networks:
+      - transcendence
+
+networks:
+    transcendence:
+        driver: bridge
 
 volumes:
   pgdata: {}
