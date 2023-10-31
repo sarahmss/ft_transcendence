@@ -6,6 +6,6 @@ COPY ./ ./
 
 RUN npm install
 
-EXPOSE 3000
+EXPOSE $FRONT_PORT
 
 ENTRYPOINT ["npm", "start"]

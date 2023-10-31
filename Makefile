@@ -1,6 +1,6 @@
 all:
 	@echo "Running service..."
-	@docker compose up
+	@docker-compose stop && docker-compose up --build -d --remove-orphans
 
 db:
 	@echo "Running Postgres service in detached mode..."

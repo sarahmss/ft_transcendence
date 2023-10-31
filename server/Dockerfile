@@ -11,6 +11,6 @@ COPY . .
 
 RUN npm run build
 
-EXPOSE 5000
+EXPOSE $BACK_PORT
 
 CMD ["npm", "run", "start:prod"]
