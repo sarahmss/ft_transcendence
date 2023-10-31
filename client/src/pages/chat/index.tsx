@@ -17,7 +17,7 @@ interface Payload {
 
 const socket = io('http://localhost:5000');
 
-const Home: React.FC = () => {
+const Chat: React.FC = () => {
   const [title] = useState('Chat Web');
   const [name, setName] = useState('');
   const [text, setText] = useState('');
@@ -107,4 +107,4 @@ const Home: React.FC = () => {
   );
 };
 
-export default Home;
+export default Chat;

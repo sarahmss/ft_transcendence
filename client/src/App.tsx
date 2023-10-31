@@ -1,12 +1,12 @@
 import React from 'react';
-import Home from './pages/Home';
+import Chat from './pages/chat';
 import GlobalStyle from './styles/global';
 
 const App: React.FC = () => {
   return (
     <>
       <GlobalStyle />
-      <Home />
+      <Chat />
     </>
   );
 };

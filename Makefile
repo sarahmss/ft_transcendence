@@ -31,7 +31,7 @@ clean-db:
 	@echo "Cleaning database..."
 	@docker-compose -f ./docker-compose.yml down -v
 
-prepare: clean-db re all
+prepare: clean-db re 
 	@echo "Relaunched to test !"
 
 clean: down
