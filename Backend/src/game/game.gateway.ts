@@ -47,7 +47,7 @@ export class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewa
             const room = this.gameService.joinRoom(client, roomId, this.server);
             this.server.emit(
                 'ReceiveMessage',
-                `${this.gameService.game.players[client.id].name} entrou numa sala.`,
+                `${this.gameService.game.players[client.id].name} entered a room.`,
               );
         }
 
