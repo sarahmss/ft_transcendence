@@ -1,13 +1,11 @@
-import { Component } from "react";
+import { Component, useReducer } from "react";
 import { Navigate } from "react-router-dom";
-import { Link } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import axios from "axios";
-
+import { Link, Button} from '@mui/material';
 import customIcon from '../assets/42logo.svg';
 
 const loginLink = process.env.REACT_APP_BACK_HOST + "/auth/login"
-
 
 type Props = {};
 
@@ -19,6 +17,45 @@ type State = {
 	message: string
 };
 
+
+export const reducer = (state : {[key: string]: any}, newState : {[key: string]: any}) => {
+	return {...state, ...newState};
+}
+
+const IntraLoginButton = () => {
+	const [state, setState] = useReducer(reducer, {
+		loading: false,
+		toastError: false,
+		toastMessage: "Something went wrong",
+	});
+
+	const handleLoading = () => {
+		setState({ loading: true });
+		setTimeout(() => {
+			setState({ loading: false });
+			setState({ toastError: true });
+		}, 7000 )
+	}
+
+	return (
+		<>
+		<div className="form-group">
+			<Button
+				variant="contained"
+				disabled={state.loading}
+				onClick={handleLoading}>
+				<Link href={"localhost:5000/auth/login"}>
+					<span>
+						<img src={customIcon} height="24"
+							width="24" alt="Icon" />
+							Login with 42
+					</span>
+				</Link>
+			</Button>
+		</div>
+		</>
+	)
+}
 
 export default class Login extends Component<Props, State> {
 	constructor(props: Props) {
@@ -115,20 +152,7 @@ export default class Login extends Component<Props, State> {
 								</button>
 							</div>
 
-							<div className="form-group">
-								<Link to={loginLink}>
-									<button
-										type="submit"
-										className="btn btn-primary btn-block">
-										<span>
-										<img src={customIcon} height="24"
-										width="24" alt="Icon" />
-											Login with 42
-										</span>
-									</button>
-								</Link>
-							</div>
-
+							<IntraLoginButton/>
 							{message && (
 								<div className="form-group">
 									<div className="alert alert-danger" role="alert">

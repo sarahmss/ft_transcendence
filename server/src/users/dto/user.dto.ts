@@ -11,22 +11,22 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 import { RegExHelper } from "src/helpers/regex.helper";
 export class CreateUserDto {
 	@IsNotEmpty()
-	@MinLength(3)
-	@MaxLength(15)
-	@IsAlphanumeric()
-	@ApiProperty({description: "not empty"})
+	// @MinLength(3)
+	// @MaxLength(15)
+	// @IsAlphanumeric()
+	// @ApiProperty({description: "not empty"})
 	userName: string;
 
 	@IsNotEmpty()
-	@IsEmail()
-	@ApiProperty({description: "not empty"})
+	// @IsEmail()
+	// @ApiProperty({description: "not empty"})
 	email: string;
 
 	@IsNotEmpty()
-	@MinLength(8)
-	@MaxLength(32)
-	@Matches(RegExHelper.password, { message: MessagesHelper.PASSWORD_VALID})
-	@ApiProperty({description: "not empty with : uppercase, lowercase, number and special character"})
+	// @MinLength(8)
+	// @MaxLength(32)
+	// @Matches(RegExHelper.password, { message: MessagesHelper.PASSWORD_VALID})
+	// @ApiProperty({description: "not empty with : uppercase, lowercase, number and special character"})
 	password: string;
 }
 

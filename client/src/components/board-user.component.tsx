@@ -1,7 +1,5 @@
 import { Component } from "react";
 
-import UserService from "../services/user.service";
-
 type Props = {};
 
 type State = {
@@ -15,26 +13,6 @@ export default class BoardUser extends Component<Props, State> {
     this.state = {
       content: ""
     };
-  }
-
-  componentDidMount() {
-    UserService.getUserBoard().then(
-      response => {
-        this.setState({
-          content: response.data
-        });
-      },
-      error => {
-        this.setState({
-          content:
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString()
-        });
-      }
-    );
   }
 
   render() {

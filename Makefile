@@ -12,6 +12,9 @@ front:
 back:
 		cd server ; npm run start:dev
 
+local: db front back
+	@echo "Running Local..."
+
 down:
 	@docker-compose -f ./docker-compose.yml down
 
@@ -31,7 +34,7 @@ clean-db:
 	@echo "Cleaning database..."
 	@docker-compose -f ./docker-compose.yml down -v
 
-prepare: clean-db re 
+prepare: clean-db re
 	@echo "Relaunched to test !"
 
 clean: down

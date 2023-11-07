@@ -5,7 +5,7 @@ import { Injectable,
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not } from 'typeorm';
 import { User } from '../entity/user.entity';
-import { UpdateUserDto } from "./dto/user.dto";
+import { CreateUserDto, UpdateUserDto } from "./dto/user.dto";
 import { status } from "../helpers/types.helper"
 import { IntraUserData, UserHelper } from '../helpers/types.helper';
 @Injectable()
@@ -129,7 +129,7 @@ export class UsersService {
 		if (user){
 			return user;
 		}
-		return this.create(IntraUser);
+		return this.createIntraUser(IntraUser);
 	}
 
 	async isNotUnique(userName: string) {
@@ -174,12 +174,12 @@ export class UsersService {
 			await this.usersRepository.delete(user.userId);
 		}
 
-		async create(user: Partial<User>): Promise<User> {
-			user = await this.checkUser(user.userId);
-			const invalidUpdate = await this.isNotUnique(user.userName);
-			if (invalidUpdate){
-				throw new UnprocessableEntityException();
-			}
+		async create(user: CreateUserDto) {
+			// user = await this.checkUser(user.userId);
+			// const invalidUpdate = await this.isNotUnique(user.userName);
+			// if (invalidUpdate){
+			// 	throw new UnprocessableEntityException();
+			// }
 			const newuser = this.usersRepository.create(user);
 			return this.usersRepository.save(newuser);
 		}

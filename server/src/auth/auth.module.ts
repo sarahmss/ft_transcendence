@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, Logger } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
@@ -18,7 +18,11 @@ import { TwoFaAuthService } from './2fa/2fa-auth.service';
 			signOptions: { expiresIn: '7d' }
 		})
 	],
-	providers: [AuthService, IntraStrategy, JwtStrategy, TwoFaAuthService],
+	providers: [AuthService,
+		IntraStrategy,
+		JwtStrategy,
+		TwoFaAuthService,
+		Logger],
 	controllers: [AuthController, TwoFaAuthController]
 })
 export class AuthModule {}
