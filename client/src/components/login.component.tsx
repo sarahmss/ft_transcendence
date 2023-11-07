@@ -25,15 +25,15 @@ export const reducer = (state : {[key: string]: any}, newState : {[key: string]:
 const IntraLoginButton = () => {
 	const [state, setState] = useReducer(reducer, {
 		loading: false,
-		toastError: false,
-		toastMessage: "Something went wrong",
+		loginError: false,
+		loginMsg: "Something went wrong",
 	});
 
 	const handleLoading = () => {
 		setState({ loading: true });
 		setTimeout(() => {
 			setState({ loading: false });
-			setState({ toastError: true });
+			setState({ loginError: true });
 		}, 7000 )
 	}
 
@@ -43,13 +43,13 @@ const IntraLoginButton = () => {
 			<Button
 				variant="contained"
 				disabled={state.loading}
-				onClick={handleLoading}>
-				<Link href={"localhost:5000/auth/login"}>
-					<span>
-						<img src={customIcon} height="24"
+				onClick={handleLoading}
+				size="large"
+				>
+				<Link href={loginLink}>
+					<img src={customIcon} height="24"
 							width="24" alt="Icon" />
 							Login with 42
-					</span>
 				</Link>
 			</Button>
 		</div>
