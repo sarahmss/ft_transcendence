@@ -1,0 +1,57 @@
+import { UsersService } from "src/users/users.service";
+import { authenticator } from "otplib";
+import { BadRequestException, Injectable } from "@nestjs/common";
+import { MESSAGES } from "@nestjs/core/constants";
+import { MessagesHelper } from "src/helpers/messages.helpers";
+
+@Injectable()
+	export class TwoFaAuthService {
+		constructor (
+			private usersService: UsersService
+			){}
+
+	private makeDir(path: string)
+	{
+		const fs = require('fs');
+		fs.mkdirSync(path, {recursive: true});
+	}
+
+	async createQrCode(userId: string) {
+		const qrCode = require('qrcode');
+		const secret = authenticator.generateSecret();
+		const user = await this.usersService.findById(userId);
+		const path =  `./uploads/${userId}`;
+		const otpauth = authenticator.keyuri(user.userName,
+											'Transcendence',
+											secret);
+
+		this.makeDir(path);
+		if (user.has2FaAuth == false){
+			await qrCode.toFile(`${path}/qrcode.png`, otpauth);
+			this.usersService.setUserSecret(userId, secret);
+		}
+
+		return { url: process.env.BACK_URL + `/images/${userId}/qrcode.png` }
+	}
+
+	async checkQrCode(userId: string, code: string){
+		const secret = await this.usersService.getUserSecret(userId);
+		return authenticator.verify({token: code, secret:secret});
+	}
+
+	async SetTwoFactorAuthOn(userId: string, code: string){
+		const IsCodeValid = await this.checkQrCode(userId, code);
+		if (IsCodeValid == false) {
+			throw new BadRequestException(MessagesHelper.INVALID_QR_CODE);
+		}
+		this.usersService.SetTwoFactorAuthOn(userId);
+	}
+
+	async SetTwoFactorAuthOff(userId: string, code: string){
+		const IsCodeValid = await this.checkQrCode(userId, code);
+		if (IsCodeValid == false) {
+			throw new BadRequestException(MessagesHelper.INVALID_QR_CODE);
+		}
+		this.usersService.SetTwoFactorAuthOff(userId);
+	}
+	}
