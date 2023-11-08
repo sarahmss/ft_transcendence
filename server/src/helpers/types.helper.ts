@@ -16,10 +16,10 @@ export type IntraUserData = {
 
 export type UserProfile = {
 	id: number;
-	userName: string;
+	username: string;
 	emails: [{ [key: string]: string }];
-	profilePicture: [{ [key: string]: string }];
-	};
+	photos: [{ [key: string]: string }];
+};
 
 export interface UserRequest extends Request {
 	user: any;

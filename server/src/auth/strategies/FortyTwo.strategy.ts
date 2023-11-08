@@ -20,13 +20,16 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, "42") {
 					refreshToken: string,
 					profile: UserProfile,
 	): Promise<IntraUserData> {
-		const { id, userName, emails, profilePicture } = profile;
+
+		const { id, username, emails, photos } = profile;
+
 		const user: IntraUserData = {
 			externalId: id,
-			userName: userName,
+			userName: username,
 			email: emails[0].value,
-			profilePicture: profilePicture[0].value,
+			profilePicture: photos[0].value,
 		};
+		
 		if (!user) {
 			throw new HttpException(MessagesHelper.INTRA_USER_NOT_FOUND,
 									HttpStatus.NOT_FOUND);

@@ -5,7 +5,7 @@ import { Injectable,
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Not } from 'typeorm';
 import { User } from '../entity/user.entity';
-import { CreateUserDto, UpdateUserDto } from "./dto/user.dto";
+import { UpdateUserDto } from "./dto/user.dto";
 import { status } from "../helpers/types.helper"
 import { IntraUserData, UserHelper } from '../helpers/types.helper';
 @Injectable()
@@ -174,12 +174,12 @@ export class UsersService {
 			await this.usersRepository.delete(user.userId);
 		}
 
-		async createLocalUser(user: CreateUserDto) {
-			// user = await this.checkUser(user.userId);
-			// const invalidUpdate = await this.isNotUnique(user.userName);
-			// if (invalidUpdate){
-			// 	throw new UnprocessableEntityException();
-			// }
+		async createLocalUser(user: User) {
+			user = await this.checkUser(user.userId);
+			const invalidUpdate = await this.isNotUnique(user.userName);
+			if (invalidUpdate){
+				throw new UnprocessableEntityException();
+			}
 			const newuser = this.usersRepository.create(user);
 			return this.usersRepository.save(newuser);
 		}
