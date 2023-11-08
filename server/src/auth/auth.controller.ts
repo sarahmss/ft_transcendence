@@ -1,6 +1,6 @@
 import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { IntraGuard } from './guards/intra.guards';
+import { FortyTwoGuard } from './guards/FortyTwo.guard';
 import { Response } from 'express';
 import { UserRequest } from '../helpers/types.helper'
 import { Logger } from '@nestjs/common';
@@ -20,14 +20,14 @@ export class AuthController {
 	}
 
 	@Get('login')
-	@UseGuards(IntraGuard)
+	@UseGuards(FortyTwoGuard)
 	intraLogin(){
 		this.logger.log( 'GET: auth/login');
 		return ;
 	}
 
 	@Get('callback')
-	@UseGuards(IntraGuard)
+	@UseGuards(FortyTwoGuard)
 	intraRedirect(@Res() response: Response,
 				@Req() request: UserRequest) {
 		this.logger.log( 'GET: auth/callback');

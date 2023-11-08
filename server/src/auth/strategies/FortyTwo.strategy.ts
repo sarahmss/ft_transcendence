@@ -6,7 +6,7 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 
 
 @Injectable()
-export class IntraStrategy extends PassportStrategy(Strategy, "42") {
+export class FortyTwoStrategy extends PassportStrategy(Strategy, "42") {
 	constructor() {
 		super({
 			clientID: process.env.FORTYTWO_CLIENT_ID,

@@ -174,7 +174,7 @@ export class UsersService {
 			await this.usersRepository.delete(user.userId);
 		}
 
-		async create(user: CreateUserDto) {
+		async createLocalUser(user: CreateUserDto) {
 			// user = await this.checkUser(user.userId);
 			// const invalidUpdate = await this.isNotUnique(user.userName);
 			// if (invalidUpdate){

@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from 'src/users/users.module';
-import { IntraStrategy } from './strategies/intra.strategy';
+import { FortyTwoStrategy } from './strategies/FortyTwo.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { TwoFaAuthController } from './2fa/2fa-auth.controller';
 import { TwoFaAuthService } from './2fa/2fa-auth.service';
@@ -19,7 +19,7 @@ import { TwoFaAuthService } from './2fa/2fa-auth.service';
 		})
 	],
 	providers: [AuthService,
-		IntraStrategy,
+		FortyTwoStrategy,
 		JwtStrategy,
 		TwoFaAuthService,
 		Logger],
