@@ -29,6 +29,7 @@ export class AuthService {
 	IsValidJwt(jwt: string) {
 		return this.jwtService.verify(jwt);
 	}
+	
 	async IsValidUser(userId: string) {
 		return this.usersService.findByIdOrFail(userId);
 	}

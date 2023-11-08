@@ -24,7 +24,7 @@ export class UsersController {
 	/********************************* GET ******************************/
 	@Get()
 	async findAll(): Promise<User[]> {
-		this.logger.log( `GET: All users}`);
+		this.logger.log( 'Get: users');
 		return this.usersService.findAll();
 	}
 

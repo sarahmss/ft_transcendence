@@ -13,15 +13,16 @@ export class AuthController {
 		private logger: Logger = new Logger('Auth')
 		) {}
 
+	/********************************* GET ******************************/
 	@Get()
 	async getAuth() {
-		this.logger.log( `GET: /auth}`);
+		this.logger.log( 'GET: /auth');
 	}
 
 	@Get('login')
 	@UseGuards(IntraGuard)
 	intraLogin(){
-		this.logger.log( `GET: auth/login}`);
+		this.logger.log( 'GET: auth/login');
 		return ;
 	}
 
@@ -29,13 +30,13 @@ export class AuthController {
 	@UseGuards(IntraGuard)
 	intraRedirect(@Res() response: Response,
 				@Req() request: UserRequest) {
-		this.logger.log( `GET: auth/callback}`);
+		this.logger.log( 'GET: auth/callback');
 		this.authService.login(response, request.user);
 	}
 
 	@Get('logout')
 	async logoutUser(@Res() response: Response) {
-		this.logger.log( `GET: auth/logout}`);
+		this.logger.log( 'GET: auth/logout');
 		await this.authService.logout(response).then(() => response.redirect(
 													process.env.FRONT_URL));
 	}

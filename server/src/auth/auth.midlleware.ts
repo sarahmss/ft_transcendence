@@ -1,5 +1,5 @@
 
-import { NextFunction, Response } from 'express';
+import { NextFunction } from 'express';
 import { AuthService } from './auth.service';
 import { Injectable, UnauthorizedException, NestMiddleware,} from '@nestjs/common';
 import { UserRequest } from '../helpers/types.helper'
@@ -13,7 +13,7 @@ import { UserRequest } from '../helpers/types.helper'
 			const token = request.headers['authorization'].split(' ')[1];
 			const decodedToken = this.authService.IsValidJwt(token);
 			const user = await this.authService.IsValidUser(decodedToken.id);
-			request.user = user;
+			request.user = user.userId;
 			next();
 		} catch {
 			throw new UnauthorizedException();

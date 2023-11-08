@@ -23,6 +23,7 @@ import { TwoFaAuthService } from './2fa/2fa-auth.service';
 		JwtStrategy,
 		TwoFaAuthService,
 		Logger],
-	controllers: [AuthController, TwoFaAuthController]
+	controllers: [AuthController, TwoFaAuthController],
+	exports: [AuthService],
 })
 export class AuthModule {}
