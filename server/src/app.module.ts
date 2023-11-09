@@ -10,7 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AppGatewayModule } from './app/app.gateway.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
-import { SignInMidlleware } from './users/middleware/user.midlleware';
+// import { SignInMidlleware } from './auth/midlleware/sigin.midlleware';
 
 @Module({
 	imports: [
@@ -34,19 +34,19 @@ import { SignInMidlleware } from './users/middleware/user.midlleware';
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
-		consumer
-		.apply(SignInMidlleware)
-		.forRoutes({ path: 'users/signup', method: RequestMethod.POST });
+		// consumer
+		// .apply(SignInMidlleware)
+		// .forRoutes({ path: 'auth/signup', method: RequestMethod.POST });
 
 		consumer
 		.apply(AuthMiddleware)
 		.exclude(
-			{ path: '/users/signup', method: RequestMethod.POST },
-			{ path: '/users/signin', method: RequestMethod.POST },
 			{ path: '/auth/', method: RequestMethod.GET },
 			{ path: '/auth/login', method: RequestMethod.GET },
 			{ path: '/auth/callback', method: RequestMethod.GET },
 			{ path: '/auth/logout', method: RequestMethod.GET },
+			{ path: '/auth/signup', method: RequestMethod.POST },
+			{ path: '/auth/signin', method: RequestMethod.POST },
 			{ path: '/2fa-auth/login', method: RequestMethod.POST },
 		)
 		.forRoutes('');

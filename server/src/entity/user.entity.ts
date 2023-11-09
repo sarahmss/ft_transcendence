@@ -16,7 +16,7 @@ export class User {
 	@Column({nullable: true, default: 0})
 	externalId: number;
 
-	@Column({unique: true, nullable: true})
+	@Column({unique: false, nullable: true})
 	password: string;
 
 	@Column({ nullable: false, default: status.OFF})

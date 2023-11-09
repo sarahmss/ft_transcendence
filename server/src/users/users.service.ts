@@ -39,7 +39,7 @@ export class UsersService {
 	}
 
 	async findByEmail(email: string): Promise<User> {
-		return this.usersRepository.findOneBy({ email });
+		return await this.usersRepository.findOneBy({ email });
 	}
 
 	/********************************* GET ******************************/
@@ -119,6 +119,21 @@ export class UsersService {
 	}
 	/********************************* VALIDATE ******************************/
 
+	async isValidSigin(email: string, userName: string)
+	{
+		const validUserEmail = await this.findByEmail(email);
+		const validUserName = await this.findByUserName(userName);
+		if (validUserEmail) {
+			console.log('Inalid user email: ',validUserEmail.email)
+			return (false);
+		}
+		if (validUserName) {
+			console.log('Inalid user email: ', validUserName.userName);
+			return (false);
+		}
+		return (true);
+	}
+
 	private async checkUser(userId: string) {
 		const user = await this.findById(userId);
 		if (!user) {
@@ -178,6 +193,10 @@ export class UsersService {
 		}
 
 		async createLocalUser(user: User) {
+			const isValidUser = await this.isValidSigin( user.email,
+														user.userName);
+			if (isValidUser == false)
+				throw new UnprocessableEntityException();
 			const newuser = this.usersRepository.create(user);
 			return this.usersRepository.save(newuser);
 		}
