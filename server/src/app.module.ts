@@ -9,7 +9,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
 import { AppGatewayModule } from './app/app.gateway.module';
 import { AuthModule } from './auth/auth.module';
-import { AuthMiddleware } from './auth/auth.midlleware';
+import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
+import { SignInMidlleware } from './users/middleware/user.midlleware';
 
 @Module({
 	imports: [
@@ -33,6 +34,10 @@ import { AuthMiddleware } from './auth/auth.midlleware';
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
+		consumer
+		.apply(SignInMidlleware)
+		.forRoutes({ path: 'users/signup', method: RequestMethod.POST });
+
 		consumer
 		.apply(AuthMiddleware)
 		.exclude(

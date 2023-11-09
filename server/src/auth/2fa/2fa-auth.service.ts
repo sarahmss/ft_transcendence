@@ -1,15 +1,15 @@
 import { UsersService } from "src/users/users.service";
 import { authenticator } from "otplib";
 import { BadRequestException, Injectable } from "@nestjs/common";
-import { MESSAGES } from "@nestjs/core/constants";
 import { MessagesHelper } from "src/helpers/messages.helpers";
 
 @Injectable()
 	export class TwoFaAuthService {
 		constructor (
 			private usersService: UsersService
-			){}
+		){}
 
+	/********************************* TOOLS ******************************/
 	private makeDir(path: string)
 	{
 		const fs = require('fs');
@@ -34,11 +34,13 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 		return { url: process.env.BACK_URL + `/images/${userId}/qrcode.png` }
 	}
 
+	/********************************* VALIDATE ******************************/
 	async checkQrCode(userId: string, code: string){
 		const secret = await this.usersService.getUserSecret(userId);
 		return authenticator.verify({token: code, secret:secret});
 	}
 
+	/********************************* SET ******************************/
 	async SetTwoFactorAuthOn(userId: string, code: string){
 		const IsCodeValid = await this.checkQrCode(userId, code);
 		if (IsCodeValid == false) {

@@ -10,6 +10,7 @@ export class AuthService {
 		private usersService: UsersService,
 	) {}
 
+	/********************************* TOOLS ******************************/
 	async login(response: any, intraUser: any): Promise<any> {
 		const user: User = await this.usersService.validateIntraUser(intraUser);
 		if (user.has2FaAuth) {
@@ -19,17 +20,18 @@ export class AuthService {
 		response.cookie('accessToken', this.jwtService.sign(userId), {
 			sameSite: 'Lax',
 		});
-		return response.redirect(process.env.FRONT_URL);
+		return response.redirect(process.env.FRONT_URL + '/user');
 	}
 
 	async logout(response: any): Promise<any> {
 		response.clearCookie('accessToken', { sameSite: 'Lax' });
 	}
 
+	/********************************* VALIDATE ******************************/
 	IsValidJwt(jwt: string) {
 		return this.jwtService.verify(jwt);
 	}
-	
+
 	async IsValidUser(userId: string) {
 		return this.usersService.findByIdOrFail(userId);
 	}

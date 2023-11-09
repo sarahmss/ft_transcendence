@@ -18,4 +18,4 @@ export class UpdateUserDto {
 	@IsOptional()
 	@IsUrl({ require_tld: false })
 	profilePicture: string;
-	}
+}

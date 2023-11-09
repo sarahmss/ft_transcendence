@@ -13,7 +13,7 @@ export class User {
 	@Column({unique: true, nullable: true, default: ""})
 	email: string;
 
-	@Column({nullable: false})
+	@Column({nullable: true, default: 0})
 	externalId: number;
 
 	@Column({unique: true, nullable: true})

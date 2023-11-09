@@ -1,9 +1,8 @@
 import { Injectable,
 	NotFoundException,
-	UnprocessableEntityException,
-	Inject} from '@nestjs/common';
+	UnprocessableEntityException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Not } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
 import { UpdateUserDto } from "./dto/user.dto";
 import { status } from "../helpers/types.helper"
@@ -37,6 +36,10 @@ export class UsersService {
 
 	async findByExternalId(externalId: number): Promise<User> {
 		return this.usersRepository.findOneBy({ externalId });
+	}
+
+	async findByEmail(email: string): Promise<User> {
+		return this.usersRepository.findOneBy({ email });
 	}
 
 	/********************************* GET ******************************/
@@ -114,7 +117,7 @@ export class UsersService {
 		user.has2FaAuth = false;
 		this.usersRepository.save(user);
 	}
-	/********************************* CHECK ******************************/
+	/********************************* VALIDATE ******************************/
 
 	private async checkUser(userId: string) {
 		const user = await this.findById(userId);
@@ -132,12 +135,12 @@ export class UsersService {
 		return this.createIntraUser(IntraUser);
 	}
 
-	async isNotUnique(userName: string) {
+	async NameisNotUnique(userName: string) {
 		if (!userName) {
 			return false;
 		}
 		const user = await this.findByUserName(userName)
-		if (user.userName) {
+		if (user) {
 			return true;
 		}
 		return false;
@@ -161,7 +164,7 @@ export class UsersService {
 
 		async update(userId: string, userDto: UpdateUserDto): Promise<User> {
 			const user = await this.checkUser(userId);
-			const invalidUpdate = await this.isNotUnique(userDto.userName);
+			const invalidUpdate = await this.NameisNotUnique(userDto.userName);
 			if (invalidUpdate){
 				throw new UnprocessableEntityException();
 			}
@@ -175,13 +178,7 @@ export class UsersService {
 		}
 
 		async createLocalUser(user: User) {
-			user = await this.checkUser(user.userId);
-			const invalidUpdate = await this.isNotUnique(user.userName);
-			if (invalidUpdate){
-				throw new UnprocessableEntityException();
-			}
 			const newuser = this.usersRepository.create(user);
 			return this.usersRepository.save(newuser);
 		}
-
 }
