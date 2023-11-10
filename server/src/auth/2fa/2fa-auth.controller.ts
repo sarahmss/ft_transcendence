@@ -23,12 +23,14 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 			private _jwtService: JwtService,
 		){}
 
+		/********************************* GET ******************************/
 		@Get('generate')
 		async generate(@Req() request: UserRequest) {
 			const userId = request.user;
 			return this._2faService.createQrCode(`${userId}`);
 		}
 
+		/********************************* POST ******************************/
 		@Post('enable')
 		async enable(@Req() request: UserRequest, @Body() body: TwoFaAuthDto) {
 			const userId = request.user;
@@ -47,15 +49,15 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 			@Body() body: TwoFaAuthDto,
 			@Res() response: Response,)
 			{
-			const isValid = await this._2faService.checkQrCode(`${userId}`,
-															body.code);
-			if (isValid == false) {
-			throw new BadRequestException(MessagesHelper.INVALID_QR_CODE);
+				const isValid = await this._2faService.checkQrCode(`${userId}`,
+																body.code);
+				if (isValid == false) {
+				throw new BadRequestException(MessagesHelper.INVALID_QR_CODE);
+				}
+				const payload = { id: userId };
+				response.cookie('accessToken',
+								this._jwtService.sign(payload),
+								{sameSite: 'lax', });
+				return response.status(200).json({ cookie: response.getHeader('set-cookie'),});
 			}
-			const payload = { id: userId };
-			response.cookie('accessToken',
-							this._jwtService.sign(payload),
-							{sameSite: 'lax', });
-			return response.status(200).json({ cookie: response.getHeader('set-cookie'),});
-		}
 		}

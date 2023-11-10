@@ -11,7 +11,7 @@ export default class BoardUser extends Component<Props, State> {
     super(props);
 
     this.state = {
-      content: ""
+      content: "USER BOARD"
     };
   }
 

@@ -10,13 +10,13 @@ export class User {
 	@Column({unique: true, nullable: false, default: "Player"})
 	userName: string;
 
-	@Column({unique: true, nullable: true, default: ""})
+	@Column({unique: true, nullable: true})
 	email: string;
 
-	@Column({nullable: false})
+	@Column({nullable: true, default: 0})
 	externalId: number;
 
-	@Column({unique: true, nullable: true})
+	@Column({unique: false, nullable: true})
 	password: string;
 
 	@Column({ nullable: false, default: status.OFF})

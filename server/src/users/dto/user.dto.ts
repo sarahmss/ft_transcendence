@@ -1,9 +1,34 @@
 import { IsNotEmpty,
+		IsString,
+		IsAlphanumeric,
+		Length,
 		MinLength,
 		IsEmail,
 		IsOptional,
 		IsUrl } from "class-validator";
 
+export class CreateUserDto {
+	@IsString()
+	@Length(3, 20)
+	@IsNotEmpty()
+	@IsAlphanumeric()
+	userName: string;
+
+	@IsNotEmpty()
+	@IsEmail()
+	@IsOptional()
+	email: string;
+
+	@IsString()
+	@IsNotEmpty()
+	@Length(8, 32)
+	password: string;
+
+	@IsString()
+	@IsNotEmpty()
+	@Length(8, 32)
+	passwordConfirm: string;
+}
 export class UpdateUserDto {
 	@IsOptional()
 	@IsNotEmpty()
@@ -18,4 +43,4 @@ export class UpdateUserDto {
 	@IsOptional()
 	@IsUrl({ require_tld: false })
 	profilePicture: string;
-	}
+}

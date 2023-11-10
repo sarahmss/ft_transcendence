@@ -3,9 +3,9 @@ import { Navigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import axios from "axios";
 import { Link, Button} from '@mui/material';
+import { reducer } from "../common/reducer";
 import customIcon from '../assets/42logo.svg';
-
-const loginLink = process.env.REACT_APP_BACK_HOST + "/auth/login"
+import { IntraloginLink } from "../common/constants";
 
 type Props = {};
 
@@ -17,10 +17,6 @@ type State = {
 	message: string
 };
 
-
-export const reducer = (state : {[key: string]: any}, newState : {[key: string]: any}) => {
-	return {...state, ...newState};
-}
 
 const IntraLoginButton = () => {
 	const [state, setState] = useReducer(reducer, {
@@ -46,7 +42,7 @@ const IntraLoginButton = () => {
 				onClick={handleLoading}
 				size="large"
 				>
-				<Link href={loginLink}>
+				<Link href={IntraloginLink}>
 					<img src={customIcon} height="24"
 							width="24" alt="Icon" />
 							Login with 42
@@ -71,14 +67,6 @@ export default class Login extends Component<Props, State> {
 		};
 	}
 
-	// componentDidMount() {
-	// 	const currentUser = AuthService.getCurrentUser();
-
-	// 	if (currentUser) {
-	// 		this.setState({ redirect: "/profile" });
-	// 	};
-	// }
-
 	componentWillUnmount() {
 		window.location.reload();
 	}
@@ -86,16 +74,15 @@ export default class Login extends Component<Props, State> {
 	handleLogin = async (formValues: { username: string; password: string }) => {
 		const { username, password } = formValues;
 		try {
-		  const response = await axios.post(loginLink, {
-			username,
-			password,
-		  });
+			const response = await axios.post(IntraloginLink, {
+				username,
+				password,
+			});
 
 		} catch (error) {
-
-		console.error("Erro ao fazer login:", error);
+			console.error("Login error:", error);
 		}
-	  };
+		};
 
 	render() {
 		if (this.state.redirect) {
@@ -153,6 +140,7 @@ export default class Login extends Component<Props, State> {
 							</div>
 
 							<IntraLoginButton/>
+
 							{message && (
 								<div className="form-group">
 									<div className="alert alert-danger" role="alert">

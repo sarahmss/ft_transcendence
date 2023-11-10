@@ -1,8 +1,10 @@
 
 import { NextFunction } from 'express';
-import { AuthService } from './auth.service';
-import { Injectable, UnauthorizedException, NestMiddleware,} from '@nestjs/common';
-import { UserRequest } from '../helpers/types.helper'
+import { AuthService } from '../auth.service';
+import { Injectable,
+		UnauthorizedException,
+		NestMiddleware,} from '@nestjs/common';
+import { UserRequest } from '../../helpers/types.helper'
 
 @Injectable()
 	export class AuthMiddleware implements NestMiddleware {
@@ -19,4 +21,4 @@ import { UserRequest } from '../helpers/types.helper'
 			throw new UnauthorizedException();
 		}
 	}
-	}
+}

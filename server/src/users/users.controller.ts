@@ -40,21 +40,6 @@ export class UsersController {
 		return this.usersService.getUser(userId);
 	}
 
-	/********************************* POST ******************************/
-
-	@Post('signup')
-	async create(@Body() user: User): Promise<User> {
-		this.logger.log( `POST signup: ${user.userId}`);
-		console.log("Create Local User Called");
-		return this.usersService.createLocalUser(user);
-	}
-
-	@Post('signin')
-	async login(@Body() user: User) {
-		console.log("Sign in");
-	}
-
-
 	/********************************* PATCH ******************************/
 
 	@Patch(':userId')
