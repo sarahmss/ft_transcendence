@@ -1,15 +1,52 @@
-import { Component } from "react";
+import { Component, useReducer } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import axios from "axios";
 import * as Yup from "yup";
-import { LocalloginLink } from "../common/constants";
+import { LocalSignupLink } from "../common/constants";
+import { Link, Button} from '@mui/material';
+import { reducer } from "../common/reducer";
 
 type Props = {};
+
+
+// const LocalSignupButton = () => {
+// 	const [state, setState] = useReducer(reducer, {
+// 		loading: false,
+// 		loginError: false,
+// 		loginMsg: "Something went wrong",
+// 	});
+
+// 	const handleLoading = () => {
+// 		setState({ loading: true });
+// 		setTimeout(() => {
+// 			setState({ loading: false });
+// 			setState({ loginError: true });
+// 		}, 7000 )
+// 	}
+
+// 	return (
+// 		<>
+// 		<div className="form-group">
+// 			<Button
+// 				variant="contained"
+// 				disabled={state.loading}
+// 				onClick={handleLoading}
+// 				size="large"
+// 				>
+// 				<Link href={LocalSignupLink}>
+// 							Signup
+// 				</Link>
+// 			</Button>
+// 		</div>
+// 		</>
+// 	)
+// }
 
 type State = {
 	username: string,
 	email: string,
 	password: string,
+	passwordConfirm: string,
 	successful: boolean,
 	message: string
 };
@@ -23,6 +60,7 @@ export default class Register extends Component<Props, State> {
 			username: "",
 			email: "",
 			password: "",
+			passwordConfirm: "",
 			successful: false,
 			message: ""
 		};
@@ -53,18 +91,22 @@ export default class Register extends Component<Props, State> {
 						val.toString().length <= 40
 				)
 				.required("This field is required!"),
+			passwordConfirm: Yup.string()
+			.oneOf([Yup.ref('password')], 'Passwords must match')
+			.required('This field is required!'),
 		});
 	}
 
-	handleRegister =  async (formValues: { username: string; email: string; password: string }) =>
+	handleRegister =	async (formValues: { username: string; email: string; password: string; passwordConfirm: string }) =>
 	{
-		const { username, email, password } = formValues;
+		const { username, email, password, passwordConfirm } = formValues;
 
 		try {
-			const response = await axios.post(LocalloginLink, {
+			const response = await axios.post(LocalSignupLink, {
 				username: username,
 				email: email,
-				password: password
+				password: password,
+				passwordConfirm: passwordConfirm
 			});
 			this.setState({
 				message: "Registration successful!",
@@ -86,6 +128,7 @@ export default class Register extends Component<Props, State> {
 			username: "",
 			email: "",
 			password: "",
+			passwordConfirm: "",
 		};
 
 		return (
@@ -140,9 +183,23 @@ export default class Register extends Component<Props, State> {
 									</div>
 
 									<div className="form-group">
-										<button type="submit" className="btn btn-primary btn-block">Sign Up</button>
+										<label htmlFor="passwordConfirm"> PasswordConfirm </label>
+										<Field
+											name="passwordConfirm"
+											type="passwordConfirm"
+											className="form-control"
+										/>
+										<ErrorMessage
+											name="passwordConfirm"
+											component="div"
+											className="alert alert-danger"
+										/>
 									</div>
-
+										<div className="form-group">
+										<button type="submit" className="btn btn-primary btn-block">
+										<span> Signup </span>
+										</button>
+										</div>
 								</div>
 							)}
 
