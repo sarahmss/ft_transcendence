@@ -10,8 +10,6 @@ import { ConfigModule } from '@nestjs/config';
 import { AppGatewayModule } from './app/app.gateway.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
-// import { SignInMidlleware } from './auth/midlleware/sigin.midlleware';
-
 @Module({
 	imports: [
 		ConfigModule.forRoot(),
@@ -34,9 +32,6 @@ import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
-		// consumer
-		// .apply(SignInMidlleware)
-		// .forRoutes({ path: 'auth/signup', method: RequestMethod.POST });
 
 		consumer
 		.apply(AuthMiddleware)

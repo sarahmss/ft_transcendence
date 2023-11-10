@@ -4,7 +4,7 @@ import { Injectable,
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
-import { UpdateUserDto } from "./dto/user.dto";
+import { UpdateUserDto, CreateUserDto } from "./dto/user.dto";
 import { status } from "../helpers/types.helper"
 import { IntraUserData, UserHelper } from '../helpers/types.helper';
 @Injectable()
@@ -163,6 +163,16 @@ export class UsersService {
 
 	/********************************* TOOLS ******************************/
 
+	async createLocalUser(data: CreateUserDto) {
+		const { userName } = data;
+		const user = await this.usersRepository.findOne({ where:
+														{ userName } });
+		if (user)
+			throw new UnprocessableEntityException('User already exists');
+		const newuser = this.usersRepository.create(data);
+		return this.usersRepository.save(newuser);
+	}
+
 	async createIntraUser(userData: IntraUserData): Promise<User> {
 		let picture = userData.profilePicture;
 		if (picture == null) {
@@ -190,14 +200,5 @@ export class UsersService {
 		async delete(userId: string): Promise<void> {
 			const user = await this.checkUser(userId);
 			await this.usersRepository.delete(user.userId);
-		}
-
-		async createLocalUser(user: User) {
-			const isValidUser = await this.isValidSigin( user.email,
-														user.userName);
-			if (isValidUser == false)
-				throw new UnprocessableEntityException();
-			const newuser = this.usersRepository.create(user);
-			return this.usersRepository.save(newuser);
 		}
 }

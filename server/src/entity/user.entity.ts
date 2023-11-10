@@ -10,7 +10,7 @@ export class User {
 	@Column({unique: true, nullable: false, default: "Player"})
 	userName: string;
 
-	@Column({unique: true, nullable: true, default: ""})
+	@Column({unique: true, nullable: true})
 	email: string;
 
 	@Column({nullable: true, default: 0})

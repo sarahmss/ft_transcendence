@@ -12,6 +12,7 @@ import { UserRequest } from '../helpers/types.helper'
 import { Logger } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/entity/user.entity';
+import { CreateUserDto } from 'src/users/dto/user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -25,14 +26,8 @@ export class AuthController {
 	/********************************* POST ******************************/
 
 	@Post('signup')
-	async create(@Res() response: Response, @Req() request: UserRequest) {
-		try {
-			const newUser = await this.usersService.createLocalUser(request.user);
-			this.logger.log( `POST signup: created ${newUser.userId}`);
-			return(newUser);
-		} catch {
-			return response.status(400).send({ message: 'Failed! Username or email is already in use!' });
-		}
+	create(@Body() data: CreateUserDto) {
+		return this.usersService.createLocalUser(data);
 	}
 
 	@Post('signin')
