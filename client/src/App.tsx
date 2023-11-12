@@ -9,7 +9,7 @@ import Register from "./components/register.component";
 import Home from "./components/home.component";
 import Profile from "./components/profile.component";
 import BoardUser from "./components/board-user.component";
-
+import Settings from "./components/settings.component";
 import EventBus from "./common/EventBus";
 
 type Props = {};
@@ -112,8 +112,9 @@ class App extends Component<Props, State> {
 						<Route path="/profile" element={<Profile />} />
 						<Route path="/login" element={<Login />} />
 						<Route path="/register" element={<Register />} />
-						<Route path="/profile" element={<Profile />} />
 						<Route path="/user" element={<BoardUser />} />
+						<Route path="/settings" element={<Settings />} />
+
 					</Routes>
 				</div>
 			</div>

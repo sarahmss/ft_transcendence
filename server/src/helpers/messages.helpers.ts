@@ -5,8 +5,8 @@ export const MessagesHelper = {
 		" 🔓 Invalid email or password",
 	PASSWORD_CONFIRM:
 		" 🔓 The passwords entered are not identical",
-	INTRA_USER_NOT_FOUND:
-		" 👤 Intra user not found.",
+	USER_NOT_FOUND:
+		" 👤 User not found.",
 	INVALID_QR_CODE:
 		" 🔐 Invalid Qr Code.",
 }
