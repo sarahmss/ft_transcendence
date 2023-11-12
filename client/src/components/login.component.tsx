@@ -3,15 +3,15 @@ import { Navigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import axios from "axios";
 import { Link, Button} from '@mui/material';
-import { reducer } from "../common/reducer";
+import { reducer } from "../common/helper";
 import customIcon from '../assets/42logo.svg';
-import { IntraloginLink } from "../common/constants";
+import { IntraloginLink, LocalSigninLink } from "../common/constants";
 
 type Props = {};
 
 type State = {
 	redirect: string | null,
-	username: string,
+	userName: string,
 	password: string,
 	loading: boolean,
 	message: string
@@ -60,7 +60,7 @@ export default class Login extends Component<Props, State> {
 
 		this.state = {
 			redirect: null,
-			username: "",
+			userName: "",
 			password: "",
 			loading: false,
 			message: ""
@@ -71,11 +71,11 @@ export default class Login extends Component<Props, State> {
 		window.location.reload();
 	}
 
-	handleLogin = async (formValues: { username: string; password: string }) => {
-		const { username, password } = formValues;
+	handleLogin = async (formValues: { userName: string; password: string }) => {
+		const { userName, password } = formValues;
 		try {
-			const response = await axios.post(IntraloginLink, {
-				username,
+			const response = await axios.post(LocalSigninLink, {
+				userName,
 				password,
 			});
 
@@ -92,7 +92,7 @@ export default class Login extends Component<Props, State> {
 		const { loading, message } = this.state;
 
 		const initialValues = {
-			username: "",
+			userName: "",
 			password: "",
 		};
 
@@ -111,10 +111,10 @@ export default class Login extends Component<Props, State> {
 					>
 						<Form>
 							<div className="form-group">
-								<label htmlFor="username">Username</label>
-								<Field name="username" type="text" className="form-control" />
+								<label htmlFor="userName">user name</label>
+								<Field name="userName" type="text" className="form-control" />
 								<ErrorMessage
-									name="username"
+									name="userName"
 									component="div"
 									className="alert alert-danger"
 								/>

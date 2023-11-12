@@ -9,7 +9,7 @@ async function bootstrap() {
 															{ cors: true });
 	const port = process.env.BACK_PORT;
 	const corsOptions = {
-		origin: [process.env.FRONTEND_URL, 'http://api.intra.42.fr'],
+		origin: [process.env.FRONT_URL, 'http://api.intra.42.fr'],
 		methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 		credentials: true,
 	}

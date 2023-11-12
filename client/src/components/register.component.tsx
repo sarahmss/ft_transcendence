@@ -4,60 +4,25 @@ import axios from "axios";
 import * as Yup from "yup";
 import { LocalSignupLink } from "../common/constants";
 import { Link, Button} from '@mui/material';
-import { reducer } from "../common/reducer";
+import { reducer } from "../common/helper";
 
 type Props = {};
 
-
-// const LocalSignupButton = () => {
-// 	const [state, setState] = useReducer(reducer, {
-// 		loading: false,
-// 		loginError: false,
-// 		loginMsg: "Something went wrong",
-// 	});
-
-// 	const handleLoading = () => {
-// 		setState({ loading: true });
-// 		setTimeout(() => {
-// 			setState({ loading: false });
-// 			setState({ loginError: true });
-// 		}, 7000 )
-// 	}
-
-// 	return (
-// 		<>
-// 		<div className="form-group">
-// 			<Button
-// 				variant="contained"
-// 				disabled={state.loading}
-// 				onClick={handleLoading}
-// 				size="large"
-// 				>
-// 				<Link href={LocalSignupLink}>
-// 							Signup
-// 				</Link>
-// 			</Button>
-// 		</div>
-// 		</>
-// 	)
-// }
-
 type State = {
-	username: string,
+	userName: string,
 	email: string,
 	password: string,
 	passwordConfirm: string,
 	successful: boolean,
 	message: string
 };
-
 export default class Register extends Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 		this.handleRegister = this.handleRegister.bind(this);
 
 		this.state = {
-			username: "",
+			userName: "",
 			email: "",
 			password: "",
 			passwordConfirm: "",
@@ -68,10 +33,10 @@ export default class Register extends Component<Props, State> {
 
 	validationSchema() {
 		return Yup.object().shape({
-			username: Yup.string()
+			userName: Yup.string()
 				.test(
 					"len",
-					"The username must be between 3 and 20 characters.",
+					"The userName must be between 3 and 20 characters.",
 					(val: any) =>
 						val &&
 						val.toString().length >= 3 &&
@@ -97,13 +62,13 @@ export default class Register extends Component<Props, State> {
 		});
 	}
 
-	handleRegister =	async (formValues: { username: string; email: string; password: string; passwordConfirm: string }) =>
+	handleRegister =	async (formValues: { userName: string; email: string; password: string; passwordConfirm: string }) =>
 	{
-		const { username, email, password, passwordConfirm } = formValues;
+		const { userName, email, password, passwordConfirm } = formValues;
 
 		try {
 			const response = await axios.post(LocalSignupLink, {
-				username: username,
+				userName: userName,
 				email: email,
 				password: password,
 				passwordConfirm: passwordConfirm
@@ -125,7 +90,7 @@ export default class Register extends Component<Props, State> {
 		const { successful, message } = this.state;
 
 		const initialValues = {
-			username: "",
+			userName: "",
 			email: "",
 			password: "",
 			passwordConfirm: "",
@@ -149,10 +114,10 @@ export default class Register extends Component<Props, State> {
 							{!successful && (
 								<div>
 									<div className="form-group">
-										<label htmlFor="username"> Username </label>
-										<Field name="username" type="text" className="form-control" />
+										<label htmlFor="userName"> user name </label>
+										<Field name="userName" type="text" className="form-control" />
 										<ErrorMessage
-											name="username"
+											name="userName"
 											component="div"
 											className="alert alert-danger"
 										/>

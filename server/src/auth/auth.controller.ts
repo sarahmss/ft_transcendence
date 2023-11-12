@@ -26,13 +26,14 @@ export class AuthController {
 	/********************************* POST ******************************/
 
 	@Post('signup')
-	create(@Body() data: CreateUserDto) {
+	signup(@Body() data: CreateUserDto) {
 		return this.usersService.createLocalUser(data);
 	}
 
 	@Post('signin')
-	async login(@Body() user: User) {
-		console.log("Sign in");
+	signin(@Res() response: Response,
+			@Req() request: UserRequest) {
+		this.authService.LocalLogin(response, request.user);
 	}
 
 	/********************************* GET ******************************/
@@ -50,10 +51,10 @@ export class AuthController {
 
 	@Get('callback')
 	@UseGuards(FortyTwoGuard)
-	intraRedirect(@Res() response: Response,
+	intraCallback(@Res() response: Response,
 				@Req() request: UserRequest) {
 		this.logger.log( 'GET: auth/callback');
-		this.authService.login(response, request.user);
+		this.authService.IntraLogin(response, request.user);
 	}
 
 	@Get('logout')

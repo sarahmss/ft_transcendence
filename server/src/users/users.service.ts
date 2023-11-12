@@ -7,6 +7,8 @@ import { User } from '../entity/user.entity';
 import { UpdateUserDto, CreateUserDto } from "./dto/user.dto";
 import { status } from "../helpers/types.helper"
 import { IntraUserData, UserHelper } from '../helpers/types.helper';
+import * as bcrypt from 'bcrypt';
+
 @Injectable()
 export class UsersService {
 
@@ -36,10 +38,6 @@ export class UsersService {
 
 	async findByExternalId(externalId: number): Promise<User> {
 		return this.usersRepository.findOneBy({ externalId });
-	}
-
-	async findByEmail(email: string): Promise<User> {
-		return await this.usersRepository.findOneBy({ email });
 	}
 
 	/********************************* GET ******************************/
@@ -119,21 +117,6 @@ export class UsersService {
 	}
 	/********************************* VALIDATE ******************************/
 
-	async isValidSigin(email: string, userName: string)
-	{
-		const validUserEmail = await this.findByEmail(email);
-		const validUserName = await this.findByUserName(userName);
-		if (validUserEmail) {
-			console.log('Inalid user email: ',validUserEmail.email)
-			return (false);
-		}
-		if (validUserName) {
-			console.log('Inalid user email: ', validUserName.userName);
-			return (false);
-		}
-		return (true);
-	}
-
 	private async checkUser(userId: string) {
 		const user = await this.findById(userId);
 		if (!user) {
@@ -150,6 +133,19 @@ export class UsersService {
 		return this.createIntraUser(IntraUser);
 	}
 
+	async validateLocalUser(data: Partial<User>) {
+		const { userName, password } = data;
+		const user = await this.usersRepository.findOne({ where:
+														{ userName } });
+		if (!user)
+			throw new UnprocessableEntityException('User Not Found!');
+		const isValid = bcrypt.compareSync(password, user.password);
+		if (!isValid)
+			throw new UnprocessableEntityException('Invalid Password!');
+		return (user);
+	}
+
+
 	async NameisNotUnique(userName: string) {
 		if (!userName) {
 			return false;
@@ -164,13 +160,18 @@ export class UsersService {
 	/********************************* TOOLS ******************************/
 
 	async createLocalUser(data: CreateUserDto) {
-		const { userName } = data;
+		const { userName, password, email } = data;
 		const user = await this.usersRepository.findOne({ where:
 														{ userName } });
 		if (user)
 			throw new UnprocessableEntityException('User already exists');
-		const newuser = this.usersRepository.create(data);
-		return this.usersRepository.save(newuser);
+		const hashedPassword = bcrypt.hashSync(password, 10);
+		const newUser = this.usersRepository.create({
+													userName: userName,
+													password: hashedPassword,
+													email: email
+												});
+		return this.usersRepository.save(newUser);
 	}
 
 	async createIntraUser(userData: IntraUserData): Promise<User> {

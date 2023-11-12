@@ -11,8 +11,20 @@ export class AuthService {
 	) {}
 
 	/********************************* TOOLS ******************************/
-	async login(response: any, intraUser: any): Promise<any> {
+	async IntraLogin(response: any, intraUser: any): Promise<any> {
 		const user: User = await this.usersService.validateIntraUser(intraUser);
+		if (user.has2FaAuth) {
+			return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
+		}
+		const userId = { id: user.userId };
+		response.cookie('accessToken', this.jwtService.sign(userId), {
+			sameSite: 'Lax',
+		});
+		return response.redirect(process.env.FRONT_URL + '/user');
+	}
+
+	async LocalLogin(response: any, intraUser: any): Promise<any> {
+		const user: User = await this.usersService.validateLocalUser(intraUser);
 		if (user.has2FaAuth) {
 			return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
 		}
