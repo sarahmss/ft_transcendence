@@ -16,9 +16,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, "42") {
 		});
 	}
 
-	async validate( accessToken: string,
-					refreshToken: string,
-					profile: UserProfile,
+	async validate( profile: UserProfile,
 	): Promise<IntraUserData> {
 
 		const { id, username, emails, photos } = profile;
@@ -29,9 +27,9 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, "42") {
 			email: emails[0].value,
 			profilePicture: photos[0].value,
 		};
-		
+
 		if (!user) {
-			throw new HttpException(MessagesHelper.INTRA_USER_NOT_FOUND,
+			throw new HttpException(MessagesHelper.USER_NOT_FOUND,
 									HttpStatus.NOT_FOUND);
 		}
 		return user;

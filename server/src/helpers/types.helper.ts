@@ -12,7 +12,14 @@ export type IntraUserData = {
 	userName: string;
 	email: string;
 	profilePicture: string;
-	};
+};
+
+export type LocalUserData = {
+	userId: string;
+	userName: string;
+	email: string;
+	profilePicture: string;
+};
 
 export type UserProfile = {
 	id: number;

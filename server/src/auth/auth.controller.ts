@@ -32,7 +32,7 @@ export class AuthController {
 	}
 
 	@Post('signin')
-	@UseGuards(JwtGuard)
+	// @UseGuards(JwtGuard)
 	signin(@Res() response: Response,
 			@Body() data: Partial<User>) {
 		this.authService.LocalLogin(response, data);
@@ -52,7 +52,6 @@ export class AuthController {
 	}
 
 	@Get('callback')
-	@UseGuards(FortyTwoGuard)
 	intraCallback(@Res() response: Response,
 				@Req() request: UserRequest) {
 		this.logger.log( 'GET: auth/callback');
