@@ -15,7 +15,7 @@ import { TwoFaAuthService } from './2fa/2fa-auth.service';
 		PassportModule,
 		JwtModule.register({
 			secret: process.env.JWT_SECRET,
-			signOptions: { expiresIn: '7d' }
+			signOptions: { expiresIn: '7d'}
 		})
 	],
 	providers: [AuthService,

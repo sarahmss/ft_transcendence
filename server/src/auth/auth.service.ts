@@ -23,8 +23,8 @@ export class AuthService {
 		return response.redirect(process.env.FRONT_URL + '/user');
 	}
 
-	async LocalLogin(response: any, intraUser: any): Promise<any> {
-		const user: User = await this.usersService.validateLocalUser(intraUser);
+	async LocalLogin(response: any, data: Partial<User>): Promise<any> {
+		const user: User = await this.usersService.validateLocalUser(data);
 		if (user.has2FaAuth) {
 			return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
 		}
