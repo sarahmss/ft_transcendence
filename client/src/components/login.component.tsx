@@ -2,6 +2,7 @@ import { Component, useReducer } from "react";
 import { Navigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import axios from "axios";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link, Button} from '@mui/material';
 import { reducer } from "../common/helper";
 import customIcon from '../assets/42logo.svg';
@@ -26,6 +27,17 @@ const IntraLoginButton = () => {
 		loginMsg: "Something went wrong",
 	});
 
+	const theme = createTheme({
+		palette: {
+		  primary: {
+			main: '#000000',
+		  },
+		  secondary: {
+			main: '#ffffff',
+		  },
+		},
+	});
+
 	const handleLoading = () => {
 		setState({ loading: true });
 		setTimeout(() => {
@@ -36,19 +48,22 @@ const IntraLoginButton = () => {
 
 	return (
 		<>
-		<div className="form-group">
-			<Button
-				variant="contained"
-				disabled={state.loading}
-				onClick={handleLoading}
-				size="large"
-				>
-				<Link href={IntraloginLink}>
-					<img src={customIcon} height="24"
-							width="24" alt="Icon" />
-							Login with 42
-				</Link>
-			</Button>
+		<div className="form-group ">
+			<ThemeProvider theme={theme}>
+				<Button
+					variant="contained"
+					disabled={state.loading}
+					onClick={handleLoading}
+					size="small"
+					style={{maxWidth:100}}
+					>
+					<Link href={IntraloginLink}>
+						<img src={customIcon} height="24"
+								width="24" alt="Icon" />
+								<span className="Teste">Login with 42</span>
+					</Link>
+				</Button>
+			</ThemeProvider>
 		</div>
 		</>
 	)
@@ -129,11 +144,10 @@ export default class Login extends Component<Props, State> {
 							</div>
 
 							<div className="form-group">
-								<button type="submit" className="btn btn-primary btn-block" disabled={loading}>
+								<button type="submit" className="btn btn-primary btn-block button_login" disabled={loading}> Login
 									{loading && (
 										<span className="spinner-border spinner-border-sm"></span>
 									)}
-									<span>Login</span>
 								</button>
 							</div>
 

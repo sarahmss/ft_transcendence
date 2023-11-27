@@ -21,8 +21,22 @@
     border-radius: 5px;
 }
 
+.button_login{
+    background-color: white;
+    border: 1px solid gray;
+    color:black;
+    width: 35%;
+    height: 35px;
+}
+
+.Teste{
+    color:white;
+    font-size:10px;
+}
+
 .lorem{
     break-before: column;
     margin-top: 140px;
     color:white;
 }
+
