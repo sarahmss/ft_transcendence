@@ -52,6 +52,7 @@ export class AuthController {
 	}
 
 	@Get('callback')
+	@UseGuards(FortyTwoGuard)
 	intraCallback(@Res() response: Response,
 				@Req() request: UserRequest) {
 		this.logger.log( 'GET: auth/callback');

@@ -20,7 +20,7 @@ export class AuthService {
 		response.cookie('accessToken', this.jwtService.sign(userId), {
 			sameSite: 'Lax',
 		});
-		return response.redirect(process.env.FRONT_URL + '/user');
+		return response.redirect(process.env.FRONT_URL);
 	}
 
 	async LocalLogin(response: any, data: Partial<User>): Promise<any> {

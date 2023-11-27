@@ -15,9 +15,10 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, "42") {
 			scope: ["public"],
 		});
 	}
-
-	async validate( profile: UserProfile,
-	): Promise<IntraUserData> {
+	async validate( accessToken: string,
+		refreshToken: string,
+		profile: UserProfile,):
+	Promise<IntraUserData> {
 
 		const { id, username, emails, photos } = profile;
 
