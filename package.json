@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@types/react-router": "^5.1.20",
     "eslint-config-airbnb-base": "^15.0.0",
+    "react-router-dom": "^6.18.0",
     "socket.io": "^4.7.2"
   }
 }

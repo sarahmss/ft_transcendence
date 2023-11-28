@@ -1,0 +1,28 @@
+.col-md-12 {
+    padding: 0px;
+    background-color: #6F10A9;
+    height: 40%;
+    width: 80%;
+    margin: auto;
+    border-radius: 5px;
+    min-width: 420px;
+    max-width: 800px;
+    min-height: 420px;
+    max-height: 800px;
+    overflow:hidden;
+    columns: 2;
+}
+
+.card-container {
+    background-color: white;
+    max-width: 350px;
+    padding: 15px;
+    margin: 30px;
+    border-radius: 5px;
+}
+
+.lorem{
+    break-before: column;
+    margin-top: 140px;
+    color:white;
+}
