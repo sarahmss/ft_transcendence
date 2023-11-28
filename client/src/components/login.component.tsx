@@ -30,7 +30,7 @@ const IntraLoginButton = () => {
 	const theme = createTheme({
 		palette: {
 		  primary: {
-			main: '#000000',
+			main: '#ffffff',
 		  },
 		  secondary: {
 			main: '#ffffff',
@@ -54,13 +54,11 @@ const IntraLoginButton = () => {
 					variant="contained"
 					disabled={state.loading}
 					onClick={handleLoading}
-					size="small"
-					style={{maxWidth:100}}
+					size="medium"
+					style={{minWidth:100}}
 					>
 					<Link href={IntraloginLink}>
-						<img src={customIcon} height="24"
-								width="24" alt="Icon" />
-								<span className="Teste">Login with 42</span>
+						<span className="span_login">Login with 42</span>
 					</Link>
 				</Button>
 			</ThemeProvider>

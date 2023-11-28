@@ -1,3 +1,7 @@
+*{
+	font-family:'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
 label {
 	display: block;
 	margin-top: 10px;
@@ -12,3 +16,23 @@ label {
 	-webkit-border-radius: 50%;
 	border-radius: 50%;
   }
+
+.navBarTop{
+    background-color: #8662DE;
+	padding-top: 5px;
+	height: 35px;
+}
+
+.navBarTop > .register{
+    display: inline-block;
+    text-align: right;
+    padding-right: 10px;
+    color:white;
+}
+
+.navMenu{
+    display: inline-block;
+    padding-right: 10px;
+	padding-left: 10px;
+    color:white;
+}

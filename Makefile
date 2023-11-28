@@ -7,10 +7,10 @@ db:
 	@docker compose up -d db
 
 front:
-		cd client ; npm start
+	cd client ; npm start
 
 back:
-		cd server ; npm run start:dev
+	cd server ; npm run start:dev
 
 local: db front back
 	@echo "Running Local..."

@@ -55,29 +55,22 @@ class App extends Component<Props, State> {
 
 		return (
 			<div>
-				<nav className="navbar navbar-expand navbar-dark bg-dark">
-					<Link to={"/"} className="navbar-brand">
-			Transcendence
+				<nav className="navBarTop d-flex justify-content-between">
+					<Link to={"/"} className="Transcendence navMenu">
+						Transcendence
 					</Link>
-					<div className="navbar-nav mr-auto">
+					{currentUser && (
 						<li className="nav-item">
-							<Link to={"/home"} className="nav-link">
-								Home
+							<Link to={"/user"} className="nav-link">
+								User
 							</Link>
 						</li>
+					)}
 
 
-						{currentUser && (
-							<li className="nav-item">
-								<Link to={"/user"} className="nav-link">
-									User
-								</Link>
-							</li>
-						)}
-					</div>
 
 					{currentUser ? (
-						<div className="navbar-nav ml-auto">
+						<div className="navbar-nav ml-auto navMenu">
 							<li className="nav-item">
 								<Link to={"/profile"} className="nav-link">
 									{currentUser.username}
@@ -90,21 +83,16 @@ class App extends Component<Props, State> {
 							</li>
 						</div>
 					) : (
-						<div className="navbar-nav ml-auto">
-							<li className="nav-item">
-								<Link to={"/login"} className="nav-link">
-									Login
-								</Link>
-							</li>
-
-							<li className="nav-item">
-								<Link to={"/register"} className="nav-link">
+						<section className="register">
+							<Link to={"/login"} className="navMenu">
+								Login
+							</Link>
+							<Link to={"/register"} className="navMenu">
 									Sign Up
-								</Link>
-							</li>
-						</div>
+							</Link>
+						</section>
 					)}
-				</nav>
+				</nav>	
 
 				<div className="container mt-3">
 					<Routes>

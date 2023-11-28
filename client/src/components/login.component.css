@@ -3,7 +3,7 @@
     background-color: #6F10A9;
     height: 40%;
     width: 80%;
-    margin: auto;
+    margin: 90px  auto;
     border-radius: 5px;
     min-width: 420px;
     max-width: 800px;
@@ -13,11 +13,14 @@
     columns: 2;
 }
 
+
+
+
 .card-container {
     background-color: white;
     max-width: 350px;
     padding: 15px;
-    margin: 30px;
+    margin: 30px 30px 30px 30px;
     border-radius: 5px;
 }
 
@@ -25,13 +28,14 @@
     background-color: white;
     border: 1px solid gray;
     color:black;
-    width: 35%;
+    width: 37%;
     height: 35px;
 }
 
-.Teste{
-    color:white;
+.span_login{
+    color:black;
     font-size:10px;
+    text-align: left;
 }
 
 .lorem{
