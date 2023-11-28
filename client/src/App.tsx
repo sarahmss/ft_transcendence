@@ -43,6 +43,7 @@ class App extends Component<Props, State> {
 	}
 
 	logOut() {
+		// logout
 		this.setState({
 			currentUser: undefined,
 		});
@@ -113,6 +114,7 @@ class App extends Component<Props, State> {
 						<Route path="/register" element={<Register />} />
 						<Route path="/user" element={<BoardUser />} />
 						<Route path="/settings" element={<Settings />} />
+
 					</Routes>
 				</div>
 			</div>

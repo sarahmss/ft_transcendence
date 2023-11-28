@@ -6,7 +6,6 @@ import { Link, Button} from '@mui/material';
 import { reducer } from "../common/helper";
 import customIcon from '../assets/42logo.svg';
 import { IntraloginLink, LocalSigninLink } from "../common/constants";
-import './login.component.css'
 
 type Props = {};
 
@@ -99,19 +98,21 @@ export default class Login extends Component<Props, State> {
 
 		return (
 			<div className="col-md-12">
-				<div className="card-container">
+				<div className="card card-container">
 					<img
 						src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
 						alt="profile-img"
 						className="profile-img-card"
 					/>
+
 					<Formik
 						initialValues={initialValues}
 						onSubmit={this.handleLogin}
 					>
 						<Form>
 							<div className="form-group">
-								<Field name="userName" type="text" className="form-control" placeholder="User" />
+								<label htmlFor="userName">user name</label>
+								<Field name="userName" type="text" className="form-control" />
 								<ErrorMessage
 									name="userName"
 									component="div"
@@ -120,7 +121,8 @@ export default class Login extends Component<Props, State> {
 							</div>
 
 							<div className="form-group">
-								<Field name="password" type="password" className="form-control" placeholder="Password" />
+								<label htmlFor="password">Password</label>
+								<Field name="password" type="password" className="form-control" />
 								<ErrorMessage
 									name="password"
 									component="div"
@@ -146,11 +148,9 @@ export default class Login extends Component<Props, State> {
 									</div>
 								</div>
 							)}
-							
 						</Form>
 					</Formik>
 				</div>
-				<p className="lorem">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi laborum ad commodi quos voluptate perspiciatis consectetur a, sapiente nam ab necessitatibus, ipsa quidem? Id aliquam, eligendi quidem dolor perferendis error.</p>
 			</div>
 		);
 	}
