@@ -18,7 +18,7 @@ export type LocalUserData = {
 	userId: string;
 	userName: string;
 	email: string;
-	profilePicture: string;
+	// profilePicture: string;
 };
 
 export type UserProfile = {

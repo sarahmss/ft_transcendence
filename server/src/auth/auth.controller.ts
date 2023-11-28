@@ -27,15 +27,18 @@ export class AuthController {
 	/********************************* POST ******************************/
 
 	@Post('signup')
-	signup(@Body() data: CreateUserDto) {
-		return this.usersService.createLocalUser(data);
+	signup(@Res() response: Response,
+		@Body() data: CreateUserDto) {
+		this.logger.log( 'GET: auth/signup');
+		return this.usersService.createLocalUser(data, response);
 	}
 
 	@Post('signin')
 	// @UseGuards(JwtGuard)
 	signin(@Res() response: Response,
 			@Body() data: Partial<User>) {
-		this.authService.LocalLogin(response, data);
+		this.logger.log( 'GET: auth/signin');
+	return this.authService.LocalLogin(response, data);
 	}
 
 	/********************************* GET ******************************/

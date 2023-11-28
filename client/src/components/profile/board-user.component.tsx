@@ -1,22 +1,23 @@
 import { Component } from "react";
-import UserService from "../services/user.service";
+import UserService from "../../services/user.service";
+
 type Props = {};
 
 type State = {
 	content: string;
 }
 
-export default class Home extends Component<Props, State> {
+export default class BoardUser extends Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 
 		this.state = {
-			content: "HOME"
+			content: "USER BOARD"
 		};
 	}
 
 	componentDidMount() {
-		UserService.getPublicContent().then(
+		UserService.getUserBoard().then(
 			response => {
 				this.setState({
 					content: response.data
@@ -25,7 +26,9 @@ export default class Home extends Component<Props, State> {
 			error => {
 				this.setState({
 					content:
-						(error.response && error.response.data) ||
+						(error.response &&
+							error.response.data &&
+							error.response.data.message) ||
 						error.message ||
 						error.toString()
 				});

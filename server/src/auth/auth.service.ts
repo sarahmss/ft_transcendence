@@ -16,11 +16,17 @@ export class AuthService {
 		if (user.has2FaAuth) {
 			return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
 		}
-		const userId = { id: user.userId };
-		response.cookie('accessToken', this.jwtService.sign(userId), {
+		const token = this.jwtService.sign({ id: user.userId });
+		response.cookie('accessToken', token, {
 			sameSite: 'Lax',
 		});
-		return response.redirect(process.env.FRONT_URL);
+
+		return response.status(200).send({
+			userId: user.userId,
+			userName: user.userName,
+			email: user.email,
+			accessToken: token
+		});
 	}
 
 	async LocalLogin(response: any, data: Partial<User>): Promise<any> {
@@ -28,11 +34,17 @@ export class AuthService {
 		if (user.has2FaAuth) {
 			return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
 		}
-		const userId = { id: user.userId };
-		response.cookie('accessToken', this.jwtService.sign(userId), {
+		const token = this.jwtService.sign({ id: user.userId });
+		response.cookie('accessToken', token, {
 			sameSite: 'Lax',
 		});
-		return response.redirect(process.env.FRONT_URL + '/user');
+
+		return response.status(200).send({
+			userId: user.userId,
+			userName: user.userName,
+			email: user.email,
+			accessToken: token
+		});
 	}
 
 	async logout(response: any): Promise<any> {

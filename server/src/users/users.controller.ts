@@ -37,7 +37,7 @@ export class UsersController {
 	@Get(':userId/profile')
 	async getUserProfile( @Param('userId', ParseUUIDPipe) userId: string ) {
 		this.logger.log( `GET Profile: ${userId}`);
-		return this.usersService.getUser(userId);
+		return this.usersService.getUserProfile(userId);
 	}
 
 	/********************************* PATCH ******************************/

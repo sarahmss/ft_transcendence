@@ -1,4 +1,4 @@
-import { Injectable,
+import { ConsoleLogger, Injectable,
 	NotFoundException,
 	UnprocessableEntityException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -159,7 +159,7 @@ export class UsersService {
 
 	/********************************* TOOLS ******************************/
 
-	async createLocalUser(data: CreateUserDto) {
+	async createLocalUser(data: CreateUserDto, response: any) {
 		const { userName, password, email } = data;
 		const user = await this.usersRepository.findOne({ where:
 														{ userName } });
@@ -171,7 +171,8 @@ export class UsersService {
 													password: hashedPassword,
 													email: email
 												});
-		return this.usersRepository.save(newUser);
+		this.usersRepository.save(newUser);
+		return response.send({ message: "User was registered successfully!" });
 	}
 
 	async createIntraUser(userData: IntraUserData): Promise<User> {

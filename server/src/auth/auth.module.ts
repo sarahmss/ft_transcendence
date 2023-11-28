@@ -8,9 +8,12 @@ import { FortyTwoStrategy } from './strategies/FortyTwo.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { TwoFaAuthController } from './2fa/2fa-auth.controller';
 import { TwoFaAuthService } from './2fa/2fa-auth.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '../entity/user.entity';
 
 @Module({
 	imports: [
+		TypeOrmModule.forFeature([User]),
 		UsersModule,
 		PassportModule,
 		JwtModule.register({

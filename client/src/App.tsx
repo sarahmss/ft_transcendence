@@ -2,14 +2,16 @@ import { Component } from "react";
 import { Routes, Route, Link } from "react-router-dom";import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
+import AuthService from "./services/auth.service";
 import IUser from './types/user.type';
 
-import Login from "./components/login.component";
-import Register from "./components/register.component";
+import Login from "./components/login/login.component";
+import Register from "./components/login/register.component";
 import Home from "./components/home.component";
-import Profile from "./components/profile.component";
-import BoardUser from "./components/board-user.component";
-import Settings from "./components/settings.component";
+import Profile from "./components/profile/profile.component";
+import BoardUser from "./components/profile/board-user.component";
+import Settings from "./components/settings/settings.component";
+
 import EventBus from "./common/EventBus";
 
 type Props = {};
@@ -28,27 +30,26 @@ class App extends Component<Props, State> {
 		};
 	}
 
-	// componentDidMount() {
-	// 	const user = AuthService.getCurrentUser();
-	// 	if (user) {
-	// 		this.setState({
-	// 			currentUser: user,
-	// 		});
-	// 	}
-	// 	EventBus.on("logout", this.logOut);
-	// }
+	componentDidMount() {
+		const user = AuthService.getCurrentUser();
+		if (user) {
+			this.setState({
+				currentUser: user,
+			});
+		}
+		EventBus.on("logout", this.logOut);
+	}
 
 	componentWillUnmount() {
 		EventBus.remove("logout", this.logOut);
 	}
 
 	logOut() {
-		// logout
+		AuthService.logout();
 		this.setState({
 			currentUser: undefined,
 		});
 	}
-
 
 	render() {
 		const { currentUser } = this.state;
@@ -80,7 +81,7 @@ class App extends Component<Props, State> {
 						<div className="navbar-nav ml-auto">
 							<li className="nav-item">
 								<Link to={"/profile"} className="nav-link">
-									{currentUser.username}
+									{currentUser.userName}
 								</Link>
 							</li>
 							<li className="nav-item">
@@ -109,12 +110,12 @@ class App extends Component<Props, State> {
 				<div className="container mt-3">
 					<Routes>
 						<Route path="/" element={<Home />} />
-						<Route path="/profile" element={<Profile />} />
+						<Route path="/home" element={<Home />} />
 						<Route path="/login" element={<Login />} />
 						<Route path="/register" element={<Register />} />
+						<Route path="/profile" element={<Profile />} />
 						<Route path="/user" element={<BoardUser />} />
 						<Route path="/settings" element={<Settings />} />
-
 					</Routes>
 				</div>
 			</div>

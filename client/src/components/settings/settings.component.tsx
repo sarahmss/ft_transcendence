@@ -1,6 +1,6 @@
 import React, { ChangeEvent } from 'react';
 import { Card, CardHeader, CardContent, CardActions, Button, TextField } from '@mui/material';
-import { getToken } from '../common/helper';
+import { getToken } from '../../common/helper';
 
 interface SettingsState {
 	twoFAEnabled: boolean;
@@ -30,7 +30,7 @@ class Settings extends React.Component<{}, SettingsState> {
 		return;
 	}
 
-	const response = await fetch(`http://${process.env.VUE_APP_DOMAIN}:${process.env.VUE_APP_NEST_PORT}/user/has2fa`, {
+	const response = await fetch(`http://${process.env.REACT_APP_BACK_HOST}/user/has2fa`, {
 		method: 'GET',
 		headers: {
 		Authorization: 'Bearer ' + token,
