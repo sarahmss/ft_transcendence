@@ -114,8 +114,7 @@ export default class Register extends Component<Props, State> {
 							{!successful && (
 								<div>
 									<div className="form-group">
-										<label htmlFor="userName"> user name </label>
-										<Field name="userName" type="text" className="form-control" />
+										<Field name="userName" type="text" className="form-control" placeholder="User" />
 										<ErrorMessage
 											name="userName"
 											component="div"
@@ -124,8 +123,7 @@ export default class Register extends Component<Props, State> {
 									</div>
 
 									<div className="form-group">
-										<label htmlFor="email"> Email </label>
-										<Field name="email" type="email" className="form-control" />
+										<Field name="email" type="email" className="form-control" placeholder="e-mail"/>
 										<ErrorMessage
 											name="email"
 											component="div"
@@ -134,11 +132,11 @@ export default class Register extends Component<Props, State> {
 									</div>
 
 									<div className="form-group">
-										<label htmlFor="password"> Password </label>
 										<Field
 											name="password"
 											type="password"
 											className="form-control"
+											placeholder="password"
 										/>
 										<ErrorMessage
 											name="password"
@@ -148,11 +146,11 @@ export default class Register extends Component<Props, State> {
 									</div>
 
 									<div className="form-group">
-										<label htmlFor="passwordConfirm"> PasswordConfirm </label>
 										<Field
 											name="passwordConfirm"
 											type="passwordConfirm"
 											className="form-control"
+											placeholder="password confirm"
 										/>
 										<ErrorMessage
 											name="passwordConfirm"
@@ -183,6 +181,7 @@ export default class Register extends Component<Props, State> {
 						</Form>
 					</Formik>
 				</div>
+				<p className="lorem">Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi impedit, dolorem id beatae cupiditate aliquid illo dicta, quisquam hic odit deserunt provident vitae repudiandae ratione, magni quos labore veritatis aliquam. Lorem ipsum dolor, sit amet consectetur adipisicing elit. A repellendus accusantium, facilis ab officiis sequi delectus, doloribus dolore porro, temporibus fugiat eaque. Officiis distinctio deserunt fuga aperiam adipisci blanditiis at?</p>
 			</div>
 		);
 	}
