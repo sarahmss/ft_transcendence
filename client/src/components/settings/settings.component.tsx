@@ -1,55 +1,51 @@
-import React, { ChangeEvent } from 'react';
+import { Component } from 'react';
 import { Card, CardHeader, CardContent, CardActions, Button, TextField } from '@mui/material';
-import { getToken } from '../../common/helper';
+import AuthService from "../../services/auth.service";
+import IUser from "../../types/user.type";
+import { Navigate } from "react-router-dom";
+import userService from '../../services/user.service';
+type Props = {};
 
-interface SettingsState {
+type SettingsState = {
+	redirect: string | null,
+	currentUser: IUser & { accessToken: string }
 	twoFAEnabled: boolean;
-	startUsername: string;
-	username: string;
+	startUserName: string;
+	userName: string;
 	avatar: string;
-	loaded: boolean;
+	userReady: boolean;
 }
 
-class Settings extends React.Component<{}, SettingsState> {
-	constructor(props: {}) {
-	super(props);
-	this.state = {
+export default class Settings extends Component<Props, SettingsState> {
+
+	constructor(props: Props) {
+		super(props);
+
+		this.state = {
+		redirect: null,
+		currentUser: { accessToken: "" },
 		twoFAEnabled: false,
-		startUsername: '',
-		username: '',
+		startUserName: '',
+		userName: '',
 		avatar: '',
-		loaded: false,
-	};
+		userReady: false,
+		};
 	}
 
-	async componentDidMount() {
-	const token = getToken();
+	componentDidMount() {
+		const currentUser = AuthService.getCurrentUser();
 
-	if (token === 'error') {
-	//	 history.push('/login');
-		return;
-	}
-
-	const response = await fetch(`http://${process.env.REACT_APP_BACK_HOST}/user/has2fa`, {
-		method: 'GET',
-		headers: {
-		Authorization: 'Bearer ' + token,
-		},
-	});
-
-	if (!response.ok) {
-	//	 history.push('/login');
-		return;
-	}
-
-	const data = await response.json();
-	this.setState({ twoFAEnabled: data.enabled });
-
-	// Restante do código de montagem...
+		if (!currentUser) this.setState({ redirect: "/home" });
+		this.setState({ currentUser: currentUser, userReady: true })
 	}
 
 	render() {
-	const messageClass = this.state.username.length === 0 ? 'md-invalid' : '';
+		if (this.state.redirect) {
+			return <Navigate to={this.state.redirect} />
+		}
+	const { currentUser } = this.state;
+
+	const messageClass = this.state.userName.length === 0 ? 'md-invalid' : '';
 
 	return (
 		<div className="settings-content">
@@ -60,14 +56,15 @@ class Settings extends React.Component<{}, SettingsState> {
 
 			<CardHeader
 					title="User Settings"
-					subheader="Update Avatar or Username"
+					subheader="Update Avatar or UserName"
 
 			/>
+
 			<CardContent style={{ textAlign: 'right', position: 'relative' }} className="md-layout md-layout-item md-alignment-center-center">
 				<div className="md-layout-item">
 					<div className="user-avatar-content">
 					<img
-						src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
+						src={currentUser.profilePicture}
 						alt="profile-img"
 						className="profile-img-card"
 					/>
@@ -75,9 +72,9 @@ class Settings extends React.Component<{}, SettingsState> {
 				</div>
 				<div className="md-layout md-layout-item md-alignment-center-left">
 				<TextField
-					label="Username"
-					value={this.state.username}
-					onChange={(e) => this.setState({ username: e.target.value })}
+					label="UserName"
+					value={currentUser.userName}
+					onChange={(e) => this.setState({ userName: e.target.value })}
 					variant="standard"
 					fullWidth
 					className={messageClass}
@@ -87,10 +84,10 @@ class Settings extends React.Component<{}, SettingsState> {
 
 				</CardContent>
 				<CardActions>
-				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.twoFAEnabled} onClick={this.redirectToEnable2FA}>
+				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.twoFAEnabled} onClick={userService.redirectToEnable2FA}>
 					Enable 2FA
 				</Button>
-				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.loaded} onClick={this.applyChanges}>
+				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.userReady} onClick={userService.applyChanges}>
 					Update
 				</Button>
 				</CardActions>
@@ -99,23 +96,5 @@ class Settings extends React.Component<{}, SettingsState> {
 		</div>
 		</div>
 	);
-	}
-
-	private redirectToEnable2FA = () => {
-	// history.push('/enable2fa');
-	};
-
-	private reditectToDisable2Fa = () => {
-	// history.push('/disable2fa');
-	};
-
-	private applyChanges = async () => {
-	// Restante do código para aplicar as alterações...
-	};
-
-	private onAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
-	// Restante do código para lidar com a mudança do avatar...
-	};
 }
-
-export default Settings;
+}

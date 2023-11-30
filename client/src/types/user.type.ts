@@ -3,4 +3,10 @@ export default interface IUser {
 	userName?: string | null,
 	email?: string,
 	password?: string,
+	profilePicture?: string
+}
+
+export default interface ITwoFac {
+	setState?: React.Dispatch<React.SetStateAction<{ [key: string]: any; }>> | null,
+
 }

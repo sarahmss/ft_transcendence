@@ -1,16 +1,12 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
-import { LocalUserData } from 'src/helpers/types.helper';
 import { MessagesHelper } from 'src/helpers/messages.helpers';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from 'src/entity/user.entity';
+import { UsersService } from 'src/users/users.service';
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
+export class LocalAuthStrategy extends PassportStrategy(Strategy) {
 	constructor(
-		@InjectRepository(User)
-		private readonly usersRepository: Repository<User>,
+		private usersService: UsersService,
 	) {
 		super({
 			jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -22,8 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 	async validate(payload: any)//: Promise<LocalUserData>
 	{
 		const { userName } = payload;
-		const user = await this.usersRepository.findOne({ where:
-			{ userName } })
+		const user = await this.usersService.findByUserName(userName);
 		if (!user) {
 			throw new HttpException(MessagesHelper.USER_NOT_FOUND,
 									HttpStatus.NOT_FOUND);

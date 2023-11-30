@@ -25,6 +25,9 @@ export class AuthService {
 			userId: user.userId,
 			userName: user.userName,
 			email: user.email,
+			profilePicture: user.profilePicture,
+			status: user.status,
+			hasTwoFactorAuth: user.has2FaAuth,
 			accessToken: token
 		});
 	}
@@ -43,6 +46,9 @@ export class AuthService {
 			userId: user.userId,
 			userName: user.userName,
 			email: user.email,
+			profilePicture: user.profilePicture,
+			status: user.status,
+			hasTwoFactorAuth: user.has2FaAuth,
 			accessToken: token
 		});
 	}

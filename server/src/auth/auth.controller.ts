@@ -13,7 +13,7 @@ import { Logger } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/entity/user.entity';
 import { CreateUserDto } from 'src/users/dto/user.dto';
-import { JwtGuard } from './guards/jwt.guards';
+// import { LocalAuthGuard } from './guards/LocalAuth.guards';
 
 @Controller('auth')
 export class AuthController {
