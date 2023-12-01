@@ -1,5 +1,4 @@
 import axios, {RawAxiosRequestHeaders} from 'axios';
-import authHeader from './authHeader';
 import AuthService from './auth.service';
 import { ChangeEvent } from 'react';
 import { TwoFaLink, TwoFaEnableLink } from '../common/constants';

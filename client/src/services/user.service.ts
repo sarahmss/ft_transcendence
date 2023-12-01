@@ -1,5 +1,4 @@
 import axios from 'axios';
-import authHeader from './authHeader';
 import { BackLink, PublicContentLink } from '../common/constants';
 import AuthService from './auth.service';
 

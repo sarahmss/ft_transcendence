@@ -178,8 +178,8 @@ export class UsersService {
 													password: hashedPassword,
 													email: email
 												});
-		this.usersRepository.save(newUser);
-		return response.send({ message: "User was registered successfully!" });
+		response.send({ message: "User was registered successfully!" });
+		return this.usersRepository.save(newUser);
 	}
 
 	async createIntraUser(userData: IntraUserData): Promise<User> {

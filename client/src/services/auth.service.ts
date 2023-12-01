@@ -1,5 +1,5 @@
 import axios, { RawAxiosRequestHeaders }  from "axios";
-import { LocalSigninLink,
+import { BackLink, LocalSigninLink,
 		LocalSignupLink,
 		UserContentLink,
 		tokenData } from "../common/constants";
@@ -14,18 +14,18 @@ class AuthService {
 			})
 			.then(response => {
 					localStorage.setItem("Logged","yes");
-					console.log(`setting local user logged: ${this.getIsLogged()}`);
 				return response.data;
 			});
 	}
 
 	IntraLogin() {
 		localStorage.setItem("Logged","yes");
-		console.log(`setting intra user logged: ${this.getIsLogged()}`);
 	}
 
 	logout() {
+		const authToken = this.getAuthToken();
 		localStorage.removeItem("LoggedUser");
+		return axios.get(BackLink + "/auth/logout", { headers: authToken })
 	}
 
 	getIsLogged()

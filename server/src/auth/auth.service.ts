@@ -29,7 +29,7 @@ export class AuthService {
 		if (user.has2FaAuth) {
 			return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
 		}
-		const token = this.jwtService.sign({ id: user.userId });
+		const token = this.jwtService.sign({ id: user.userId }, {secret: process.env.JWT_SECRET});
 		console.log(`Local token: ${token}`);
 		response.cookie('accessToken', token, {
 			sameSite: 'Lax',
