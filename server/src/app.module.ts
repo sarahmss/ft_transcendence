@@ -2,20 +2,19 @@ import { Module,
 		MiddlewareConsumer,
 		RequestMethod,
 		NestModule } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { AppGatewayModule } from './app/app.gateway.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
+import { PassportModule } from '@nestjs/passport';
+
 @Module({
 	imports: [
 		ConfigModule.forRoot(),
+		PassportModule.register({ session: true }),
 		UsersModule,
 		AuthModule,
-		AppGatewayModule,
 		TypeOrmModule.forRoot({
 			type: process.env.DB_TYPE as any,
 			host: process.env.PG_HOST,
@@ -27,12 +26,9 @@ import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
 			synchronize: true,
 		}),
 	],
-	controllers: [AppController],
-	providers: [AppService],
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
-
 		consumer
 		.apply(AuthMiddleware)
 		.exclude(

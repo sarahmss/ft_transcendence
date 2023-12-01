@@ -3,6 +3,7 @@ import { Link, Button} from '@mui/material';
 import { reducer } from "../../common/helper";
 import customIcon from '../../assets/42logo.svg';
 import { IntraloginLink } from "../../common/constants";
+import AuthService from "../../services/auth.service";
 
 export const IntraLoginButton = () => {
 	const [state, setState] = useReducer(reducer, {
@@ -17,6 +18,7 @@ export const IntraLoginButton = () => {
 			setState({ loading: false });
 			setState({ loginError: true });
 		}, 7000 )
+		AuthService.IntraLogin();
 	}
 
 	return (

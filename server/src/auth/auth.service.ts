@@ -17,19 +17,11 @@ export class AuthService {
 			return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
 		}
 		const token = this.jwtService.sign({ id: user.userId });
+		console.log(`Intra token: ${token}`);
 		response.cookie('accessToken', token, {
 			sameSite: 'Lax',
 		});
-
-		return response.status(200).send({
-			userId: user.userId,
-			userName: user.userName,
-			email: user.email,
-			profilePicture: user.profilePicture,
-			status: user.status,
-			hasTwoFactorAuth: user.has2FaAuth,
-			accessToken: token
-		});
+		return response.redirect(process.env.FRONT_URL);
 	}
 
 	async LocalLogin(response: any, data: Partial<User>): Promise<any> {
@@ -38,19 +30,11 @@ export class AuthService {
 			return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
 		}
 		const token = this.jwtService.sign({ id: user.userId });
+		console.log(`Local token: ${token}`);
 		response.cookie('accessToken', token, {
 			sameSite: 'Lax',
 		});
-
-		return response.status(200).send({
-			userId: user.userId,
-			userName: user.userName,
-			email: user.email,
-			profilePicture: user.profilePicture,
-			status: user.status,
-			hasTwoFactorAuth: user.has2FaAuth,
-			accessToken: token
-		});
+		return response.redirect(process.env.FRONT_URL);
 	}
 
 	async logout(response: any): Promise<any> {

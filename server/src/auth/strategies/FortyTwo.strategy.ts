@@ -15,6 +15,7 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, "42") {
 			scope: ["public"],
 		});
 	}
+	
 	async validate( accessToken: string,
 		refreshToken: string,
 		profile: UserProfile,):

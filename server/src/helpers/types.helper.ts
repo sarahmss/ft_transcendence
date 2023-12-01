@@ -30,6 +30,7 @@ export type UserProfile = {
 
 export interface UserRequest extends Request {
 	user: any;
+	headers: any;
 }
 
 const TEMP_PROFILE_PICTURE =

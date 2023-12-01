@@ -13,7 +13,6 @@ import { UsersService } from './users.service';
 import { User } from '../entity/user.entity';
 import {UpdateUserDto} from "./dto/user.dto";
 import { Logger } from '@nestjs/common';
-import { LocalAuthGuard } from 'src/auth/guards/LocalAuth.guards';
 
 @Controller('users')
 export class UsersController {
@@ -44,7 +43,6 @@ export class UsersController {
 	/********************************* PATCH ******************************/
 
 	@Patch(':userId')
-	@UseGuards(LocalAuthGuard)
 	@HttpCode(204)
 	async update (
 				@Param('userId', ParseUUIDPipe) userId: string,

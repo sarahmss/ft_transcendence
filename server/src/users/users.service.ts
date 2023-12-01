@@ -39,6 +39,10 @@ export class UsersService {
 		return this.usersRepository.findOneBy({ userName});
 	}
 
+	async findByEmail(email: string): Promise<User> {
+		return this.usersRepository.findOneBy({ email });
+	}
+
 	async findByExternalId(externalId: number): Promise<User> {
 		return this.usersRepository.findOneBy({ externalId });
 	}

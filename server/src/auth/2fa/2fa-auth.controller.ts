@@ -54,10 +54,11 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 				if (isValid == false) {
 				throw new BadRequestException(MessagesHelper.INVALID_QR_CODE);
 				}
-				const payload = { id: userId };
 				response.cookie('accessToken',
-								this._jwtService.sign(payload),
+								this._jwtService.sign({ id: userId }),
 								{sameSite: 'lax', });
-				return response.status(200).json({ cookie: response.getHeader('set-cookie'),});
+				return response.status(200).json({
+					cookie: response.getHeader('set-cookie'),
+				});
 			}
 		}

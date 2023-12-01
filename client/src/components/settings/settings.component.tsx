@@ -1,9 +1,11 @@
-import { Component } from 'react';
-import { Card, CardHeader, CardContent, CardActions, Button, TextField } from '@mui/material';
+import { Component, useState, useEffect } from 'react';
+import { Box, Card, CardHeader, CardContent, CardActions, Button, TextField } from '@mui/material';
 import AuthService from "../../services/auth.service";
 import IUser from "../../types/user.type";
 import { Navigate } from "react-router-dom";
-import userService from '../../services/user.service';
+import TwoFaService from '../../services/twoFa.service';
+import twoFaService from '../../services/twoFa.service';
+
 type Props = {};
 
 type SettingsState = {
@@ -83,11 +85,11 @@ export default class Settings extends Component<Props, SettingsState> {
 				</div>
 
 				</CardContent>
-				<CardActions>
-				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.twoFAEnabled} onClick={userService.redirectToEnable2FA}>
+					<CardActions>
+				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.twoFAEnabled} onClick={twoFaService.redirectToEnable2FA}>
 					Enable 2FA
 				</Button>
-				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.userReady} onClick={userService.applyChanges}>
+				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.userReady} onClick={TwoFaService.applyChanges}>
 					Update
 				</Button>
 				</CardActions>

@@ -13,7 +13,6 @@ import { Logger } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/entity/user.entity';
 import { CreateUserDto } from 'src/users/dto/user.dto';
-// import { LocalAuthGuard } from './guards/LocalAuth.guards';
 
 @Controller('auth')
 export class AuthController {
@@ -34,7 +33,6 @@ export class AuthController {
 	}
 
 	@Post('signin')
-	// @UseGuards(JwtGuard)
 	signin(@Res() response: Response,
 			@Body() data: Partial<User>) {
 		this.logger.log( 'GET: auth/signin');

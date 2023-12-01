@@ -57,7 +57,7 @@ export default class Login extends Component<Props, State> {
 			loading: true
 		});
 
-		AuthService.login(userName, password).then(
+		AuthService.LocalLogin(userName, password).then(
 			() => {
 				this.setState({
 				redirect: "/profile"
