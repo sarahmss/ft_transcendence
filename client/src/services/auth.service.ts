@@ -5,6 +5,7 @@ import { BackLink, LocalSigninLink,
 		tokenData } from "../common/constants";
 import "core-js/stable/atob";
 import { jwtDecode } from "jwt-decode";
+
 class AuthService {
 	LocalLogin(userName: string, password: string) {
 		return axios
@@ -13,13 +14,18 @@ class AuthService {
 				password
 			})
 			.then(response => {
-					localStorage.setItem("Logged","yes");
+				if (response.data.accessToken)
+				{
+					localStorage.setItem("accessToken", response.data.accessToken);
+					localStorage.setItem("id", response.data.id);
+					localStorage.setItem("Logged","local");
+				}
 				return response.data;
 			});
 	}
 
 	IntraLogin() {
-		localStorage.setItem("Logged","yes");
+		localStorage.setItem("Logged","intra");
 	}
 
 	logout() {
@@ -60,7 +66,6 @@ class AuthService {
 	RequestCurrentUser() {
 		const userId = this.getIdFromToken();
 		const authToken = this.getAuthToken();
-		console.log(`Request currente user: ${authToken}`);
 		axios.get(UserContentLink + userId, { headers: authToken }).then((response) => {
 			localStorage.setItem("LoggedUser", JSON.stringify(response.data))
 			return response.data;
@@ -75,13 +80,24 @@ class AuthService {
 	}
 
 	getAuthToken() {
-		const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
-		return authToken;
+		if (this.getIsLogged() == "local") {
+			const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + localStorage.getItem("accessToken")};
+			return authToken;
+		} else if (this.getIsLogged() == "intra") {
+			const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
+			return authToken;
+		}
 	}
 
 	getIdFromToken() {
-		const tokenData: tokenData = jwtDecode(document.cookie);
-		return tokenData.id;
+		if (this.getIsLogged() == "local") {
+			return localStorage.getItem("id");
+		} else if (this.getIsLogged() == "intra")
+		{
+			const cookie = document.cookie
+			const tokenData: tokenData = jwtDecode(cookie);
+			return tokenData.id;
+		}
 	}
 }
 

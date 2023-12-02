@@ -36,7 +36,7 @@ export class AuthController {
 	signin(@Res() response: Response,
 			@Body() data: Partial<User>) {
 		this.logger.log( 'GET: auth/signin');
-	return this.authService.LocalLogin(response, data);
+		this.authService.LocalLogin(response, data);
 	}
 
 	/********************************* GET ******************************/
