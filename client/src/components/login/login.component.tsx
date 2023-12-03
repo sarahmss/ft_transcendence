@@ -1,11 +1,10 @@
-import { Component, useReducer } from "react";
+import { Component } from "react";
 import { Navigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import axios from "axios";
-import { Link, Button} from '@mui/material';
-import { reducer } from "../common/helper";
-import customIcon from '../assets/42logo.svg';
-import { IntraloginLink, LocalSigninLink } from "../common/constants";
+// import axios from "axios";
+import AuthService from "../../services/auth.service";
+import * as Yup from "yup";
+import { IntraLoginButton } from "./intraLogin.component";
 
 type Props = {};
 
@@ -16,42 +15,6 @@ type State = {
 	loading: boolean,
 	message: string
 };
-
-
-const IntraLoginButton = () => {
-	const [state, setState] = useReducer(reducer, {
-		loading: false,
-		loginError: false,
-		loginMsg: "Something went wrong",
-	});
-
-	const handleLoading = () => {
-		setState({ loading: true });
-		setTimeout(() => {
-			setState({ loading: false });
-			setState({ loginError: true });
-		}, 7000 )
-	}
-
-	return (
-		<>
-		<div className="form-group">
-			<Button
-				variant="contained"
-				disabled={state.loading}
-				onClick={handleLoading}
-				size="large"
-				>
-				<Link href={IntraloginLink}>
-					<img src={customIcon} height="24"
-							width="24" alt="Icon" />
-							Login with 42
-				</Link>
-			</Button>
-		</div>
-		</>
-	)
-}
 
 export default class Login extends Component<Props, State> {
 	constructor(props: Props) {
@@ -67,22 +30,54 @@ export default class Login extends Component<Props, State> {
 		};
 	}
 
+	componentDidMount() {
+		const currentUser = AuthService.getCurrentUser();
+
+		if (currentUser) {
+			this.setState({ redirect: "/profile" });
+		};
+	}
+
 	componentWillUnmount() {
 		window.location.reload();
 	}
 
-	handleLogin = async (formValues: { userName: string; password: string }) => {
-		const { userName, password } = formValues;
-		try {
-			const response = await axios.post(LocalSigninLink, {
-				userName,
-				password,
-			});
-
-		} catch (error) {
-			console.error("Login error:", error);
+	validationSchema() {
+		return Yup.object().shape({
+			userName: Yup.string().required("This field is required!"),
+			password: Yup.string().required("This field is required!"),
+		});
 		}
-		};
+
+	handleLogin = async (formValues:{ userName: string; password: string }) => {
+		const { userName, password } = formValues;
+
+		this.setState({
+			message: "",
+			loading: true
+		});
+
+		AuthService.LocalLogin(userName, password).then(
+			() => {
+				this.setState({
+				redirect: "/profile"
+				});
+			},
+			error => {
+				const resMessage =
+					(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+					error.message ||
+					error.toString();
+
+				this.setState({
+					loading: false,
+					message: resMessage
+				});
+				}
+			);
+			}
 
 	render() {
 		if (this.state.redirect) {

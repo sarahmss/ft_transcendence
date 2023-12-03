@@ -1,5 +1,5 @@
 
-import { NextFunction } from 'express';
+import { NextFunction, Response, Request } from 'express';
 import { AuthService } from '../auth.service';
 import { Injectable,
 		UnauthorizedException,
@@ -10,14 +10,18 @@ import { UserRequest } from '../../helpers/types.helper'
 	export class AuthMiddleware implements NestMiddleware {
 	constructor(private readonly authService: AuthService) {}
 
-	async use(request: UserRequest, next: NextFunction) {
+	async use(request: UserRequest, response: Response, next: NextFunction) {
 		try {
 			const token = request.headers['authorization'].split(' ')[1];
+			console.log(`Token middleware: ${token}`);
 			const decodedToken = this.authService.IsValidJwt(token);
 			const user = await this.authService.IsValidUser(decodedToken.id);
+			console.log(`User middleware: ${user.userName}`);
 			request.user = user.userId;
+			console.log(`User middleware: ${user.userId}`);
 			next();
 		} catch {
+			console.log(`UNAUTHORIZED`);
 			throw new UnauthorizedException();
 		}
 	}

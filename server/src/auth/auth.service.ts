@@ -11,28 +11,34 @@ export class AuthService {
 	) {}
 
 	/********************************* TOOLS ******************************/
+	async LocalLogin(response: any, data: Partial<User>): Promise<any> {
+		try{
+			const user: User = await this.usersService.validateLocalUser(data);
+			if (user.has2FaAuth) {
+				return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
+			}
+			const token = this.jwtService.sign({ id: user.userId });
+			response.cookie('accessToken', token, {
+				sameSite: 'Lax',
+			});
+			return response.status(200).send({
+				id: user.userId,
+				accessToken: token})
+		} catch(error) {
+			return response.status(500).send(error);
+		}
+	}
+
 	async IntraLogin(response: any, intraUser: any): Promise<any> {
 		const user: User = await this.usersService.validateIntraUser(intraUser);
 		if (user.has2FaAuth) {
 			return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
 		}
-		const userId = { id: user.userId };
-		response.cookie('accessToken', this.jwtService.sign(userId), {
+		const token = this.jwtService.sign({ id: user.userId });
+		response.cookie('accessToken', token, {
 			sameSite: 'Lax',
 		});
-		return response.redirect(process.env.FRONT_URL + '/user');
-	}
-
-	async LocalLogin(response: any, data: Partial<User>): Promise<any> {
-		const user: User = await this.usersService.validateLocalUser(data);
-		if (user.has2FaAuth) {
-			return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
-		}
-		const userId = { id: user.userId };
-		response.cookie('accessToken', this.jwtService.sign(userId), {
-			sameSite: 'Lax',
-		});
-		return response.redirect(process.env.FRONT_URL + '/user');
+		return response.redirect(process.env.FRONT_URL);
 	}
 
 	async logout(response: any): Promise<any> {

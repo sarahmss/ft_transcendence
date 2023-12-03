@@ -1,7 +1,12 @@
 export default interface IUser {
-	id?: any | null,
-	username?: string | null,
+	userId?: any | null,
+	userName?: string | null,
 	email?: string,
 	password?: string,
-	roles?: Array<string>
+	profilePicture?: string
+}
+
+export default interface ITwoFac {
+	setState?: React.Dispatch<React.SetStateAction<{ [key: string]: any; }>> | null,
+
 }
