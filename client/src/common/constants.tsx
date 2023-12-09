@@ -4,7 +4,7 @@ export const LocalSignupLink = process.env.REACT_APP_BACK_HOST + "/auth/signup"
 export const LocalSigninLink = process.env.REACT_APP_BACK_HOST + "/auth/signin"
 export const UserContentLink = process.env.REACT_APP_BACK_HOST + "/users/"
 export const BackLink = process.env.REACT_APP_BACK_HOST
-export const TwoFaLink = process.env.REACT_APP_BACK_HOST + "/two-factor-auth/login?user="
+export const TwoFaLink = process.env.REACT_APP_BACK_HOST + "/2fa-auth"
 export const TwoFaDisableLink = process.env.REACT_APP_BACK_HOST + "/two-factor-auth/disable"
 export const TwoFaEnableLink = process.env.REACT_APP_BACK_HOST + "/two-factor-auth/enable"
 export const FrontUrl = process.env.REACT_APP_FRONT_HOST

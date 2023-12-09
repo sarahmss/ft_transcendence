@@ -2,6 +2,7 @@ import axios, {RawAxiosRequestHeaders} from 'axios';
 import AuthService from './auth.service';
 import { ChangeEvent } from 'react';
 import { TwoFaLink, TwoFaEnableLink } from '../common/constants';
+import authService from './auth.service';
 
 class TwoFaService {
 
@@ -24,14 +25,60 @@ class TwoFaService {
 	// 	)
 	// }
 
-	// getQRcode = async ({ setState } : { setState: React.Dispatch<React.SetStateAction<{ [key: string]: any; }>>}) => {
-	// 	const authToken: RawAxiosRequestHeaders  = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
-	// 	const response = (await axios.get(process.env.REACT_APP_BACK_HOST + '/two-factor-auth/generate', { headers: authToken }));
-	// 	setState({ qrcode: response.data.url });
-	// }
+	// if(authService.getIsLogged())
+	// 	return localStorage.getItem("qrcode");
+	getQrCode(){
+		const authTokenQr = AuthService.getAuthToken();
+		const localQr = localStorage.getItem("qrcode");
 
-	redirectToEnable2FA = () => {
-		// history.push('/enable2fa');
+		console.log(localQr);
+		console.log(authTokenQr);
+		if(localQr)
+		{
+			axios.get(localQr, 
+			{headers : authTokenQr})
+			.then((response) => {
+				console.log("Deu certo");
+			})
+			.catch(error => {
+				console.log("Deu errado!");
+			  });
+
+		} else {
+			console.log("teste");
+		}
+	}
+
+	generateQrCode() {
+        const authToken = AuthService.getAuthToken()
+        axios.get( "http://localhost:5000/2fa-auth/generate",
+            { headers: authToken })
+            .then((response) => {
+				console.log("Response data: ", response.data)
+                localStorage.setItem("qrcode", response.data.url)
+				console.log("foi");
+            });
+    }
+    
+
+	redirectToEnable2FA (userId:string, code:string) {
+		const authToken = AuthService.getAuthToken()
+        axios.post( "http://localhost:5000/2fa-auth/enable",
+			{ code: code },
+            { headers: authToken })
+            .then((response) => {
+                localStorage.setItem("qrcode", response.data.url)
+            });
+	};
+
+	redirectToDisable2FA (userId:string, code:string) {
+		const authToken = AuthService.getAuthToken()
+        axios.post( "http://localhost:5000/2fa-auth/disable",
+			{ code: code },
+            { headers: authToken })
+            .then((response) => {
+                localStorage.setItem("qrcode", response.data.url)
+            });
 	};
 
 	reditectToDisable2Fa = () => {

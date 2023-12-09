@@ -1,10 +1,12 @@
-import { Component, useState, useEffect } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import { Box, Card, CardHeader, CardContent, CardActions, Button, TextField } from '@mui/material';
 import AuthService from "../../services/auth.service";
 import IUser from "../../types/user.type";
 import { Navigate } from "react-router-dom";
 import TwoFaService from '../../services/twoFa.service';
-import twoFaService from '../../services/twoFa.service';
+import imagem from './transcendence.png';
+import './settings.component.css';
+import Popup from './popup'
 
 type Props = {};
 
@@ -16,6 +18,8 @@ type SettingsState = {
 	userName: string;
 	avatar: string;
 	userReady: boolean;
+	showLabelAndImage: boolean;
+	pathQrCode: string;
 }
 
 export default class Settings extends Component<Props, SettingsState> {
@@ -26,11 +30,13 @@ export default class Settings extends Component<Props, SettingsState> {
 		this.state = {
 		redirect: null,
 		currentUser: { accessToken: "" },
-		twoFAEnabled: false,
+		twoFAEnabled: true,
 		startUserName: '',
 		userName: '',
 		avatar: '',
 		userReady: false,
+		showLabelAndImage: false,
+		pathQrCode: '',
 		};
 	}
 
@@ -40,6 +46,16 @@ export default class Settings extends Component<Props, SettingsState> {
 		if (!currentUser) this.setState({ redirect: "/home" });
 		this.setState({ currentUser: currentUser, userReady: true })
 	}
+
+	handleEnable2FAClick = () => {
+		TwoFaService.generateQrCode();
+		this.setState({
+			showLabelAndImage: true,
+			pathQrCode: imagem,
+		});
+		TwoFaService.getQrCode();
+	  }
+
 
 	render() {
 		if (this.state.redirect) {
@@ -83,15 +99,23 @@ export default class Settings extends Component<Props, SettingsState> {
 					required
 					/>
 				</div>
-
 				</CardContent>
 					<CardActions>
-				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.twoFAEnabled} onClick={twoFaService.redirectToEnable2FA}>
+				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.twoFAEnabled} onClick={this.handleEnable2FAClick}>
 					Enable 2FA
 				</Button>
 				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.userReady} onClick={TwoFaService.applyChanges}>
 					Update
 				</Button>
+				{this.state.showLabelAndImage && (
+					<div className="App">
+						<Popup
+							buttonText=""
+							popupTitle=""
+							popupContent=""
+						/>
+					</div>
+				)}
 				</CardActions>
 			</Card>
 			</div>
