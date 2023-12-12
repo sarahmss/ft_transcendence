@@ -61,11 +61,12 @@ class TwoFaService {
     }
     
 
-	redirectToEnable2FA (userId:string, code:string) {
-		const authToken = AuthService.getAuthToken()
+	redirectToEnable2FA (code:string) {
+		const userID = AuthService.getAuthToken();
+		console.log(code);
         axios.post( "http://localhost:5000/2fa-auth/enable",
 			{ code: code },
-            { headers: authToken })
+            { headers: userID })
             .then((response) => {
                 localStorage.setItem("qrcode", response.data.url)
             });
