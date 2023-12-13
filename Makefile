@@ -24,22 +24,11 @@ re:
 list:
 	@docker ps -a
 
-list-volumes:
-	@docker volume ls
-
 list-networks:
 	@docker network ls
 
-clean-db:
-	@echo "Cleaning database..."
-	@docker-compose -f ./docker-compose.yml down -v
-
-prepare: clean-db re
-	@echo "Relaunched to test !"
-
 clean: down
 	@-docker rmi -f `docker images -qa`
-	@-docker volume rm `docker volume ls -q`
 
 fclean: clean
 	@echo "Cleaned !!"

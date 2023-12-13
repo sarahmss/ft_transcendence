@@ -11,7 +11,6 @@ import Home from "./components/home.component";
 import Profile from "./components/profile/profile.component";
 import BoardUser from "./components/profile/board-user.component";
 import Settings from "./components/settings/settings.component";
-// import TwoFactorAuthCard from "./components/settings/twoFactor.compontent";
 import EventBus from "./common/EventBus";
 
 type Props = {};
