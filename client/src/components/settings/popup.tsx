@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import TwoFaService from '../../services/twoFa.service';
 import './popup.css'
-import authService from '../../services/auth.service';
-
+import AuthService from '../../services/auth.service';
+import axios from 'axios';
 interface PopupProps {
   buttonText: string;
   popupTitle: string;
@@ -13,9 +13,12 @@ interface PopupProps {
 const Popup: React.FC<PopupProps> = ({ buttonText }) => {
   const [isPopupOpen, setPopupOpen] = useState(false);
   const [code, setCode] = useState('');
+  const [QrcodeImg, setQrCodeImg] = useState<HTMLImageElement | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const openPopup = () => {
     setPopupOpen(true);
+	getQrCode()
   };
 
   const closePopup = () => {
@@ -26,6 +29,29 @@ const Popup: React.FC<PopupProps> = ({ buttonText }) => {
     TwoFaService.redirectToEnable2FA(code);
   }
 
+  const getQrCode = () => {
+    const authTokenQr = AuthService.getAuthToken();
+    const localQr = localStorage.getItem("qrcode");
+
+    if (localQr) {
+      axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' })
+        .then((response) => {
+          if (response.data) {
+            const imageBase64 = Buffer.from(response.data, 'binary').toString('base64');
+            const imgElement = document.createElement('img');
+            imgElement.src = `data:image/png;base64, ${imageBase64}`;
+            setQrCodeImg(imgElement);
+          } else {
+            setError('No image data found.');
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          setError('Error fetching QR code.');
+        });
+    }
+  }
+
   return (
     <div className="popup-container">
       <button onClick={openPopup}>{buttonText}</button>
@@ -34,10 +60,11 @@ const Popup: React.FC<PopupProps> = ({ buttonText }) => {
         <div className="popup">
           <div className="popup-content">
             <span className="close" onClick={closePopup}>&times;</span>
-
-            <img src={TwoFaService.getQrCode()} alt="" />
-
-
+            {QrcodeImg ? (
+              <img src={QrcodeImg.src} alt="" />
+            ) : (
+              <div>{error || 'Loading QR code...'}</div>
+            )}
             <input type="text" placeholder='Enter Code' className='inputCode' onChange={(e) => setCode(e.target.value)}/>
             <button className='send' onClick={handleClickToEnable}>Send</button>
             {/* COLOCAR O USERID E O CODE */}

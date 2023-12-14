@@ -27,6 +27,10 @@ list:
 list-networks:
 	@docker network ls
 
+clean-db:
+	@echo "Cleaning database..."
+	@docker-compose -f ./docker-compose.yml down -v
+
 clean: down
 	@-docker rmi -f `docker images -qa`
 	@-docker volume rm `docker volume ls -q`

@@ -4,7 +4,6 @@ import AuthService from "../../services/auth.service";
 import IUser from "../../types/user.type";
 import { Navigate } from "react-router-dom";
 import TwoFaService from '../../services/twoFa.service';
-import imagem from './transcendence.png';
 import './settings.component.css';
 import Popup from './popup'
 
@@ -19,7 +18,6 @@ type SettingsState = {
 	avatar: string;
 	userReady: boolean;
 	showLabelAndImage: boolean;
-	pathQrCode: string;
 }
 
 export default class Settings extends Component<Props, SettingsState> {
@@ -36,7 +34,6 @@ export default class Settings extends Component<Props, SettingsState> {
 		avatar: '',
 		userReady: false,
 		showLabelAndImage: false,
-		pathQrCode: '',
 		};
 	}
 
@@ -51,9 +48,7 @@ export default class Settings extends Component<Props, SettingsState> {
 		TwoFaService.generateQrCode();
 		this.setState({
 			showLabelAndImage: true,
-			pathQrCode: imagem,
 		});
-		// TwoFaService.getQrCode();
 	  }
 
 
