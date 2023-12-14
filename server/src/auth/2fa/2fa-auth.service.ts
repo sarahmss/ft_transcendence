@@ -30,8 +30,6 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 			await qrCode.toFile(`${path}/qrcode.png`, otpauth);
 			this.usersService.setUserSecret(userId, secret);
 		}
-
-		return { url: process.env.BACK_URL + `/images/${userId}/qrcode.png` }
 	}
 
 	/********************************* VALIDATE ******************************/

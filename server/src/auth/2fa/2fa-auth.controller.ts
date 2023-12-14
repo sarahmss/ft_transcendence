@@ -25,9 +25,10 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 
 		/********************************* GET ******************************/
 		@Get('generate')
-		async generate(@Req() request: UserRequest) {
+		async generate(@Res() response: Response, @Req() request: UserRequest) {
 			const userId = request.user;
-			return this._2faService.createQrCode(`${userId}`);
+			this._2faService.createQrCode(`${userId}`);
+			return(response.status(200).send({ url: process.env.BACK_URL + `/uploads/${userId}/qrcode.png`}));
 		}
 
 		/********************************* POST ******************************/

@@ -1,14 +1,13 @@
 import { Controller,
 		ParseUUIDPipe,
 		Get,
-		Post,
+		Res,
 		Body,
 		Patch,
 		Param,
 		Delete,
-		UseGuards,
 		HttpCode,
-		Headers} from '@nestjs/common';
+		Post} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from '../entity/user.entity';
 import {UpdateUserDto} from "./dto/user.dto";

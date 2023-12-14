@@ -27,6 +27,7 @@ class TwoFaService {
 
 	// if(authService.getIsLogged())
 	// 	return localStorage.getItem("qrcode");
+
 	getQrCode(){
 		const authTokenQr = AuthService.getAuthToken();
 		const localQr = localStorage.getItem("qrcode");
@@ -35,18 +36,16 @@ class TwoFaService {
 		console.log(authTokenQr);
 		if(localQr)
 		{
-			axios.get(localQr, 
+			axios.get(localQr,
 			{headers : authTokenQr})
 			.then((response) => {
-				console.log("Deu certo");
+				return (response);
 			})
 			.catch(error => {
-				console.log("Deu errado!");
-			  });
-
-		} else {
-			console.log("teste");
+				console.log(error);
+			});
 		}
+		return ("https://ssl.gstatic.com/accounts/ui/avatar_2x.png")
 	}
 
 	generateQrCode() {
@@ -59,7 +58,7 @@ class TwoFaService {
 				console.log("foi");
             });
     }
-    
+
 
 	redirectToEnable2FA (code:string) {
 		const userID = AuthService.getAuthToken();

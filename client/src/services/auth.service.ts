@@ -80,19 +80,19 @@ class AuthService {
 	}
 
 	getAuthToken() {
-		if (this.getIsLogged() == "local") {
+		if (this.getIsLogged() === "local") {
 			const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + localStorage.getItem("accessToken")};
 			return authToken;
-		} else if (this.getIsLogged() == "intra") {
+		} else if (this.getIsLogged() === "intra") {
 			const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
 			return authToken;
 		}
 	}
 
 	getIdFromToken() {
-		if (this.getIsLogged() == "local") {
+		if (this.getIsLogged() === "local") {
 			return localStorage.getItem("id");
-		} else if (this.getIsLogged() == "intra")
+		} else if (this.getIsLogged() === "intra")
 		{
 			const cookie = document.cookie
 			const tokenData: tokenData = jwtDecode(cookie);

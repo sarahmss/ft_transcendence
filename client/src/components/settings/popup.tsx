@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import TwoFaService from '../../services/twoFa.service';
 import './popup.css'
-import image from './transcendence.png'
+import authService from '../../services/auth.service';
 
 interface PopupProps {
   buttonText: string;
@@ -34,7 +34,10 @@ const Popup: React.FC<PopupProps> = ({ buttonText }) => {
         <div className="popup">
           <div className="popup-content">
             <span className="close" onClick={closePopup}>&times;</span>
-            <img src={image} alt="" />
+
+            <img src={TwoFaService.getQrCode()} alt="" />
+
+
             <input type="text" placeholder='Enter Code' className='inputCode' onChange={(e) => setCode(e.target.value)}/>
             <button className='send' onClick={handleClickToEnable}>Send</button>
             {/* COLOCAR O USERID E O CODE */}

@@ -8,12 +8,14 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
 import { PassportModule } from '@nestjs/passport';
+import { UploadsModule } from './uploads/upload.module';
 
 @Module({
 	imports: [
 		ConfigModule.forRoot(),
 		PassportModule.register({ session: true }),
 		UsersModule,
+		UploadsModule,
 		AuthModule,
 		TypeOrmModule.forRoot({
 			type: process.env.DB_TYPE as any,
@@ -39,7 +41,6 @@ export class AppModule implements NestModule {
 			{ path: '/auth/signup', method: RequestMethod.POST },
 			{ path: '/auth/signin', method: RequestMethod.POST },
 			{ path: '/2fa-auth/login', method: RequestMethod.POST },
-			{ path: '/images/:userId/:path', method: RequestMethod.GET },
 		)
 		.forRoutes('');
 	}

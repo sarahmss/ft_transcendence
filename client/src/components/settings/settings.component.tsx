@@ -53,7 +53,7 @@ export default class Settings extends Component<Props, SettingsState> {
 			showLabelAndImage: true,
 			pathQrCode: imagem,
 		});
-		TwoFaService.getQrCode();
+		// TwoFaService.getQrCode();
 	  }
 
 
