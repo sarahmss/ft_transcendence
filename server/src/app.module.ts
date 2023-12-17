@@ -8,6 +8,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
 import { PassportModule } from '@nestjs/passport';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
 	imports: [
@@ -25,6 +26,7 @@ import { PassportModule } from '@nestjs/passport';
 			entities: [__dirname + '/**/*.entity{.ts,.js}'],
 			synchronize: true,
 		}),
+		ChatModule,
 	],
 })
 export class AppModule implements NestModule {
@@ -40,6 +42,8 @@ export class AppModule implements NestModule {
 			{ path: '/auth/signin', method: RequestMethod.POST },
 			{ path: '/2fa-auth/login', method: RequestMethod.POST },
 			{ path: '/images/:userId/:path', method: RequestMethod.GET },
+			/* Erase everything below afterwards testing */
+			{ path: '/room/:id', method: RequestMethod.GET}
 		)
 		.forRoutes('');
 	}
