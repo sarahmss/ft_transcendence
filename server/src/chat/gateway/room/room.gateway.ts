@@ -26,10 +26,13 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('receive-message')
-	handleMessage(client: any, payload: createMessage): string {
+	handleMessage(client: any, payload: any): string {
+		/*
 		this.messageService.createMessage(payload.message,
 										 payload.room,
 										 payload.user);
+		*/
+		console.log("test");
 		return 'Wow creation done!';
 	}
 }

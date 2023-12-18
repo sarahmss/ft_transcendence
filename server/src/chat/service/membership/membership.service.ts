@@ -11,10 +11,10 @@ export class MembershipService {
 		@InjectRepository(Membership) private readonly membershipRepository: Repository<Membership>
 	) {}
 
-	joinRoom(user: User[],
-			 room: Room,
-			 owner: string
-			) {
+	async joinRoom(user: User[],
+				   room: Room,
+				   owner: string
+				  ) {
 
 		for (let k = 0; k < user.length ; k++) {
 
@@ -25,24 +25,33 @@ export class MembershipService {
 
 
 			let member = this.membershipRepository.create({userId: user[k].userId,
-														  	roomId: room.roomId,
-															room: room,
-															user: user[k],
-															owner: owner_status});
+														roomId: room.roomId,
+			room: room,
+			user: user[k],
+			owner: owner_status});
 
-			this.membershipRepository.insert(member);
+			await this.membershipRepository.insert(member);
 		}
 	}
 
 	async giveAdmin(user: User, room: Room) {
-		this.membershipRepository.update({userId: user.userId, roomId: room.roomId}, { admin: true });
+		await this.membershipRepository.update({userId: user.userId, roomId: room.roomId}, { admin: true });
 	}
 
 	async removeAdmin(user: User, room: Room) {
-		this.membershipRepository.update({userId: user.userId, roomId: room.roomId}, { admin: false });
+		await this.membershipRepository.update({userId: user.userId, roomId: room.roomId}, { admin: false });
 	}
 
 	async leaveRoom(user: User, room: Room) {
-		this.membershipRepository.delete({userId: user.userId, roomId: room.roomId});
+		await this.membershipRepository.delete({userId: user.userId, roomId: room.roomId});
+	}
+
+	async findMemberRooms(userId: string) {
+		return await this.membershipRepository.find({where: {userId: userId}});
+	}
+
+	async findMemberRoom(userId: string, roomId: string) {
+		return await this.membershipRepository.find({where: {userId: userId,
+													roomId: roomId}});
 	}
 }

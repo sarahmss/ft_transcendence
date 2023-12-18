@@ -17,7 +17,7 @@ export class BlacklistService {
 															 	blocked_user: blocked_user,
 																roomId: room})
 
-		this.blackListRepository.insert(blackListEntry);
+		await this.blackListRepository.insert(blackListEntry);
 		return blackListEntry;
 	}
 

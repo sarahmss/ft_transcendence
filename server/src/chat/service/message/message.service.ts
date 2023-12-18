@@ -20,23 +20,23 @@ export class MessageService {
 		messageInstance.roomId = room;
 		messageInstance.userId = user;
 
-		this.messageRepository.insert(messageInstance);
+		await this.messageRepository.insert(messageInstance);
 		return messageInstance;
 	}
 
 	async findMessageById(messageId: string) {
-		return this.messageRepository.findOne({where: {messageId: messageId}});
+		return await this.messageRepository.findOne({where: {messageId: messageId}});
 	}
 
 	async findMessage(user: User,
 					 room: Room,
 					 quant: number = 25): Promise<Message[]> {
 
-		return this.messageRepository.find({ where:
-										   		 {userId: user, roomId: room},
-											 order:
-												 { timestamp: 'DESC' },
-											 take: quant});
+		return await this.messageRepository.find({ where:
+													{userId: user, roomId: room},
+													order:
+														{ timestamp: 'DESC' },
+													take: quant});
 	}
 
 	async findMessageWithPage(user: User,
@@ -47,21 +47,21 @@ export class MessageService {
 		if (page < 0)
 			page = 0;
 
-		return this.messageRepository.find({ where:
+		return await this.messageRepository.find({ where:
 										   		 {userId: user, roomId: room},
-											 order:
-												 { timestamp: 'DESC' },
-											 take: quant,
-											 skip: page * quant});
+													order:
+														{ timestamp: 'DESC' },
+													take: quant,
+													skip: page * quant});
 	}
 
 	async updateMessage(messageId: string,
 					   newMessage: string) {
-		return this.messageRepository.update({messageId: messageId},
-											 {message: newMessage});
+		return await this.messageRepository.update({messageId: messageId},
+												   {message: newMessage});
 	}
 
 	async deleteMessage(messageId: string) {
-		this.messageRepository.delete({messageId: messageId});
+		await this.messageRepository.delete({messageId: messageId});
 	}
 }
