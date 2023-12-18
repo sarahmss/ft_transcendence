@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
 import { PassportModule } from '@nestjs/passport';
 import { UploadsModule } from './uploads/upload.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
 	imports: [
@@ -27,6 +28,7 @@ import { UploadsModule } from './uploads/upload.module';
 			entities: [__dirname + '/**/*.entity{.ts,.js}'],
 			synchronize: true,
 		}),
+		ChatModule,
 	],
 })
 export class AppModule implements NestModule {
