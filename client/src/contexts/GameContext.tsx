@@ -1,8 +1,9 @@
-import React, { useEffect, useReducer, createContext, FC } from "react";
-import { Provider, useState } from "react";
+import React, { useEffect,
+				useReducer,
+				createContext,
+				useState} from "react";
 import socketClient from 'socket.io-client';
 import AuthService from "../services/auth.service";
-import { string } from "yup";
 interface Player {
 	name: string;
 	room?: string;
@@ -248,10 +249,11 @@ const sendMessage = (message: string) => {
 	socket.emit('sendKey', { type, key });
   };
 
+  export type { State };
+
   export {
 	GameContext,
 	GameProvider,
-	type State,
 	sendMessage,
 	createRoom,
 	leaveRoom,

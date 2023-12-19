@@ -1,8 +1,7 @@
-import axios, {RawAxiosRequestHeaders} from 'axios';
+import axios from 'axios';
 import AuthService from './auth.service';
 import { ChangeEvent } from 'react';
-import { TwoFaLink, TwoFaEnableLink } from '../common/constants';
-import authService from './auth.service';
+import { TwoFaLink } from '../common/constants';
 
 class TwoFaService {
 
@@ -32,8 +31,6 @@ class TwoFaService {
 		const authTokenQr = AuthService.getAuthToken();
 		const localQr = localStorage.getItem("qrcode");
 
-		console.log(localQr);
-		console.log(authTokenQr);
 		if(localQr)
 		{
 			axios.get(localQr,
@@ -53,9 +50,7 @@ class TwoFaService {
         axios.get( "http://localhost:5000/2fa-auth/generate",
             { headers: authToken })
             .then((response) => {
-				console.log("Response data: ", response.data)
                 localStorage.setItem("qrcode", response.data.url)
-				console.log("foi");
             });
     }
 
@@ -94,5 +89,6 @@ class TwoFaService {
 	};
 
 }
+const twoFaService = new TwoFaService();
 
-export default new TwoFaService();
+export default twoFaService;

@@ -133,7 +133,7 @@ export class GameService {
 				room.spectators[client.id] = {
 					id:currentCliendId,
 					state:'watching'
-				}	
+				}
 				delete room.spectators[oldClientId];
 			}
 			else
@@ -172,12 +172,12 @@ export class GameService {
     }
 
     enterSpectator(client: Socket, roomId: string, server: Server) : void {
-        
+
         client.join(roomId);
         const spectator = client.id;
         if (!this.game.rooms[roomId].spectators)
         this.game.rooms[roomId].spectators = {};
-        
+
         this.game.rooms[roomId].spectators[client.id] = {
             id:spectator,
             state:'watching'
@@ -235,7 +235,7 @@ export class GameService {
 	}
 
     addOnQueue(client: Socket, server: Server): void {
-        
+
         const player = this.game.players[client.id];
         player.state = 'waiting';
         this.game.waiting[client.id] = player;
@@ -308,13 +308,13 @@ export class GameService {
 			}
 			this.game.players[client.id].room = '';
 			this.game.players[client.id].state = '';
-			
+
 			if (!room.player1 && !room.player2 && Object.keys(room.spectators).length === 0) {
                 delete this.game.rooms[roomId];
                 if (match) {
 					// é aqui que precisa gravar as informações da
 					// partida antes de fazer o delete
-					
+
 					delete this.game.match[roomId];
                 }
             }
@@ -347,7 +347,7 @@ export class GameService {
                 this.moveBall(match);
                 this.movePaddle(match);
                 this.checkCollision(match);
-            break;        
+            break;
         }
         this.refreshMatch(server, roomId);
         setTimeout(() => this.gameInProgress(roomId, server), 1000 / 60);
@@ -445,7 +445,7 @@ export class GameService {
     refreshRooms = (server: Server) => {
         server.emit('RoomsRefresh', this.game.rooms);
     }
- 
+
     refreshMatch = (server: Server, roomId) => {
         if (roomId == undefined)
         {
