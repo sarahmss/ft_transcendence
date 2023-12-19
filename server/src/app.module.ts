@@ -10,6 +10,7 @@ import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
 import { PassportModule } from '@nestjs/passport';
 import { UploadsModule } from './uploads/upload.module';
 import { ChatModule } from './chat/chat.module';
+import { GameModule } from './game/game.module';
 
 @Module({
 	imports: [
@@ -29,6 +30,7 @@ import { ChatModule } from './chat/chat.module';
 			synchronize: true,
 		}),
 		ChatModule,
+		GameModule
 	],
 })
 export class AppModule implements NestModule {
