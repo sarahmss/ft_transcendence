@@ -1,6 +1,7 @@
 all:
 	@echo "Running service..."
 	@docker-compose stop && docker-compose up --build -d --remove-orphans
+#docker build --cache-from <previous_image> -t <new_image> .
 
 db:
 	@echo "Running Postgres service in detached mode..."
