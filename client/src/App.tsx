@@ -66,9 +66,6 @@ class App extends Component<Props, State> {
 							</Link>
 						</li>
 					)}
-
-
-
 					{currentUser ? (
 						<div className="navbar-nav ml-auto navMenu">
 							<li className="nav-item">

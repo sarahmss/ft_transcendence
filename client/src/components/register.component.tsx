@@ -148,7 +148,7 @@ export default class Register extends Component<Props, State> {
 									<div className="form-group">
 										<Field
 											name="passwordConfirm"
-											type="passwordConfirm"
+											type="password"
 											className="form-control"
 											placeholder="password confirm"
 										/>
