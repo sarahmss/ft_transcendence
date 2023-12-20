@@ -68,7 +68,10 @@ class TwoFaService {
             { headers: userID })
             .then((response) => {
                 localStorage.setItem("qrcode", response.data.url)
-            });
+            })
+			.catch(error =>{
+				console.log(error);
+			});
 	};
 
 	redirectToDisable2FA (userId:string, code:string) {
