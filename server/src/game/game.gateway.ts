@@ -8,7 +8,6 @@ import { AuthService } from 'src/auth/auth.service';
 	cors: {
 		origin: process.env.FRONT_URL,
 		credentials: true,
-		methods: ["GET", "POST"],
 	},
 	namespace: '/game',
 })

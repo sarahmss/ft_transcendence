@@ -19,6 +19,8 @@ import { GameModule } from './game/game.module';
 		UsersModule,
 		UploadsModule,
 		AuthModule,
+		ChatModule,
+		GameModule,
 		TypeOrmModule.forRoot({
 			type: process.env.DB_TYPE as any,
 			host: process.env.PG_HOST,
@@ -29,9 +31,8 @@ import { GameModule } from './game/game.module';
 			entities: [__dirname + '/**/*.entity{.ts,.js}'],
 			synchronize: true,
 		}),
-		ChatModule,
-		GameModule
 	],
+	
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {

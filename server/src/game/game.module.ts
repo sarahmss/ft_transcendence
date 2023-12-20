@@ -5,7 +5,7 @@ import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
     imports: [AuthModule],
-    providers: [GameService, GameGateway],
+    providers: [GameGateway, GameService],
     controllers: [],
 })
 
