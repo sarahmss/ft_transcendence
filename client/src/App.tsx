@@ -12,6 +12,7 @@ import Profile from "./components/profile/profile.component";
 import BoardUser from "./components/profile/board-user.component";
 import Settings from "./components/settings/settings.component";
 import EventBus from "./common/EventBus";
+import { GameProvider } from './contexts/GameContext';
 import Pong from "./components/game/Pong";
 
 type Props = {};
@@ -116,8 +117,13 @@ class App extends Component<Props, State> {
 						<Route path="/profile" element={<Profile />} />
 						<Route path="/user" element={<BoardUser />} />
 						<Route path="/settings" element={<Settings />} />
-						<Route path="/game" element={<Pong />} />
-					</Routes>
+						<Route path="/game" element={
+									<div>
+									<GameProvider>
+										<Pong />
+									</GameProvider>
+									</div>
+								} /> </Routes>
 				</div>
 			</div>
 		);

@@ -4,6 +4,8 @@ import React, { useEffect,
 				useState} from "react";
 import socketClient from 'socket.io-client';
 import AuthService from "../services/auth.service";
+import { GameLink } from "../common/constants"
+
 interface Player {
 	name: string;
 	room?: string;
@@ -55,8 +57,9 @@ type ActionType =
   | { type: 'MATCH'; payload: Match }
   | { type: 'WAITING_QUEUE'; payload: number };
 
-const socket = socketClient('http://localhost:4000/game', {
+const gameSocket = socketClient(GameLink, {
   autoConnect: false,
+  withCredentials: true
 });
 
 const reducer = (state: State, action: ActionType): State => {
@@ -129,24 +132,24 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
   const [redirect, setRedirect] = useState('');
 
   useEffect(() => {
-    socket.on('connect', () => {
+    gameSocket.on('connect', () => {
 		const storedPlayer = AuthService.getCurrentUser();
 		// if (!storedPlayer){
 		// 	setRedirect("/home");
 		// }
 		if (storedPlayer !== null) {
-			socket.emit('reconnect', storedPlayer);
+			gameSocket.emit('reconnect', storedPlayer);
 		}
-		socket.emit('login', storedPlayer.userName);
+		gameSocket.emit('login', storedPlayer.userName);
 		dispatch({ type: 'CONNECTED', payload: true });
 	});
 
-	socket.on('disconnect', () => {
+	gameSocket.on('disconnect', () => {
 		dispatch({ type: 'CONNECTED', payload: false });
 	});
 
-	socket.on('PlayersRefresh', (players) => {
-		const player = players[socket.id];
+	gameSocket.on('PlayersRefresh', (players) => {
+		const player = players[gameSocket.id];
 		if (player)
 		{
 			const storedPlayer = AuthService.getCurrentUser();
@@ -154,33 +157,33 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
 			// 	setRedirect("/home");
 			// }
 			localStorage.setItem(storedPlayer.userId, JSON.stringify(player));
-			dispatch({type: 'PLAYER', payload: players[socket.id]});
+			dispatch({type: 'PLAYER', payload: players[gameSocket.id]});
 		}
 		else {
 			dispatch({type: 'RESET_STATE'});
 		}
 		dispatch({type: 'PLAYERS', payload: players});
 	});
-	socket.on('ReceiveMessage', (receiveMessage) => {
+	gameSocket.on('ReceiveMessage', (receiveMessage) => {
 		dispatch({type: 'MESSAGE', payload: receiveMessage });
 	});
-	socket.on('RoomsRefresh', (rooms) => {
+	gameSocket.on('RoomsRefresh', (rooms) => {
 		dispatch({type: 'ROOMS', payload: rooms});
-		dispatch({type: 'ROOM', payload: socket.id});
+		dispatch({type: 'ROOM', payload: gameSocket.id});
 	});
-	socket.on('MatchRefresh', (match) => {
+	gameSocket.on('MatchRefresh', (match) => {
 		dispatch({type: 'MATCH', payload: match});
 	});
 
-	socket.on('WaitingRefresh', (waitingLength) => {
+	gameSocket.on('WaitingRefresh', (waitingLength) => {
 		dispatch({type: 'WAITING_QUEUE', payload: waitingLength});
 	});
 
-	socket.on('RemoveMatch', () => {
+	gameSocket.on('RemoveMatch', () => {
 		dispatch({type: 'MATCH', payload: {}});
 	})
 
-	socket.open();
+	gameSocket.open();
   }, []);
 
   return (
@@ -193,51 +196,51 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
 // Restante do código...
 
 const sendMessage = (message: string) => {
-	socket.emit('SendMessage', message);
+	gameSocket.emit('SendMessage', message);
   };
 
   const exitQueue = () => {
-	socket.emit('exitQueue');
+	gameSocket.emit('exitQueue');
   };
 
   const addOnQueue = () => {
-	socket.emit('addOnQueue');
+	gameSocket.emit('addOnQueue');
   };
 
   const execMatch = () => {
-	socket.emit('execMatch');
+	gameSocket.emit('execMatch');
   };
 
   const login = (name: string) => {
-	socket.emit('login', name);
+	gameSocket.emit('login', name);
   };
 
   const customizeAndPlay = (customChoices: any) => {
-	socket.emit('customizeAndPlay', customChoices);
+	gameSocket.emit('customizeAndPlay', customChoices);
   };
 
   const createRoom = () => {
-	socket.emit('createRoom');
+	gameSocket.emit('createRoom');
   };
 
   const leaveRoom = () => {
-	socket.emit('leaveRoom');
+	gameSocket.emit('leaveRoom');
   };
 
   const joinRoom = (roomId: string) => {
-	socket.emit('joinRoom', roomId);
+	gameSocket.emit('joinRoom', roomId);
   };
 
   const gameLoaded = () => {
-	socket.emit('gameLoaded');
+	gameSocket.emit('gameLoaded');
   };
 
   const enterSpectator = (roomId: string) => {
-	socket.emit('enterSpectator', roomId);
+	gameSocket.emit('enterSpectator', roomId);
   };
 
 //   const leaveRoomSpectator = () => {
-// 	socket.emit('leaveRoomSpectator');
+// 	gameSocket.emit('leaveRoomSpectator');
 //   };
 
   let lastType: string | undefined = undefined;
@@ -246,7 +249,7 @@ const sendMessage = (message: string) => {
 	  return;
 	}
 	lastType = type;
-	socket.emit('sendKey', { type, key });
+	gameSocket.emit('sendKey', { type, key });
   };
 
   export type { State };
