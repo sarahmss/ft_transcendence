@@ -37,9 +37,12 @@ const Popup: React.FC<PopupProps> = ({ buttonText }) => {
       axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' })
         .then((response) => {
           if (response.data) {
-            const imageBase64 = Buffer.from(response.data, 'binary').toString('base64');
+            const imageBase64 = btoa(
+              new Uint8Array(response.data)
+                .reduce((data, byte) => data + String.fromCharCode(byte), '')
+            );
             const imgElement = document.createElement('img');
-            imgElement.src = `data:image/png;base64, ${imageBase64}`;
+            imgElement.src = `data:image/png;base64,${imageBase64}`;
             setQrCodeImg(imgElement);
           } else {
             setError('No image data found.');
