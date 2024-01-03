@@ -1,10 +1,10 @@
 
 import { Column,
+	CreateDateColumn,
 	Entity,
 	JoinColumn,
 	ManyToOne,
-	PrimaryGeneratedColumn, 
-    UpdateDateColumn} from 'typeorm';
+	PrimaryGeneratedColumn} from 'typeorm';
 import { User } from './user.entity';
 import { Room } from './room.entity';
 
@@ -30,6 +30,11 @@ export class BlackList {
 	@Column({ default: true })
 	status: boolean;
 
-	@UpdateDateColumn({ type: 'timestamptz' })
-	timestamp: Date;
+	@CreateDateColumn({ type: 'timestamptz' })
+	start_end: Date;
+
+	@Column({ type: 'timestamptz',
+			nullable: true,
+			default: null })
+	block_end: Date;
 }

@@ -43,6 +43,12 @@ export class GroupRoom {
 
 	@Column( {default: true, name: "is_private" } )
 	isPrivate: boolean;
+
+	@Column( { default: false } )
+	protected: boolean;
+
+	@Column( { default: null, nullable: true } )
+	password: string;
 }
 
 @Entity()

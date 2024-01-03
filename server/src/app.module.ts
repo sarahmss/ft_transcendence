@@ -42,10 +42,6 @@ export class AppModule implements NestModule {
 			{ path: '/auth/signin', method: RequestMethod.POST },
 			{ path: '/2fa-auth/login', method: RequestMethod.POST },
 			{ path: '/images/:userId/:path', method: RequestMethod.GET },
-			/* Erase everything below afterwards testing */
-
-			{ path: '/room/:id', method: RequestMethod.GET},
-			{ path: '/room', method: RequestMethod.POST}
 		)
 		.forRoutes('');
 	}
