@@ -59,7 +59,8 @@ type ActionType =
 
 const gameSocket = socketClient(GameLink, {
   autoConnect: false,
-  withCredentials: true
+  transports: ['websocket'],
+  withCredentials: true,
 });
 
 const reducer = (state: State, action: ActionType): State => {

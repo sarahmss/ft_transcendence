@@ -9,8 +9,8 @@ async function bootstrap() {
 	const app: INestApplication = await NestFactory.create(AppModule);
 	const port = process.env.BACK_PORT;
 	const corsOptions = {
-		origin: [process.env.FRONT_URL, 'http://api.intra.42.fr'],
-		methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+		origin: [process.env.FRONT_URL, 'http://api.intra.42.fr', process.env.BACK_URL],
+		methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
 		credentials: true,
 	}
 
