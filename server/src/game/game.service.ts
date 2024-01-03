@@ -295,10 +295,12 @@ export class GameService {
 				room[playerNumbers] = undefined;
 				if (match) {
 					match[playerNumbers] = undefined;
-					match.status = 'END';
-					match.message = `Player ${
-					  this.game.players[client.id].name
-					} left the match.`;
+					if (match.status !== 'END') {
+						match.status = 'END';
+						match.message = `Player ${
+						  this.game.players[client.id].name
+						} left the match.`;
+					}
 				}
             }
 			else
@@ -318,8 +320,8 @@ export class GameService {
 					delete this.game.match[roomId];
                 }
             }
-            this.refreshMatch(server, roomId);
             client.leave(roomId);
+            this.refreshMatch(server, roomId);
         }
 		this.logger.log('Usuário saiu da partida: ', JSON.stringify(this.game.players[client.id]));
         this.refreshPlayers(server);
@@ -346,11 +348,11 @@ export class GameService {
             case 'PLAY':
                 this.moveBall(match);
                 this.movePaddle(match);
-                this.checkCollision(match);
+                this.checkCollision(match, roomId);
             break;
         }
         this.refreshMatch(server, roomId);
-        setTimeout(() => this.gameInProgress(roomId, server), 1000 / 60);
+        setTimeout(() => this.gameInProgress(roomId, server), 1000 / 30);
     }
 
     moveBall({ball}) {
@@ -384,16 +386,23 @@ export class GameService {
         });
     }
 
-    restartMatch(match) {
+    restartMatch(match, roomId) {
 
       const { ball, gameConfig } = match;
 
       ball.xdirection *= -1;
       ball.x = gameConfig.width / 2;
       ball.y = gameConfig.height / 2;
+
+	  if (match.score1 === 10 || match.score2 === 10) {
+		const playerNumber = match.score1 === 10 ? 1 : 2;
+		const playerSocketId = this.game.rooms[roomId][`player${playerNumber}`];
+		match.status = 'END';
+		match.message = `The player ${this.game.players[playerSocketId].name} won.`;
+	  }
     }
 
-    checkCollision(match) {
+    checkCollision(match, roomId) {
 
         const { ball, gameConfig } = match;
         if (ball.y > gameConfig.height - ball.width || ball.y < ball.width) {
@@ -425,11 +434,11 @@ export class GameService {
             ball.x = playerNumber === 1 ? match[player].x + match[player].width + br : match[player].x - br;
         } else if (ball.x < ball.width) {
             match.score2++;
-            this.restartMatch(match);
+            this.restartMatch(match, roomId);
 
         } else if (ball.x > gameConfig.width - ball.width) {
             match.score1++;
-            this.restartMatch(match);
+            this.restartMatch(match, roomId);
         }
 		if (match.accelerated && Math.abs(match.score2 - match.score1) === 10)
 		{
