@@ -215,8 +215,8 @@ export class GameService {
                 width: 10,
                 xdirection: 1,
                 ydirection: 1,
-                xspeed: 2.8,
-                yspeed: 2.2,
+                xspeed: 4.0,
+                yspeed: 4.0,
                 x: this.gameConfig.width / 2,
                 y: this.gameConfig.height / 2,
             };
