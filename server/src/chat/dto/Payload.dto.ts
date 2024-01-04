@@ -6,10 +6,10 @@ import { IsNotEmpty } from "class-validator";
 export class ChatData {
 
 	@IsNotEmpty()
-	room: Room;
+	room: string;
 
 	@IsNotEmpty()
-	user: User;
+	user: string;
 
 	@IsNotEmpty()
 	message: Message;
