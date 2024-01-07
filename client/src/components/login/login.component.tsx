@@ -1,13 +1,13 @@
 import { Component, useReducer } from "react";
 import { Navigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import axios from "axios";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link, Button} from '@mui/material';
-import { reducer } from "../common/helper";
-import customIcon from '../assets/42logo.svg';
-import { IntraloginLink, LocalSigninLink } from "../common/constants";
+import { reducer } from "../../common/helper";
+import { IntraloginLink } from "../../common/constants";
 import './login.component.css'
+import AuthService from "../../services/auth.service";
+import * as Yup from "yup";
 
 type Props = {};
 
@@ -81,22 +81,54 @@ export default class Login extends Component<Props, State> {
 		};
 	}
 
+	componentDidMount() {
+		const currentUser = AuthService.getCurrentUser();
+
+		if (currentUser) {
+			this.setState({ redirect: "/profile" });
+		};
+	}
+
 	componentWillUnmount() {
 		window.location.reload();
 	}
 
-	handleLogin = async (formValues: { userName: string; password: string }) => {
-		const { userName, password } = formValues;
-		try {
-			const response = await axios.post(LocalSigninLink, {
-				userName,
-				password,
-			});
-
-		} catch (error) {
-			console.error("Login error:", error);
+	validationSchema() {
+		return Yup.object().shape({
+			userName: Yup.string().required("This field is required!"),
+			password: Yup.string().required("This field is required!"),
+		});
 		}
-		};
+
+	handleLogin = async (formValues:{ userName: string; password: string }) => {
+		const { userName, password } = formValues;
+
+		this.setState({
+			message: "",
+			loading: true
+		});
+
+		AuthService.LocalLogin(userName, password).then(
+			() => {
+				this.setState({
+				redirect: "/profile"
+				});
+			},
+			error => {
+				const resMessage =
+					(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+					error.message ||
+					error.toString();
+
+				this.setState({
+					loading: false,
+					message: resMessage
+				});
+				}
+			);
+			}
 
 	render() {
 		if (this.state.redirect) {
@@ -158,7 +190,7 @@ export default class Login extends Component<Props, State> {
 									</div>
 								</div>
 							)}
-							
+
 						</Form>
 					</Formik>
 				</div>

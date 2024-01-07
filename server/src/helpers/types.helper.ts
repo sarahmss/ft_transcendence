@@ -18,7 +18,7 @@ export type LocalUserData = {
 	userId: string;
 	userName: string;
 	email: string;
-	profilePicture: string;
+	// profilePicture: string;
 };
 
 export type UserProfile = {
@@ -30,6 +30,7 @@ export type UserProfile = {
 
 export interface UserRequest extends Request {
 	user: any;
+	headers: any;
 }
 
 const TEMP_PROFILE_PICTURE =

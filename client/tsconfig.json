@@ -22,5 +22,5 @@
   },
   "include": [
     "src"
-, "../../.vscode/api.ts"  ]
+, "../../.vscode/api.ts", "../../.vscode/CodeTextField.tsx", "../../.vscode/twoFactor.compontent.tsx"  ]
 }

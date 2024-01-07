@@ -22,7 +22,7 @@ export class User {
 	@Column({ nullable: false, default: status.OFF})
 	status: status;
 
-	@Column("text", {nullable: true, default: "empty"})
+	@Column("text", {nullable: true, default: "https://ssl.gstatic.com/accounts/ui/avatar_2x.png"})
 	profilePicture: string;
 
 	@Column({ default: false, nullable: false})

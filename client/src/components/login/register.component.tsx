@@ -1,10 +1,9 @@
-import { Component, useReducer } from "react";
+import { Component } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-import axios from "axios";
+// import axios from "axios";
+// import { LocalSignupLink } from "../../common/constants";
 import * as Yup from "yup";
-import { LocalSignupLink } from "../common/constants";
-import { Link, Button} from '@mui/material';
-import { reducer } from "../common/helper";
+import AuthService from "../../services/auth.service";
 
 type Props = {};
 
@@ -16,6 +15,7 @@ type State = {
 	successful: boolean,
 	message: string
 };
+
 export default class Register extends Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
@@ -66,25 +66,37 @@ export default class Register extends Component<Props, State> {
 	{
 		const { userName, email, password, passwordConfirm } = formValues;
 
-		try {
-			const response = await axios.post(LocalSignupLink, {
-				userName: userName,
-				email: email,
-				password: password,
-				passwordConfirm: passwordConfirm
-			});
-			this.setState({
-				message: "Registration successful!",
+		this.setState({
+			message: "",
+			successful: false
+		});
+		AuthService.register(
+			userName,
+			email,
+			password,
+			passwordConfirm
+			).then(
+			response => {
+				this.setState({
+				message: response.data.message,
 				successful: true
-			});
-		} catch (error) {
-			console.error("Login error:", error);
-			this.setState({
-				message: "Registration failed! Please try again.",
-				successful: false
-			});
+				});
+			},
+			error => {
+				const resMessage =
+				(error.response &&
+					error.response.data &&
+					error.response.data.message) ||
+				error.message ||
+				error.toString();
+
+				this.setState({
+				successful: false,
+				message: resMessage
+				});
+			}
+			);
 		}
-	}
 
 	render() {
 		const { successful, message } = this.state;

@@ -5,12 +5,15 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from 'src/users/users.module';
 import { FortyTwoStrategy } from './strategies/FortyTwo.strategy';
-import { JwtStrategy } from './strategies/jwt.strategy';
 import { TwoFaAuthController } from './2fa/2fa-auth.controller';
 import { TwoFaAuthService } from './2fa/2fa-auth.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from '../entity/user.entity';
+import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
 	imports: [
+		TypeOrmModule.forFeature([User]),
 		UsersModule,
 		PassportModule,
 		JwtModule.register({
@@ -20,8 +23,8 @@ import { TwoFaAuthService } from './2fa/2fa-auth.service';
 	],
 	providers: [AuthService,
 		FortyTwoStrategy,
-		JwtStrategy,
 		TwoFaAuthService,
+		JwtStrategy,
 		Logger],
 	controllers: [AuthController, TwoFaAuthController],
 	exports: [AuthService],

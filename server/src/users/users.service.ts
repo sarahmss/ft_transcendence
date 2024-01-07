@@ -1,4 +1,6 @@
-import { Injectable,
+import { HttpException,
+	HttpStatus,
+	Injectable,
 	NotFoundException,
 	UnprocessableEntityException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +10,7 @@ import { UpdateUserDto, CreateUserDto } from "./dto/user.dto";
 import { status } from "../helpers/types.helper"
 import { IntraUserData, UserHelper } from '../helpers/types.helper';
 import * as bcrypt from 'bcrypt';
+import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UsersService {
@@ -34,6 +37,10 @@ export class UsersService {
 
 	async findByUserName(userName: string): Promise<User> {
 		return this.usersRepository.findOneBy({ userName});
+	}
+
+	async findByEmail(email: string): Promise<User> {
+		return this.usersRepository.findOneBy({ email });
 	}
 
 	async findByExternalId(externalId: number): Promise<User> {
@@ -159,7 +166,7 @@ export class UsersService {
 
 	/********************************* TOOLS ******************************/
 
-	async createLocalUser(data: CreateUserDto) {
+	async createLocalUser(data: CreateUserDto, response: any) {
 		const { userName, password, email } = data;
 		const user = await this.usersRepository.findOne({ where:
 														{ userName } });
@@ -171,6 +178,7 @@ export class UsersService {
 													password: hashedPassword,
 													email: email
 												});
+		response.send({ message: "User was registered successfully!" });
 		return this.usersRepository.save(newUser);
 	}
 

@@ -13,7 +13,6 @@ import { Logger } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/entity/user.entity';
 import { CreateUserDto } from 'src/users/dto/user.dto';
-import { JwtGuard } from './guards/jwt.guards';
 
 @Controller('auth')
 export class AuthController {
@@ -27,14 +26,16 @@ export class AuthController {
 	/********************************* POST ******************************/
 
 	@Post('signup')
-	signup(@Body() data: CreateUserDto) {
-		return this.usersService.createLocalUser(data);
+	signup(@Res() response: Response,
+		@Body() data: CreateUserDto) {
+		this.logger.log( 'GET: auth/signup');
+		return this.usersService.createLocalUser(data, response);
 	}
 
 	@Post('signin')
-	// @UseGuards(JwtGuard)
 	signin(@Res() response: Response,
 			@Body() data: Partial<User>) {
+		this.logger.log( 'GET: auth/signin');
 		this.authService.LocalLogin(response, data);
 	}
 
@@ -52,6 +53,7 @@ export class AuthController {
 	}
 
 	@Get('callback')
+	@UseGuards(FortyTwoGuard)
 	intraCallback(@Res() response: Response,
 				@Req() request: UserRequest) {
 		this.logger.log( 'GET: auth/callback');

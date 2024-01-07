@@ -2,20 +2,25 @@ import { Module,
 		MiddlewareConsumer,
 		RequestMethod,
 		NestModule } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { AppGatewayModule } from './app/app.gateway.module';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
+import { PassportModule } from '@nestjs/passport';
+import { UploadsModule } from './uploads/upload.module';
+import { ChatModule } from './chat/chat.module';
+import { GameModule } from './game/game.module';
+
 @Module({
 	imports: [
 		ConfigModule.forRoot(),
+		PassportModule.register({ session: true }),
 		UsersModule,
+		UploadsModule,
 		AuthModule,
-		AppGatewayModule,
+		ChatModule,
+		GameModule,
 		TypeOrmModule.forRoot({
 			type: process.env.DB_TYPE as any,
 			host: process.env.PG_HOST,
@@ -27,12 +32,10 @@ import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
 			synchronize: true,
 		}),
 	],
-	controllers: [AppController],
-	providers: [AppService],
+	
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
-
 		consumer
 		.apply(AuthMiddleware)
 		.exclude(

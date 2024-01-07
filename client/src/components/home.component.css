@@ -1,0 +1,14 @@
+.wrapper {
+	display: flex;
+	flex-direction: row;
+  }
+
+  .image-container {
+	flex: 3;
+	text-align: left;
+  }
+
+  .container {
+	flex: 1;
+	text-align: right;
+  }

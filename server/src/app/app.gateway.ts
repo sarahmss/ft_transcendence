@@ -1,4 +1,4 @@
-import { Logger, OnModuleInit, UnauthorizedException } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
 import {
 	SubscribeMessage,
 	WebSocketGateway,

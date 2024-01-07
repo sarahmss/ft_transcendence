@@ -1,7 +1,7 @@
 # Base image
 FROM node:16
 
-WORKDIR /app
+WORKDIR /server
 
 COPY package*.json ./
 
