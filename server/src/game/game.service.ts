@@ -39,12 +39,16 @@ class RoomModel {
 	name: string;
 	player1: string;
 	player2: string | undefined;
+	player1Name: string;
+	player2Name: string | undefined;
 	spectators: Record<string, any>;
 
-	constructor(name: string, player1: string, player2: string | undefined){
+	constructor(name: string, player1: string, player2: string | undefined, player1Name: string, player2Name: string | undefined){
 		this.name = name;
 		this.player1 = player1;
 		this.player2 = player2;
+		this.player1Name = player1Name;
+		this.player2Name = player2Name;
 		this.spectators = {};
 	}
 }
@@ -56,6 +60,7 @@ class MatchModel {
 	player1: any;
 	player2: any;
 	status: string;
+	timeStartMatch: any;
 	ball: any;
 	message: string;
 	accelerated: boolean;
@@ -67,6 +72,7 @@ class MatchModel {
 		this.player1 = { ready: false, x: 10, y: this.gameConfig.height / 2, height: 80, width: 10, speed: 5};
 		this.player2 = { ready: false, x: this.gameConfig.width - 10, y: this.gameConfig.height / 2, height: 80, width: 10, speed: 5 };
 		this.status = 'CUSTOM';
+		this.timeStartMatch = '';
 		this.ball = '';
 		this.message = '';
 		this.accelerated = false;
@@ -106,7 +112,7 @@ export class GameService {
 
         client.join(client.id);
 		delete this.game.waiting[client.id];
-		this.game.rooms[client.id] = new RoomModel(`Room of ${this.game.players[client.id].name}`, client.id, undefined);
+		this.game.rooms[client.id] = new RoomModel(`Room of ${this.game.players[client.id].name}`, client.id, undefined, this.game.players[client.id].name, undefined);
         this.game.players[client.id].room = client.id;
 		this.game.players[client.id].state = 'in_room';
         this.refreshPlayers(server);
@@ -141,13 +147,14 @@ export class GameService {
 		}
 		else
 		{
-			if (room.player1 === oldClientId)
+			if (room.player1 === oldClientId) {
 				room.player1 = currentCliendId;
-			else if (room.player2 === oldClientId)
+				room.player1Name = player.name;
+			} else if (room.player2 === oldClientId) {
 				room.player2 = currentCliendId;
-			else
+				room.player2Name = player.name;
+			} else
 				return;
-
 		}
 
 		client.join(roomId);
@@ -159,6 +166,7 @@ export class GameService {
         client.join(roomId);
         const position = this.game.rooms[roomId].player1 ? '2' : '1';
         this.game.rooms[roomId][`player${position}`] = client.id;
+		this.game.rooms[roomId][`player${position}Name`] = this.game.players[client.id].name;
         this.game.players[client.id].room = roomId;
 		this.game.players[client.id].state = 'in_room';
         const room = this.game.rooms[roomId];
@@ -202,12 +210,13 @@ export class GameService {
         };
         if (match.player1.ready && match.player2.ready) {''
             match.status = 'PLAY';
+			match.timeStartMatch = new Date();
             match.ball = {
                 width: 10,
                 xdirection: 1,
                 ydirection: 1,
-                xspeed: 2.8,
-                yspeed: 2.2,
+                xspeed: 4.0,
+                yspeed: 4.0,
                 x: this.gameConfig.width / 2,
                 y: this.gameConfig.height / 2,
             };
@@ -295,10 +304,12 @@ export class GameService {
 				room[playerNumbers] = undefined;
 				if (match) {
 					match[playerNumbers] = undefined;
-					match.status = 'END';
-					match.message = `Player ${
-					  this.game.players[client.id].name
-					} left the match.`;
+					if (match.status !== 'END') {
+						match.status = 'END';
+						match.message = `Player ${
+						  this.game.players[client.id].name
+						} left the match.`;
+					}
 				}
             }
 			else
@@ -310,16 +321,18 @@ export class GameService {
 			this.game.players[client.id].state = '';
 
 			if (!room.player1 && !room.player2 && Object.keys(room.spectators).length === 0) {
-                delete this.game.rooms[roomId];
-                if (match) {
+				if (match) {
 					// é aqui que precisa gravar as informações da
 					// partida antes de fazer o delete
-
+					// isso inclui: nomes dos jogadores (player1Name e player2Name armazenado em this.game.rooms[roomId])
+					// score1, score2, timeStartMatch armazenado em match (timeStartMatch pra ser usado pra calcular o tempo que a partida levou)
+					
 					delete this.game.match[roomId];
                 }
+				delete this.game.rooms[roomId];
             }
-            this.refreshMatch(server, roomId);
             client.leave(roomId);
+            this.refreshMatch(server, roomId);
         }
 		this.logger.log('Usuário saiu da partida: ', JSON.stringify(this.game.players[client.id]));
         this.refreshPlayers(server);
@@ -346,11 +359,11 @@ export class GameService {
             case 'PLAY':
                 this.moveBall(match);
                 this.movePaddle(match);
-                this.checkCollision(match);
+                this.checkCollision(match, roomId);
             break;
         }
         this.refreshMatch(server, roomId);
-        setTimeout(() => this.gameInProgress(roomId, server), 1000 / 60);
+        setTimeout(() => this.gameInProgress(roomId, server), 1000 / 30);
     }
 
     moveBall({ball}) {
@@ -384,16 +397,23 @@ export class GameService {
         });
     }
 
-    restartMatch(match) {
+    restartMatch(match, roomId) {
 
       const { ball, gameConfig } = match;
 
       ball.xdirection *= -1;
       ball.x = gameConfig.width / 2;
       ball.y = gameConfig.height / 2;
+
+	  if (match.score1 === 10 || match.score2 === 10) {
+		const playerNumber = match.score1 === 10 ? 1 : 2;
+		const playerSocketId = this.game.rooms[roomId][`player${playerNumber}`];
+		match.status = 'END';
+		match.message = `The player ${this.game.players[playerSocketId].name} won.`;
+	  }
     }
 
-    checkCollision(match) {
+    checkCollision(match, roomId) {
 
         const { ball, gameConfig } = match;
         if (ball.y > gameConfig.height - ball.width || ball.y < ball.width) {
@@ -425,11 +445,11 @@ export class GameService {
             ball.x = playerNumber === 1 ? match[player].x + match[player].width + br : match[player].x - br;
         } else if (ball.x < ball.width) {
             match.score2++;
-            this.restartMatch(match);
+            this.restartMatch(match, roomId);
 
         } else if (ball.x > gameConfig.width - ball.width) {
             match.score1++;
-            this.restartMatch(match);
+            this.restartMatch(match, roomId);
         }
 		if (match.accelerated && Math.abs(match.score2 - match.score1) === 10)
 		{

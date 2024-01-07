@@ -37,6 +37,7 @@ interface Match {
 
 interface State {
   isConnected: boolean;
+  isUserLogged: boolean;
   players: Record<string, Player>;
   current_player: Player;
   current_room: Room;
@@ -48,6 +49,7 @@ interface State {
 
 type ActionType =
   | { type: 'CONNECTED'; payload: boolean }
+  | { type: 'LOGGED'; payload: boolean }
   | { type: 'RESET_STATE' }
   | { type: 'MESSAGE'; payload: string }
   | { type: 'ROOMS'; payload: Record<string, Room> }
@@ -59,7 +61,8 @@ type ActionType =
 
 const gameSocket = socketClient(GameLink, {
   autoConnect: false,
-  withCredentials: true
+  transports: ['websocket'],
+  withCredentials: true,
 });
 
 const reducer = (state: State, action: ActionType): State => {
@@ -69,6 +72,11 @@ const reducer = (state: State, action: ActionType): State => {
         ...state,
         isConnected: action.payload,
       };
+	case 'LOGGED':
+    	return {
+    	  ...state,
+    	  isUserLogged: action.payload,
+    	};
     case 'RESET_STATE':
       return {
         ...initialState,
@@ -116,6 +124,7 @@ const reducer = (state: State, action: ActionType): State => {
 
 const initialState: State = {
   isConnected: false,
+  isUserLogged: true,
   players: {},
   current_player: { name: '' },
   current_room: { name: '' },
@@ -129,14 +138,14 @@ const GameContext = createContext<State | undefined>(undefined);
 
 const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const [redirect, setRedirect] = useState('');
 
   useEffect(() => {
     gameSocket.on('connect', () => {
 		const storedPlayer = AuthService.getCurrentUser();
-		// if (!storedPlayer){
-		// 	setRedirect("/home");
-		// }
+		if (!storedPlayer){
+			dispatch({ type: 'LOGGED', payload: false });
+			return;
+		}
 		if (storedPlayer !== null) {
 			gameSocket.emit('reconnect', storedPlayer);
 		}
@@ -153,9 +162,10 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
 		if (player)
 		{
 			const storedPlayer = AuthService.getCurrentUser();
-			// if (!storedPlayer){
-			// 	setRedirect("/home");
-			// }
+			if (!storedPlayer){
+				dispatch({ type: 'LOGGED', payload: false });
+				return;
+			}
 			localStorage.setItem(storedPlayer.userId, JSON.stringify(player));
 			dispatch({type: 'PLAYER', payload: players[gameSocket.id]});
 		}

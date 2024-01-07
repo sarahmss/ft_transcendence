@@ -5,11 +5,12 @@ import { PlayerModel } from './game.service';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
 @WebSocketGateway ({
-	cors: {
-		origin: process.env.FRONT_URL,
-		credentials: true,
-	},
 	namespace: '/game',
+	cors: {
+		origin: [process.env.FRONT_URL, process.env.BACK_URL],
+		credentials: true,
+		methods: 'GET',
+	},
 })
 
 @Injectable ()
@@ -35,7 +36,7 @@ export class GameGateway
 
 		private disconnect(client: Socket) {
 			console.log(`Client disconnected: ${client.id}`);
-			client.disconnect();
+			// client.disconnect();
 		}
 
 		handleDisconnect(client: Socket) {
