@@ -58,28 +58,18 @@ class App extends Component<Props, State> {
 		return (
 			<div>
 				<nav className="navBarTop d-flex justify-content-between">
-					<Link to={"/"} className="Transcendence navMenu">
+					<Link to={"/"} className="navMenu">
 						Transcendence
 					</Link>
-					{currentUser && (
-						<li className="nav-item">
-							<Link to={"/user"} className="nav-link">
-								User
-							</Link>
-						</li>
-					)}
 					{currentUser ? (
-						<div className="navbar-nav ml-auto navMenu">
-							<li className="nav-item">
-								<Link to={"/profile"} className="nav-link">
-									{currentUser.userName}
-								</Link>
-							</li>
-							<li className="nav-item">
-								<a href="/login" className="nav-link" onClick={this.logOut}>
-									LogOut
-								</a>
-							</li>
+						<div className="register">
+							<Link to={"/profile"} className="navMenu">
+								{currentUser.userName}
+							</Link>
+
+							<a href="/login" className="navMenu" onClick={this.logOut}>
+								LogOut
+							</a>
 						</div>
 					) : (
 						<section className="register">
@@ -93,14 +83,13 @@ class App extends Component<Props, State> {
 					)}
 				</nav>
 
-				<div className="container mt-3">
+				<div>
 					<Routes>
 						<Route path="/" element={<Home />} />
 						<Route path="/home" element={<Home />} />
 						<Route path="/login" element={<Login />} />
 						<Route path="/register" element={<Register />} />
 						<Route path="/profile" element={<Profile />} />
-						<Route path="/user" element={<BoardUser />} />
 						<Route path="/settings" element={<Settings />} />
 						<Route path="/game" element={
 									<div>

@@ -4,11 +4,9 @@
   }
 
   .image-container {
-	flex: 3;
-	text-align: left;
-  }
+	flex: 70%;
 
+  }
   .container {
-	flex: 1;
-	text-align: right;
+	flex: 30%;
   }

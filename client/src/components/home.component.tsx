@@ -42,7 +42,7 @@ export default class Home extends Component<Props, State> {
 			  <img
 				src={TransPong}
 				alt="TransPong"
-				style={{ maxWidth: "100%", height: "auto" }}
+				style={{ width: "100%", objectFit: "cover", height: "100%" }}
 			  />
 			</div>
 
