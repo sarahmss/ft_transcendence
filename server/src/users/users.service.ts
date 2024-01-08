@@ -76,7 +76,7 @@ export class UsersService {
 		return user.status;
 	}
 
-	async getUserSecret(userId: string): Promise<string>
+	async getUserPassword(userId: string): Promise<string>
 	{
 		const user = await this.checkUser(userId);
 		return user.password;
@@ -102,7 +102,7 @@ export class UsersService {
 		return this.setStatus(userId, status.PLAYING);
 	}
 
-	async setUserSecret(userId: string, password: string): Promise<User> {
+	async setUserPassword(userId: string, password: string): Promise<User> {
 		const user = await this.checkUser(userId);
 		user.password = password;
 		return this.usersRepository.save(user);
@@ -192,6 +192,12 @@ export class UsersService {
 			profilePicture: picture,
 		});
 		return this.usersRepository.save(newUser);
+		}
+
+		async updateProfilePic(userId: string, newProfilePic:string): Promise<User> {
+			const user = await this.checkUser(userId);
+			this.usersRepository.merge(user, {profilePicture: newProfilePic});
+			return this.usersRepository.save(user);
 		}
 
 		async update(userId: string, userDto: UpdateUserDto): Promise<User> {

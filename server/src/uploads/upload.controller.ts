@@ -16,11 +16,15 @@ import {existsSync,
 import { join } from 'path';
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from 'multer';
-
+import { UsersService } from "src/users/users.service";
 const fs = require('fs');
 
 @Controller('uploads')
 export class UploadsController {
+	constructor(
+		private usersService: UsersService,
+		) {}
+
 	@Get(':userId/:path')
 		getFile(@Res() res: Response, @Param('userId', ParseUUIDPipe) userId: string): void {
 			const qrCodeLink = `/uploads/${userId}/qrcode.png`;
@@ -59,8 +63,10 @@ export class UploadsController {
 				}),
 			)
 	file: Express.Multer.File,
-	@Param('userId') userId: string): Promise<any>{
-	return {url: `/uploads/${userId}/profilePictures/${file.filename}`};
+	@Param('userId') userId: string): Promise<any> {
+		const url = `/uploads/${userId}/profilePictures/${file.filename}`
+		this.usersService.updateProfilePic(userId, url);
+		return {url:url};
 	}
 
 	@Get('/:userId/profilePictures/:filename')
