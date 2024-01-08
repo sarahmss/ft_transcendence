@@ -82,15 +82,6 @@ class TwoFaService {
 	reditectToDisable2Fa = () => {
 	// history.push('/disable2fa');
 	};
-
-	applyChanges = async () => {
-	// Restante do código para aplicar as alterações...
-	};
-
-	onAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
-	// Restante do código para lidar com a mudança do avatar...
-	};
-
 }
 const twoFaService = new TwoFaService();
 

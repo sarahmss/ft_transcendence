@@ -1,5 +1,5 @@
-import React, { useContext, useEffect } from 'react';
-import { GameContext, State, execMatch, exitQueue } from '../../contexts/GameContext';
+import React, { useEffect } from 'react';
+import { execMatch, exitQueue } from '../../contexts/GameContext';
 
 const Queue: React.FC = () => {
 //   const { in_waiting, current_player, rooms, match } = useContext(GameContext) as State;

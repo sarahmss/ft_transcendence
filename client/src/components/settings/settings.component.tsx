@@ -15,12 +15,10 @@ type SettingsState = {
 	redirect: string | null,
 	currentUser: IUser & { accessToken: string }
 	twoFAEnabled: boolean;
-	startUserName: string;
 	userName: string;
-	userReady: boolean;
+	update: boolean;
 	showLabelAndImage: boolean;
 }
-
 export default class Settings extends Component<Props, SettingsState> {
 
 	constructor(props: Props) {
@@ -30,10 +28,9 @@ export default class Settings extends Component<Props, SettingsState> {
 		redirect: null,
 		currentUser: { accessToken: "" },
 		twoFAEnabled: true,
-		startUserName: '',
 		userName: '',
+		update: false,
 		selectedFile: undefined,
-		userReady: false,
 		showLabelAndImage: false,
 		};
 	}
@@ -42,7 +39,7 @@ export default class Settings extends Component<Props, SettingsState> {
 		const currentUser = AuthService.getCurrentUser();
 
 		if (!currentUser) this.setState({ redirect: "/home" });
-		this.setState({ currentUser: currentUser, userReady: true })
+		this.setState({ currentUser: currentUser })
 	}
 
 	handleEnable2FAClick = () => {
@@ -57,16 +54,16 @@ export default class Settings extends Component<Props, SettingsState> {
 			this.setState({ selectedFile: file });
 		  };
 
-		handleUploadClick = () => {
+		handleUploadClick = async () => {
 		const { selectedFile } = this.state;
 
 		if (selectedFile) {
 			const formData = new FormData();
 			formData.append('file', selectedFile);
-			userService.uploadProfilePic(selectedFile.name, formData);
+			const newProfilePic = userService.uploadProfilePic(selectedFile.name, formData);
+			console.log(newProfilePic);
 		} else {
-			console.error('Please select a file before uploading');
-		}
+			console.error('Please select a file before uploading'); }
 		};
 
 	render() {
@@ -86,7 +83,6 @@ export default class Settings extends Component<Props, SettingsState> {
 			<CardHeader
 					title="User Settings"
 					subheader="Update Avatar or UserName"
-
 			/>
 
 			<CardContent style={{ textAlign: 'right', position: 'relative' }} className="md-layout md-layout-item md-alignment-center-center">
@@ -97,13 +93,13 @@ export default class Settings extends Component<Props, SettingsState> {
 						alt="profile-img"
 						className="profile-img-card"
 					/>
+					</div>
+					<div className="md-layout-item md-alignment-center-center">
+						<input type="file" name="file" accept="image/*" onChange={this.handleUpdateProfilePicture}/>
 
-					<input type="file" name="file" accept="image/*" onChange={this.handleUpdateProfilePicture}/>
-
-					<button onClick={this.handleUploadClick}>
-						Upload Profile Picture
-					</button>
-
+						<button onClick={this.handleUploadClick}>
+							Upload Profile Picture
+						</button>
 					</div>
 				</div>
 				<div className="md-layout md-layout-item md-alignment-center-left">
@@ -122,7 +118,7 @@ export default class Settings extends Component<Props, SettingsState> {
 				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.twoFAEnabled} onClick={this.handleEnable2FAClick}>
 					Enable 2FA
 				</Button>
-				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.userReady} onClick={TwoFaService.applyChanges}>
+				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.update} onClick={userService.applyChanges}>
 					Update
 				</Button>
 				{this.state.showLabelAndImage && (

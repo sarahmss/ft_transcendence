@@ -1,6 +1,4 @@
-import { HttpException,
-	HttpStatus,
-	Injectable,
+import { Injectable,
 	NotFoundException,
 	UnprocessableEntityException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,7 +8,6 @@ import { UpdateUserDto, CreateUserDto } from "./dto/user.dto";
 import { status } from "../helpers/types.helper"
 import { IntraUserData, UserHelper } from '../helpers/types.helper';
 import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UsersService {

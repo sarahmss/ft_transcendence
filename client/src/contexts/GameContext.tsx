@@ -1,7 +1,6 @@
 import React, { useEffect,
 				useReducer,
-				createContext,
-				useState} from "react";
+				createContext} from "react";
 import socketClient from 'socket.io-client';
 import AuthService from "../services/auth.service";
 import { GameLink } from "../common/constants"

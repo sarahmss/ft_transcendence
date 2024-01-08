@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { GameContext, leaveRoom, enterSpectator, State} from '../../contexts/GameContext';
+import { GameContext, enterSpectator, State} from '../../contexts/GameContext';
 
 
 const Rooms: React.FC = () => {

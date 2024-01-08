@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import PlayerList from './PlayerList';
-import { GameContext, leaveRoom, addOnQueue, State } from '../../contexts/GameContext';
+import { GameContext, addOnQueue, State } from '../../contexts/GameContext';
 import Rooms from './Rooms';
 import Queue from './Queue';
 import Customizing from './Customizing';

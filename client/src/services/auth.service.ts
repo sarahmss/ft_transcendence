@@ -30,7 +30,7 @@ class AuthService {
 
 	logout() {
 		const authToken = this.getAuthToken();
-		localStorage.removeItem("LoggedUser");
+		localStorage.clear();
 		return axios.get(BackLink + "/auth/logout", { headers: authToken })
 	}
 

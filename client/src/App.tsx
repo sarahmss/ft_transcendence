@@ -9,7 +9,6 @@ import Login from "./components/login/login.component";
 import Register from "./components/login/register.component";
 import Home from "./components/home.component";
 import Profile from "./components/profile/profile.component";
-import BoardUser from "./components/profile/board-user.component";
 import Settings from "./components/settings/settings.component";
 import EventBus from "./common/EventBus";
 import { GameProvider } from './contexts/GameContext';
