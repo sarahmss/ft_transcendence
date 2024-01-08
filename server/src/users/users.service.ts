@@ -173,7 +173,8 @@ export class UsersService {
 		const newUser = this.usersRepository.create({
 													userName: userName,
 													password: hashedPassword,
-													email: email
+													email: email,
+													profilePicture: UserHelper.TEMP_PROFILE_PICTURE
 												});
 		response.send({ message: "User was registered successfully!" });
 		return this.usersRepository.save(newUser);

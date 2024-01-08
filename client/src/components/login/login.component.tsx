@@ -44,6 +44,7 @@ const IntraLoginButton = () => {
 			setState({ loading: false });
 			setState({ loginError: true });
 		}, 7000 )
+		AuthService.IntraLogin();
 	}
 
 	return (

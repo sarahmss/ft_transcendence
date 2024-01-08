@@ -1,4 +1,4 @@
-import	{ Component } from 'react';
+import	React, { Component } from 'react';
 import {Card, CardHeader, CardContent, CardActions, Button, TextField } from '@mui/material';
 import AuthService from "../../services/auth.service";
 import IUser from "../../types/user.type";
@@ -7,11 +7,11 @@ import TwoFaService from '../../services/twoFa.service';
 import './settings.component.css';
 import Popup from './popup'
 import userService from '../../services/user.service';
+import { ProfilePicComponent } from './picture.component';
 
 type Props = {};
 
 type SettingsState = {
-	selectedFile: File | undefined,
 	redirect: string | null,
 	currentUser: IUser & { accessToken: string }
 	twoFAEnabled: boolean;
@@ -30,7 +30,6 @@ export default class Settings extends Component<Props, SettingsState> {
 		twoFAEnabled: true,
 		userName: '',
 		update: false,
-		selectedFile: undefined,
 		showLabelAndImage: false,
 		};
 	}
@@ -48,23 +47,6 @@ export default class Settings extends Component<Props, SettingsState> {
 			showLabelAndImage: true,
 		});
 		}
-
-		handleUpdateProfilePicture = (event: React.ChangeEvent<HTMLInputElement>) => {
-			const file = event.target.files?.[0];
-			this.setState({ selectedFile: file });
-		  };
-
-		handleUploadClick = async () => {
-		const { selectedFile } = this.state;
-
-		if (selectedFile) {
-			const formData = new FormData();
-			formData.append('file', selectedFile);
-			const newProfilePic = userService.uploadProfilePic(selectedFile.name, formData);
-			console.log(newProfilePic);
-		} else {
-			console.error('Please select a file before uploading'); }
-		};
 
 	render() {
 		if (this.state.redirect) {
@@ -86,22 +68,11 @@ export default class Settings extends Component<Props, SettingsState> {
 			/>
 
 			<CardContent style={{ textAlign: 'right', position: 'relative' }} className="md-layout md-layout-item md-alignment-center-center">
-				<div className="md-layout-item">
-					<div className="user-avatar-content ">
-					<img
-						src={currentUser.profilePicture}
-						alt="profile-img"
-						className="profile-img-card"
-					/>
-					</div>
-					<div className="md-layout-item md-alignment-center-center">
-						<input type="file" name="file" accept="image/*" onChange={this.handleUpdateProfilePicture}/>
 
-						<button onClick={this.handleUploadClick}>
-							Upload Profile Picture
-						</button>
-					</div>
-				</div>
+			<ProfilePicComponent
+				currentUser={currentUser}
+			 />
+
 				<div className="md-layout md-layout-item md-alignment-center-left">
 				<TextField
 					label="UserName"
@@ -136,5 +107,5 @@ export default class Settings extends Component<Props, SettingsState> {
 		</div>
 		</div>
 	);
-}
+	}
 }

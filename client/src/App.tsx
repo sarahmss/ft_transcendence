@@ -60,14 +60,19 @@ class App extends Component<Props, State> {
 					<Link to={"/"} className="navMenu">
 						Transcendence
 					</Link>
+
 					{currentUser ? (
 						<div className="register">
 							<Link to={"/profile"} className="navMenu">
-								{currentUser.userName}
+							👤 {currentUser.userName}
+							</Link>
+
+							<Link to={"/settings"} className="navMenu">
+								⚙️ Settings
 							</Link>
 
 							<a href="/login" className="navMenu" onClick={this.logOut}>
-								LogOut
+							🚪 LogOut
 							</a>
 						</div>
 					) : (
