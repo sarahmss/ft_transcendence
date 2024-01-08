@@ -1,4 +1,4 @@
-import  { Component } from 'react';
+import	{ Component } from 'react';
 import {Card, CardHeader, CardContent, CardActions, Button, TextField } from '@mui/material';
 import AuthService from "../../services/auth.service";
 import IUser from "../../types/user.type";
@@ -6,16 +6,17 @@ import { Navigate } from "react-router-dom";
 import TwoFaService from '../../services/twoFa.service';
 import './settings.component.css';
 import Popup from './popup'
+import userService from '../../services/user.service';
 
 type Props = {};
 
 type SettingsState = {
+	selectedFile: File | undefined,
 	redirect: string | null,
 	currentUser: IUser & { accessToken: string }
 	twoFAEnabled: boolean;
 	startUserName: string;
 	userName: string;
-	avatar: string;
 	userReady: boolean;
 	showLabelAndImage: boolean;
 }
@@ -31,7 +32,7 @@ export default class Settings extends Component<Props, SettingsState> {
 		twoFAEnabled: true,
 		startUserName: '',
 		userName: '',
-		avatar: '',
+		selectedFile: undefined,
 		userReady: false,
 		showLabelAndImage: false,
 		};
@@ -49,8 +50,24 @@ export default class Settings extends Component<Props, SettingsState> {
 		this.setState({
 			showLabelAndImage: true,
 		});
-	  }
+		}
 
+		handleUpdateProfilePicture = (event: React.ChangeEvent<HTMLInputElement>) => {
+			const file = event.target.files?.[0];
+			this.setState({ selectedFile: file });
+		  };
+
+		handleUploadClick = () => {
+		const { selectedFile } = this.state;
+
+		if (selectedFile) {
+			const formData = new FormData();
+			formData.append('file', selectedFile);
+			userService.uploadProfilePic(selectedFile.name, formData);
+		} else {
+			console.error('Please select a file before uploading');
+		}
+		};
 
 	render() {
 		if (this.state.redirect) {
@@ -62,8 +79,7 @@ export default class Settings extends Component<Props, SettingsState> {
 
 	return (
 		<div className="settings-content">
-
-		<div className="md-layout md-gutter">
+		<div className="md-layout md-gutter container mt-3">
 			<div style={{ margin: '100px 0' }} className="md-layout-item md-layout md-gutter md-alignment-top-center">
 			<Card style={{ minWidth: '300px' }} className="md-layout-item md-size-65">
 
@@ -75,12 +91,19 @@ export default class Settings extends Component<Props, SettingsState> {
 
 			<CardContent style={{ textAlign: 'right', position: 'relative' }} className="md-layout md-layout-item md-alignment-center-center">
 				<div className="md-layout-item">
-					<div className="user-avatar-content">
+					<div className="user-avatar-content ">
 					<img
 						src={currentUser.profilePicture}
 						alt="profile-img"
 						className="profile-img-card"
 					/>
+
+					<input type="file" name="file" accept="image/*" onChange={this.handleUpdateProfilePicture}/>
+
+					<button onClick={this.handleUploadClick}>
+						Upload Profile Picture
+					</button>
+
 					</div>
 				</div>
 				<div className="md-layout md-layout-item md-alignment-center-left">

@@ -11,6 +11,12 @@ class UserService {
 		const userId = AuthService.getCurrentUserId();
 		return axios.get(`${BackLink}/${userId}/profile`, { headers: AuthService.getAuthToken() });
 	}
+
+	uploadProfilePic(imgName: string, img: FormData) {
+		const userId = AuthService.getCurrentUserId();
+
+		return axios.post(`${BackLink}/uploads/${userId}/profilePictures/${imgName}`, {file: img}, {headers: AuthService.getAuthToken() });
+	}
 }
 
 const userService = new UserService();
