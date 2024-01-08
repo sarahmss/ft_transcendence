@@ -43,6 +43,7 @@ services:
     env_file: .env
     environment:
       - REACT_APP_BACK_HOST=${BACK_URL}
+      - REACT_APP_FRONT_HOST=${FRONT_URL}
     ports:
       - "${FRONT_PORT}:${FRONT_PORT}"
     depends_on:

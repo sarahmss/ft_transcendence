@@ -1,10 +1,16 @@
 import { Component } from "react";
 import TransPong from '../assets/home.jpeg';
 import "./home.component.css"
+import AuthService from "../services/auth.service";
+import IUser from "../types/user.type";
+import {FrontLogin, FrontGame} from "./../common/constants";
+
 type Props = {};
 
 type State = {
 	content: string;
+	currentUser: IUser & { accessToken: string };
+	isLogged: boolean;
 }
 
 export default class Home extends Component<Props, State> {
@@ -12,27 +18,20 @@ export default class Home extends Component<Props, State> {
 		super(props);
 
 		this.state = {
-			content: "Chat"
+			content: "Chat",
+			currentUser: { accessToken: "" },
+			isLogged: false,
 		};
 	}
 
-	// componentDidMount() {
-	// 	UserService.getPublicContent().then(
-	// 		response => {
-	// 			this.setState({
-	// 				content: response.data
-	// 			});
-	// 		},
-	// 		error => {
-	// 			this.setState({
-	// 				content:
-	// 					(error.response && error.response.data) ||
-	// 					error.message ||
-	// 					error.toString()
-	// 			});
-	// 		}
-	// 	);
-	// }
+	componentDidMount() {
+        const currentUser = AuthService.getCurrentUser();
+
+        if (currentUser) 
+			this.setState({isLogged: true });
+		
+        this.setState({ currentUser: currentUser})
+    }
 
 
 	render() {
@@ -47,9 +46,18 @@ export default class Home extends Component<Props, State> {
 			</div>
 
 			<div className="container">
-			  <header className="jumbotron">
+			  <section className="jumbotron">
 				<h3>{this.state.content}</h3>
-			  </header>
+			  </section>
+			  {this.state.isLogged ? (
+					<a href={FrontGame}>
+						<button>Play</button>
+					</a>
+					) : (
+						<a href={FrontLogin}>
+							<button>Please, log in!</button>
+						</a>
+					)}
 			</div>
 		  </div>
 		);
