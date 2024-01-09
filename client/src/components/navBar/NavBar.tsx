@@ -9,48 +9,47 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
+import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import authService from '../../services/auth.service';
+import { Link } from 'react-router-dom';
+import { DefaultPic } from '../../common/constants';
 
-const pagesLogged = ['Profile', 'Settings', 'Logout'];
-//const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-const pagesUnlogged = ['Login', 'Signup'];
+const pagesLogged = [
+	{ label: 'Profile', link: '/profile' },
+	{ label: 'Settings', link: '/settings' },
+	{ label: 'Logout', link: '/logout' },
+];
+
+const pagesUnlogged = [
+	{ label: 'Login', link: '/login' },
+	{ label: 'Signup', link: '/signup' },
+];
 
 const NavBar: React.FC = () => {
-  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
   const [isLogged, setIsLogged] = React.useState(false);
+  const [profilePic, setProfilePic] = React.useState('');
+
 
   React.useEffect(() => {
     const user = authService.getCurrentUser();
-
     if (user) {
       setIsLogged(true);
+	  setProfilePic(user.profilePicture);
     } else {
       setIsLogged(false);
+	  setProfilePic(DefaultPic);
     }
   }, []);
 
-  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorElUser(event.currentTarget);
-  };
-
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
-
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
-  };
+  const logout = () => {
+	//
+	};
 
   return (
     <AppBar position="static" sx={{ backgroundColor: '#B700cc' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+          <SelfImprovementIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h6"
             noWrap
@@ -75,12 +74,11 @@ const NavBar: React.FC = () => {
               aria-label="account of current user"
               aria-controls="menu-appbar"
               aria-haspopup="true"
-              onClick={handleOpenNavMenu}
               color="inherit"
             >
             </IconButton>
           </Box>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
+          <SelfImprovementIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap
@@ -99,29 +97,29 @@ const NavBar: React.FC = () => {
           >
             LOGO
           </Typography>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {isLogged ? 
-              (
-                pagesLogged.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{page}</Typography>
-                  </MenuItem>
-                ))
-              )
-              :
-              (
-                pagesUnlogged.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{page}</Typography>
-                  </MenuItem>
-                ))
-              )}
+		  <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+            {isLogged ? (
+              pagesLogged.map((page) => (
+                <MenuItem key={page.label}>
+                  <Link to={page.link} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Typography textAlign="center">{page.label}</Typography>
+                  </Link>
+                </MenuItem>
+              ))
+            ) : (
+              pagesUnlogged.map((page) => (
+                <MenuItem key={page.label}>
+                  <Link to={page.link} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Typography textAlign="center">{page.label}</Typography>
+                  </Link>
+                </MenuItem>
+              ))
+            )}
           </Box>
-
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Profile Picture">
               <IconButton sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar alt="Remy Sharp" src={profilePic} />
               </IconButton>
             </Tooltip>
           </Box>

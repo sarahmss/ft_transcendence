@@ -1,7 +1,6 @@
 import axios from 'axios';
 import AuthService from './auth.service';
-import { ChangeEvent } from 'react';
-import { TwoFaLink } from '../common/constants';
+import { DefaultPic, TwoFaLink } from '../common/constants';
 
 class TwoFaService {
 
@@ -15,17 +14,6 @@ class TwoFaService {
 			}).catch(() => {
 			});
 	}
-
-	// redirectToEnable2FA = (code: string) => {
-	// 	return axios.post(
-	// 		TwoFaEnableLink,
-	// 		{ code: code },
-	// 		{ headers: authHeader() }
-	// 	)
-	// }
-
-	// if(authService.getIsLogged())
-	// 	return localStorage.getItem("qrcode");
 
 	getQrCode(){
 		const authTokenQr = AuthService.getAuthToken();
@@ -42,7 +30,7 @@ class TwoFaService {
 				console.log(error);
 			});
 		}
-		return ("https://ssl.gstatic.com/accounts/ui/avatar_2x.png")
+		return (DefaultPic)
 	}
 
 	generateQrCode() {

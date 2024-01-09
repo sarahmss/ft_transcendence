@@ -11,6 +11,7 @@ export const TwoFaDisableLink = BackLink + "/two-factor-auth/disable"
 export const TwoFaEnableLink = BackLink + "/two-factor-auth/enable"
 export const FrontLogin = FrontLink + "/login";
 export const FrontGame = FrontLink + "/game";
+export const DefaultPic = "https://ssl.gstatic.com/accounts/ui/avatar_2x.png";
 export const DEFAULT_ERROR_MSG = "ooops, something went wrong";
 
 export type booleanSetState = React.Dispatch<React.SetStateAction<boolean>>
