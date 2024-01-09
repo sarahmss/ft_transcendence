@@ -1,12 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MembershipDto } from 'src/chat/dto/Membership.dto';
 import { RoomCreationData } from 'src/chat/dto/room.dto';
 import { DIRECT, GROUP } from 'src/constants/roomType.constant';
-import { Membership } from 'src/entity/membership.entity';
 import { DirectRoom, GroupRoom, Room } from 'src/entity/room.entity';
+import { User } from 'src/entity/user.entity';
+import { UsersService } from 'src/users/users.service';
 import { Repository } from 'typeorm';
-import { MembershipService } from '../membership/membership.service';
 
 @Injectable()
 export class RoomService {
@@ -15,7 +14,18 @@ export class RoomService {
 		@InjectRepository(Room) private readonly roomRepository: Repository<Room>,
 		@InjectRepository(GroupRoom) private readonly groupRepository: Repository<GroupRoom>,
 		@InjectRepository(DirectRoom) private readonly directRepository: Repository<DirectRoom>,
+		@Inject(UsersService) private readonly userService: UsersService,
 	) {}
+
+	async checkUser(userList: User[]): Promise<boolean> {
+		this.userService
+		for (let k = 0; k < userList.length; k++) {
+			let userInstance = await this.userService.findById(userList[k].userId);
+			if (!userInstance)
+				return false;
+		}
+		return true;
+	}
 
 	async createGroupRoom(room: Room, isPrivate: boolean) {
 
@@ -37,6 +47,13 @@ export class RoomService {
 		let room = this.roomRepository.create({roomType: roomCreationData.roomType,
 												roomName: roomCreationData.roomName});
 
+		if (room.roomType == DIRECT) {
+			// Filter the owner and get the other end user
+			let participant = await this.userService.findById(roomCreationData.user.filter(
+																user => user.userId != roomCreationData.owner.userId)[0].userId);
+			room.roomName = participant.userName;
+		}
+		
 		await this.roomRepository.insert(room);
 
 		if (room.roomType == GROUP)

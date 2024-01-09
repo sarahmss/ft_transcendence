@@ -4,7 +4,6 @@ import { Message } from 'src/entity/message.entity';
 import { Room } from 'src/entity/room.entity';
 import { User } from 'src/entity/user.entity';
 
-
 export class createMessage {
 	@IsNotEmpty()
 	user: User;
@@ -15,7 +14,6 @@ export class createMessage {
 	@IsNotEmpty()
 	message: string;
 }
-
 
 export class GetMessage {
 

@@ -1,12 +1,29 @@
-import { Body, Controller, Delete, Get, HttpException, Patch } from '@nestjs/common';
-import { DeleteMessage, GetMessage, UpdateMessage } from 'src/chat/dto/Message.dto';
+import { Body,
+	Controller,
+	Delete,
+	Get,
+	HttpException,
+	Patch, 
+    Post} from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { DeleteMessage, GetMessage, UpdateMessage, createMessage } from 'src/chat/dto/Message.dto';
 import { MessageService } from 'src/chat/service/message/message.service';
 
 @Controller('message')
 export class MessageController {
 
 	constructor (
-		private readonly messageService: MessageService) {}
+		private readonly messageService: MessageService,
+		private readonly emitter: EventEmitter2) {}
+
+	@Post()
+	async message(@Body() message: createMessage) {
+		this.messageService.createMessage(message.message,
+																				message.room,
+																				message.user);
+
+		this.emitter.emit('message.create', message);
+	}
 
 	@Get()
 	async getMessage(@Body() roomAndUser: GetMessage) {

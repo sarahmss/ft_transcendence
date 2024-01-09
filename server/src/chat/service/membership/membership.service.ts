@@ -16,6 +16,7 @@ export class MembershipService {
 				   owner: string
 				  ) {
 
+		console.log(user);
 		for (let k = 0; k < user.length ; k++) {
 
 			let owner_status: boolean = false;
@@ -32,6 +33,10 @@ export class MembershipService {
 
 			await this.membershipRepository.insert(member);
 		}
+	}
+
+	async getAll() {
+		return this.membershipRepository.find();
 	}
 
 	async giveAdmin(user: User, room: Room) {

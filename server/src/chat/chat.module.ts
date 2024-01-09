@@ -11,6 +11,10 @@ import { MessageController } from './controller/message/message.controller';
 import { MembershipService } from './service/membership/membership.service';
 import { BlackList } from 'src/entity/blacklist.entity';
 import { Membership } from 'src/entity/membership.entity';
+import { AuthService } from 'src/auth/auth.service';
+import { UsersService } from 'src/users/users.service';
+import { JwtService } from '@nestjs/jwt';
+import { User } from 'src/entity/user.entity';
 
 @Module({
 	imports: [ TypeOrmModule.forFeature([Message,
@@ -18,9 +22,20 @@ import { Membership } from 'src/entity/membership.entity';
 										DirectRoom,
 										GroupRoom,
 										BlackList,
-										Membership]) ],
-	controllers: [RoomController, MessageController],
-	providers: [RoomGateway, RoomService, BlacklistService, MessageService, MembershipService],
+										Membership,
+										User]), ],
+
+	controllers: [RoomController,
+									MessageController],
+
+	providers: [RoomGateway,
+								RoomService,
+								BlacklistService,
+								MessageService,
+								MembershipService,
+								AuthService,
+								UsersService,
+								JwtService],
 
 })
 export class ChatModule {}

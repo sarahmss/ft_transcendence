@@ -8,7 +8,7 @@ export class RoomCreationData {
 	@Min(1)
 	@Max(2)
 	roomType: number;
-
+	
 	@IsNotEmpty()
 	isPrivate: boolean;
 
@@ -19,5 +19,4 @@ export class RoomCreationData {
 	owner: User;
 
 	roomName: string;
-
 }

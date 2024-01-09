@@ -1,3 +1,6 @@
 ./Backend/node_modules
 ./Backend/dist
+node_modules
+# s.sh
 k.sh
+d.sh
