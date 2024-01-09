@@ -1,5 +1,6 @@
 import { Component } from "react";
-import { Routes, Route, Link } from "react-router-dom";import "bootstrap/dist/css/bootstrap.min.css";
+import { Routes, Route, Link } from "react-router-dom";
+import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 import AuthService from "./services/auth.service";
@@ -13,6 +14,8 @@ import Settings from "./components/settings/settings.component";
 import EventBus from "./common/EventBus";
 import { GameProvider } from './contexts/GameContext';
 import Pong from "./components/game/Pong";
+
+import NavBar from "./components/navBar/NavBar"
 
 type Props = {};
 
@@ -55,55 +58,25 @@ class App extends Component<Props, State> {
 		const { currentUser } = this.state;
 
 		return (
+
 			<div>
-				<nav className="navBarTop d-flex justify-content-between">
-					<Link to={"/"} className="navMenu">
-						Transcendence
-					</Link>
-
-					{currentUser ? (
-						<div className="register">
-							<Link to={"/profile"} className="navMenu">
-							👤 {currentUser.userName}
-							</Link>
-
-							<Link to={"/settings"} className="navMenu">
-								⚙️ Settings
-							</Link>
-
-							<a href="/login" className="navMenu" onClick={this.logOut}>
-							🚪 LogOut
-							</a>
-						</div>
-					) : (
-						<section className="register">
-							<Link to={"/login"} className="navMenu">
-								Login
-							</Link>
-							<Link to={"/register"} className="navMenu">
-									Sign Up
-							</Link>
-						</section>
-					)}
-				</nav>
-
-				<div>
-					<Routes>
-						<Route path="/" element={<Home />} />
-						<Route path="/home" element={<Home />} />
-						<Route path="/login" element={<Login />} />
-						<Route path="/register" element={<Register />} />
-						<Route path="/profile" element={<Profile />} />
-						<Route path="/settings" element={<Settings />} />
-						<Route path="/game" element={
-									<div>
-									<GameProvider>
-										<Pong />
-									</GameProvider>
-									</div>
-								} /> </Routes>
-				</div>
+				<NavBar/>
+				<Routes>
+					<Route path="/" element={<Home />} />
+					<Route path="/home" element={<Home />} />
+					<Route path="/login" element={<Login />} />
+					<Route path="/register" element={<Register />} />
+					<Route path="/profile" element={<Profile />} />
+					<Route path="/settings" element={<Settings />} />
+					<Route path="/game" element={
+								<div>
+								<GameProvider>
+									<Pong />
+								</GameProvider>
+								</div>
+							} /> </Routes>
 			</div>
+
 		);
 	}
 }
