@@ -69,7 +69,7 @@ const TabAccount = () => {
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <ImgStyled src={imgSrc} alt='Profile Pic' />
               <Box>
-                <ButtonStyled component='label' variant='contained' htmlFor='account-settings-upload-image'>
+                <ButtonStyled component='label' variant='contained' htmlFor='account-settings-upload-image' sx={{backgroundColor: '#B700cc'}}>
                   Upload New Photo
                   <input
                     hidden
@@ -79,7 +79,7 @@ const TabAccount = () => {
                     id='account-settings-upload-image'
                   />
                 </ButtonStyled>
-                <ResetButtonStyled color='error' variant='outlined' onClick={() => setImgSrc(DefaultPic)}>
+                <ResetButtonStyled color='secondary' variant='outlined' onClick={() => setImgSrc(DefaultPic)}>
                   Reset
                 </ResetButtonStyled>
                 <Typography variant='body2' sx={{ marginTop: 5 }}>
@@ -103,7 +103,7 @@ const TabAccount = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <Button variant='contained' sx={{ marginRight: 3.5 }}>
+            <Button variant='contained' sx={{ marginRight: 3.5, backgroundColor: '#B700cc'}}>
               Save Changes
             </Button>
             <Button type='reset' variant='outlined' color='secondary'>
