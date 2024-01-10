@@ -7,6 +7,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.3",
+    "@mui/lab": "^5.0.0-alpha.159",
     "@mui/material": "^5.15.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -20,8 +21,10 @@
     "bootstrap": "^4.6.0",
     "formik": "^2.4.5",
     "jwt-decode": "^4.0.0",
+    "mdi-material-ui": "^7.8.0",
     "phaser": "^3.70.0",
     "react": "^18.2.0",
+    "react-datepicker": "^4.25.0",
     "react-dom": "^18.2.0",
     "react-icons": "^4.11.0",
     "react-router-dom": "^6.18.0",
@@ -54,5 +57,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/react-datepicker": "^4.19.5"
   }
 }

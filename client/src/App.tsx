@@ -12,10 +12,12 @@ import Home from "./components/home.component";
 import Profile from "./components/profile/profile.component";
 import Settings from "./components/settings/settings.component";
 import EventBus from "./common/EventBus";
-import { GameProvider } from './contexts/GameContext';
 import Pong from "./components/game/Pong";
-
 import NavBar from "./components/navBar/NavBar"
+
+import { GameProvider } from './contexts/GameContext';
+// import { SettingsConsumer, SettingsProvider } from './contexts/settingsContext'
+import AccountSettings from "./components/account/AcountSettings";
 
 type Props = {};
 
@@ -54,13 +56,14 @@ class App extends Component<Props, State> {
 		});
 	}
 
+
 	render() {
 		const { currentUser } = this.state;
-
 		return (
 
 			<div>
 				<NavBar/>
+
 				<Routes>
 					<Route path="/" element={<Home />} />
 					<Route path="/home" element={<Home />} />
@@ -68,6 +71,7 @@ class App extends Component<Props, State> {
 					<Route path="/register" element={<Register />} />
 					<Route path="/profile" element={<Profile />} />
 					<Route path="/settings" element={<Settings />} />
+					<Route path="/account" element={ <AccountSettings/>}/>
 					<Route path="/game" element={
 								<div>
 								<GameProvider>
