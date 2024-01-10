@@ -16,64 +16,67 @@ import OutlinedInput from '@mui/material/OutlinedInput'
 import InputAdornment from '@mui/material/InputAdornment'
 
 // ** Icons Imports
-import EyeOutline from 'mdi-material-ui/EyeOutline'
+import QrCodeIcon from '@mui/icons-material/QrCode';
 import KeyOutline from 'mdi-material-ui/KeyOutline'
-import EyeOffOutline from 'mdi-material-ui/EyeOffOutline'
 import LockOpenOutline from 'mdi-material-ui/LockOpenOutline'
-import { DefaultPic } from '../../../common/constants'
+
+import TwoFaService from '../../../services/twoFa.service';
+import AuthService from '../../../services/auth.service';
+import axios from 'axios';
 
 interface State {
-  newPassword: string
-  currentPassword: string
-  showNewPassword: boolean
-  confirmNewPassword: string
-  showCurrentPassword: boolean
-  showConfirmNewPassword: boolean
+	QrCodeImg: HTMLImageElement | null,
+	TwoFaEnabled: boolean
+	QrCodeGenerated: boolean
+	Code: string
+
 }
 
 const TabSecurity = () => {
   // ** States
   const [values, setValues] = useState<State>({
-    newPassword: '',
-    currentPassword: '',
-    showNewPassword: false,
-    confirmNewPassword: '',
-    showCurrentPassword: false,
-    showConfirmNewPassword: false
+    TwoFaEnabled: false,
+	QrCodeImg: null,
+	QrCodeGenerated: false,
+	Code: ''
   })
 
-  // Handle Current Password
-  const handleCurrentPasswordChange = (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
-    setValues({ ...values, [prop]: event.target.value })
-  }
-  const handleClickShowCurrentPassword = () => {
-    setValues({ ...values, showCurrentPassword: !values.showCurrentPassword })
-  }
-  const handleMouseDownCurrentPassword = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
+
+  const getQrCode = () => {
+    const authTokenQr = AuthService.getAuthToken();
+    const localQr = localStorage.getItem("qrcode");
+
+    if (localQr) {
+      axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' })
+        .then((response) => {
+          if (response.data) {
+            const imageBase64 = btoa(
+              new Uint8Array(response.data)
+                .reduce((data, byte) => data + String.fromCharCode(byte), '')
+            );
+            const imgElement = document.createElement('img');
+            imgElement.src = `data:image/png;base64,${imageBase64}`;
+			setValues({ ...values, QrCodeImg: imgElement, QrCodeGenerated:true});
+			} else {
+				setValues({ ...values, QrCodeGenerated:false});
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
   }
 
-  // Handle New Password
-  const handleNewPasswordChange = (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
+  // Handle QrCode field
+  const handleEnable2FaChange = (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value })
-  }
-  const handleClickShowNewPassword = () => {
-    setValues({ ...values, showNewPassword: !values.showNewPassword })
-  }
-  const handleMouseDownNewPassword = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
   }
 
-  // Handle Confirm New Password
-  const handleConfirmNewPasswordChange = (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
-    setValues({ ...values, [prop]: event.target.value })
-  }
-  const handleClickShowConfirmNewPassword = () => {
-    setValues({ ...values, showConfirmNewPassword: !values.showConfirmNewPassword })
-  }
-  const handleMouseDownConfirmNewPassword = (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault()
-  }
+const handleEnable2FAClick = () => {
+	// TwoFaService.generateQrCode();
+	//getQrCode();
+	setValues({ ...values, QrCodeGenerated: true});
+}
 
   return (
     <form>
@@ -100,9 +103,46 @@ const TabSecurity = () => {
             >
               <LockOpenOutline sx={{ fontSize: '1.75rem', backgroundColor: '#B700cc'  }} />
             </Avatar>
-            <Typography sx={{ fontWeight: 600, marginTop: 3.5, marginBottom: 3.5 }}>
-              Two factor authentication is not enabled yet.
-            </Typography>
+			{values.QrCodeGenerated ? (
+              values.TwoFaEnabled ? (
+                <Typography sx={{ fontWeight: 600, marginTop: 3.5, marginBottom: 3.5 }}>
+                  Two factor authentication is enabled.
+                </Typography>
+              ) : (
+                <Typography sx={{ fontWeight: 600, marginTop: 3.5, marginBottom: 3.5 }}>
+                  {values.QrCodeImg ? (
+                    <img src={values.QrCodeImg.src} alt='' />
+                  ) : (
+                    <div>{'Error Loading QR code...'}</div>
+                  )}
+
+                  <Grid item xs={12} sx={{ marginTop: 6 }}>
+                    <FormControl fullWidth>
+                      <InputLabel htmlFor='account-enable-2fa'>Code</InputLabel>
+                      <OutlinedInput
+                        label='Code'
+                        value={values.Code}
+                        id='account-enable-2fa'
+                        // onChange={handleEnable2FaChange('test')}
+                        type={'text'}
+                        endAdornment={
+                          <InputAdornment position='end'>
+                            <IconButton edge='end' aria-label='qrCode'>
+                              <QrCodeIcon />
+                            </IconButton>
+                          </InputAdornment>
+                        }
+                      />
+                    </FormControl>
+                  </Grid>
+                </Typography>
+              )
+            ) : (
+              <Typography sx={{ fontWeight: 600, marginTop: 3.5, marginBottom: 3.5 }}>
+                Two factor authentication is not enabled yet.
+              </Typography>
+            )}
+
             <Typography variant='body2'>
               Two-factor authentication adds an additional layer of security to your account by requiring more than just
               a password to log in. Learn more.
@@ -111,17 +151,15 @@ const TabSecurity = () => {
         </Box>
 
         <Box sx={{ mt: 11 }}>
-          <Button variant='contained' sx={{ marginRight: 3.5, backgroundColor: '#B700cc' }}>
-            Save Changes
-          </Button>
           <Button
-            type='reset'
-            variant='outlined'
-            color='secondary'
-            onClick={() => setValues({ ...values, currentPassword: '', newPassword: '', confirmNewPassword: '' })}
-          >
-            Reset
+			className="md-primary"
+			variant='contained'
+			sx={{ marginRight: 3.5, backgroundColor: '#B700cc' }}
+			disabled={values.TwoFaEnabled}
+			onClick={handleEnable2FAClick}>
+            Enable 2FA
           </Button>
+
         </Box>
       </CardContent>
     </form>

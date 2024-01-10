@@ -70,7 +70,6 @@ const Popup: React.FC<PopupProps> = ({ buttonText }) => {
             )}
             <input type="text" placeholder='Enter Code' className='inputCode' onChange={(e) => setCode(e.target.value)}/>
             <button className='send' onClick={handleClickToEnable}>Send</button>
-            {/* COLOCAR O USERID E O CODE */}
           </div>
         </div>
       )}
