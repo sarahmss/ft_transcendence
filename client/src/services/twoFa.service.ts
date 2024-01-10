@@ -4,7 +4,7 @@ import { DefaultPic,
 		TwoFaLink,
 		TwoFaDisableLink,
 		TwoFaEnableLink,
-		TwoFfaGenerateLink } from '../common/constants';
+		TwoFaGenerateLink } from '../common/constants';
 
 class TwoFaService {
 
@@ -39,7 +39,7 @@ class TwoFaService {
 
 	generateQrCode() {
 		const authToken = AuthService.getAuthToken()
-		axios.get( TwoFfaGenerateLink,
+		axios.get( TwoFaGenerateLink,
 				{ headers: authToken })
 				.then((response) => {
 						localStorage.setItem("qrcode", response.data.url)
@@ -61,10 +61,6 @@ class TwoFaService {
 		axios.post( TwoFaDisableLink,
 					{ code: code },
 					{ headers: authToken });
-	};
-
-	reditectToDisable2Fa = () => {
-	// history.push('/disable2fa');
 	};
 }
 const twoFaService = new TwoFaService();

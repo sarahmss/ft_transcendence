@@ -7,9 +7,12 @@ export const LocalSigninLink = BackLink + "/auth/signin"
 export const UserContentLink = BackLink + "/users/"
 export const TwoFaLink = BackLink + "/2fa-auth"
 export const GameLink = BackLink + "/game"
+
 export const TwoFaDisableLink = TwoFaLink + "/disable"
 export const TwoFaEnableLink = TwoFaLink + "/enable"
-export const TwoFfaGenerateLink = TwoFaLink + "/generate"
+export const TwoFaGenerateLink = TwoFaLink + "/generate"
+export const TwoFaLoginLink = TwoFaLink + "/login"
+
 
 export const FrontLogin = FrontLink + "/login";
 export const FrontGame = FrontLink + "/game";

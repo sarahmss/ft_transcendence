@@ -4,21 +4,14 @@ import { useState, ElementType, ChangeEvent, SyntheticEvent } from 'react'
 // ** MUI Imports
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
-import Link from '@mui/material/Link'
-import Alert from '@mui/material/Alert'
-import Select from '@mui/material/Select'
 import { styled } from '@mui/material/styles'
-import MenuItem from '@mui/material/MenuItem'
 import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import InputLabel from '@mui/material/InputLabel'
-import AlertTitle from '@mui/material/AlertTitle'
 import IconButton from '@mui/material/IconButton'
 import CardContent from '@mui/material/CardContent'
 import FormControl from '@mui/material/FormControl'
 import Button, { ButtonProps } from '@mui/material/Button'
 
-import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';import AddAPhotoOutlinedIcon from '@mui/icons-material/AddAPhotoOutlined';import OutlinedInput from '@mui/material/OutlinedInput'
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';import AddAPhotoOutlinedIcon from '@mui/icons-material/AddAPhotoOutlined';
 import InputAdornment from '@mui/material/InputAdornment'
 
 import IUser from '../../../types/user.type'

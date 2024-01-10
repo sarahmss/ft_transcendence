@@ -6,7 +6,6 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
-import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
@@ -22,7 +21,7 @@ const pagesLogged = [
 
 const pagesUnlogged = [
 	{ label: 'Login', link: '/login' },
-	{ label: 'Signup', link: '/signup' },
+	{ label: 'Signup', link: '/register' },
 ];
 
 const NavBar: React.FC = () => {
