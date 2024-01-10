@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DIRECT } from 'src/constants/roomType.constant';
 import { Membership } from 'src/entity/membership.entity';
 import { Room } from 'src/entity/room.entity';
 import { User } from 'src/entity/user.entity';
@@ -58,5 +59,19 @@ export class MembershipService {
 	async findMemberRoom(userId: string, roomId: string) {
 		return await this.membershipRepository.find({where: {userId: userId,
 													roomId: roomId}});
+	}
+
+	async checkDirectRoomMembership(user1: User, user2: User): Promise<boolean> {
+		let result = await this.membershipRepository
+								.createQueryBuilder('membership')
+								.leftJoinAndSelect('membership.room', 'room')
+								.where('membership.userId = :userId1',
+												{userId1: user1.userId})
+						    .andWhere('membership.roomId IN (SELECT roomId FROM membership WHERE userId = :userId2)',
+												{ userId2: user2.userId })
+						    .andWhere('room.roomType = :roomType', { roomType: DIRECT })
+								.getOne();
+
+		return !!result; // This trick is to cast the object to a boolean value
 	}
 }

@@ -18,9 +18,10 @@ export class RoomService {
 	) {}
 
 	async checkUser(userList: User[]): Promise<boolean> {
-		this.userService
 		for (let k = 0; k < userList.length; k++) {
+
 			let userInstance = await this.userService.findById(userList[k].userId);
+
 			if (!userInstance)
 				return false;
 		}
