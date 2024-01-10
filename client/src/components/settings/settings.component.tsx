@@ -37,7 +37,7 @@ export default class Settings extends Component<Props, SettingsState> {
 	componentDidMount() {
 		const currentUser = AuthService.getCurrentUser();
 
-		if (!currentUser) this.setState({ redirect: "/home" });
+		if (!currentUser) this.setState({ redirect: "/" });
 		this.setState({ currentUser: currentUser })
 	}
 

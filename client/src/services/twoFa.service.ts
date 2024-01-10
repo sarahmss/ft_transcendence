@@ -4,7 +4,8 @@ import { DefaultPic,
 		TwoFaLink,
 		TwoFaDisableLink,
 		TwoFaEnableLink,
-		TwoFaGenerateLink } from '../common/constants';
+		TwoFaGenerateLink,
+		TwoFaLoginLink } from '../common/constants';
 
 class TwoFaService {
 
@@ -61,6 +62,19 @@ class TwoFaService {
 		axios.post( TwoFaDisableLink,
 					{ code: code },
 					{ headers: authToken });
+	};
+
+	Login2Fa (code:string, userId: string)
+	{
+		axios .post(`${TwoFaLoginLink}?user=${userId}`, { code: code })
+		.then((response) => {
+			document.cookie = response.data.cookie;
+			return (true);
+		})
+		.catch(() => {
+			return (false);
+		});
+		return (false);
 	};
 }
 const twoFaService = new TwoFaService();

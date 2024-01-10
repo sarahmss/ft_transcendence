@@ -25,7 +25,7 @@ class AuthService {
 	}
 
 	IntraLogin() {
-		localStorage.setItem("Logged","intra");
+		localStorage.setItem("Logged", "intra");
 	}
 
 	logout() {

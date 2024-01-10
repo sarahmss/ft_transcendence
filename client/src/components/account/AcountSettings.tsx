@@ -54,7 +54,7 @@ const AccountSettings = () => {
     if (user) {
 		setCurrentUser(user);
 	} else {
-		setRedirect('/home');
+		setRedirect('home');
 	}
 
   }, []);
@@ -64,7 +64,7 @@ const AccountSettings = () => {
   }
 
   if (redirect === 'home') {
-    return <Navigate to={'/home'} />;
+    return <Navigate to={'/'} />;
   }
 
   return (

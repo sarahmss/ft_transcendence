@@ -2,10 +2,10 @@ import { Component, useReducer } from "react";
 import { Navigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link, Button} from '@mui/material';
+import { Link, Button, Card} from '@mui/material';
 import { reducer } from "../../common/helper";
 import { IntraloginLink } from "../../common/constants";
-import './login.component.css'
+import './css/login.component.css'
 import AuthService from "../../services/auth.service";
 import * as Yup from "yup";
 
@@ -144,8 +144,8 @@ export default class Login extends Component<Props, State> {
 		};
 
 		return (
-			<div className="col-md-12">
-				<div className="card-container">
+			<Card className="col-md-12" sx={{backgroundColor:'#6e10a8'}}>
+				<Card className="card-container">
 					<img
 						src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
 						alt="profile-img"
@@ -194,9 +194,9 @@ export default class Login extends Component<Props, State> {
 
 						</Form>
 					</Formik>
-				</div>
+				</Card>
 				<p className="lorem">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi laborum ad commodi quos voluptate perspiciatis consectetur a, sapiente nam ab necessitatibus, ipsa quidem? Id aliquam, eligendi quidem dolor perferendis error.</p>
-			</div>
+			</Card>
 		);
 	}
 }

@@ -1,64 +1,26 @@
 import { Component } from "react";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
-
-import AuthService from "./services/auth.service";
-import IUser from './types/user.type';
 
 import Login from "./components/login/login.component";
 import Register from "./components/login/register.component";
 import Home from "./components/home.component";
 import Profile from "./components/profile/profile.component";
-import Settings from "./components/settings/settings.component";
-import EventBus from "./common/EventBus";
 import Pong from "./components/game/Pong";
 import NavBar from "./components/navBar/NavBar"
-
+import Login2Fa from "./components/login/login2fa.component";
+import Logout from "./components/login/logout.component";
 import { GameProvider } from './contexts/GameContext';
-// import { SettingsConsumer, SettingsProvider } from './contexts/settingsContext'
 import AccountSettings from "./components/account/AcountSettings";
 
 type Props = {};
 
 type State = {
-	currentUser: IUser | undefined
 }
 
 class App extends Component<Props, State> {
-	constructor(props: Props) {
-		super(props);
-		this.logOut = this.logOut.bind(this);
-
-		this.state = {
-			currentUser: undefined,
-		};
-	}
-
-	componentDidMount() {
-		const user = AuthService.getCurrentUser();
-		if (user) {
-			this.setState({
-				currentUser: user,
-			});
-		}
-		EventBus.on("logout", this.logOut);
-	}
-
-	componentWillUnmount() {
-		EventBus.remove("logout", this.logOut);
-	}
-
-	logOut() {
-		AuthService.logout();
-		this.setState({
-			currentUser: undefined,
-		});
-	}
-
-
 	render() {
-		const { currentUser } = this.state;
 		return (
 
 			<div>
@@ -66,8 +28,9 @@ class App extends Component<Props, State> {
 
 				<Routes>
 					<Route path="/" element={<Home />} />
-					<Route path="/home" element={<Home />} />
 					<Route path="/login" element={<Login />} />
+					<Route path="/logout" element={<Logout />} />
+					<Route path='/2fa' element={<Login2Fa/>} />
 					<Route path="/register" element={<Register />} />
 					<Route path="/profile" element={<Profile />} />
 					<Route path="/settings" element={<AccountSettings />} />

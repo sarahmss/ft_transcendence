@@ -1,18 +1,16 @@
-// ** React Imports
-import { ChangeEvent, useState } from 'react'
-
-// ** MUI Imports
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Avatar from '@mui/material/Avatar'
-import Button from '@mui/material/Button'
-import InputLabel from '@mui/material/InputLabel'
-import IconButton from '@mui/material/IconButton'
-import Typography from '@mui/material/Typography'
-import CardContent from '@mui/material/CardContent'
-import FormControl from '@mui/material/FormControl'
-import OutlinedInput from '@mui/material/OutlinedInput'
-import InputAdornment from '@mui/material/InputAdornment'
+import { ChangeEvent, useState, useEffect } from 'react'
+import {Box,
+		Grid,
+		Avatar,
+		Button,
+		InputLabel,
+		IconButton,
+		Typography,
+		CardContent,
+		FormControl,
+		OutlinedInput,
+		InputAdornment
+	} from '@mui/material';
 
 // ** Icons Imports
 import QrCodeIcon from '@mui/icons-material/QrCode';
@@ -36,6 +34,11 @@ interface TabSecurityProps {
 }
 
 const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
+
+	useEffect(() => {
+		getQrCode();
+	});
+
 	const [values, setValues] = useState<State>({
 		TwoFaEnabled: currentUser?.hasTwoFactorAuth || false,
 		QrCodeGenerated: currentUser?.hasTwoFactorAuth || false,
@@ -89,7 +92,6 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 
 	const handleEnable2FAClick = () => {
 		TwoFaService.generateQrCode();
-		getQrCode();
 	}
 	const handleDisable2FAClick = () => {
 		setValues({ ...values, TwoFaDisable: true});
@@ -125,11 +127,6 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 							  values.TwoFaDisable ? (
 								<div>
 								  To disable two-factor authentication, send the code.
-								  {values.QrCodeImg ? (
-									<img src={values.QrCodeImg.src} alt='' />
-								  ) : (
-									<div>{'Error Loading QR code...'}</div>
-								  )}
 								  <Grid item xs={12} sx={{ marginTop: 6 }}>
 									<FormControl fullWidth>
 									  <InputLabel htmlFor='account-disable-2fa'>Code</InputLabel>

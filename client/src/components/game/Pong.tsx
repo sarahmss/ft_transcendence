@@ -47,7 +47,7 @@ const Pong: React.FC = () => {
     	  )}
     		</>
 		) : (
-			<Navigate to="/home" />
+			<Navigate to="/" />
 		)}
 		</>
   );
