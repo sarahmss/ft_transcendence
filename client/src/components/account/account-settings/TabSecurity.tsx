@@ -70,17 +70,17 @@ const TabSecurity = () => {
   // Handle QrCode field
   const handleEnable2FaChange = (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
     setValues({ ...values, [prop]: event.target.value })
+	TwoFaService.redirectToEnable2FA(values.Code);
+	setValues({ ...values, TwoFaEnabled: true});
   }
 
 const handleEnable2FAClick = () => {
-	// TwoFaService.generateQrCode();
-	//getQrCode();
-	setValues({ ...values, QrCodeGenerated: true});
+	TwoFaService.generateQrCode();
+	getQrCode();
 }
 
   return (
     <form>
-
       <CardContent>
         <Box sx={{ mt: 1.75, display: 'flex', alignItems: 'center' }}>
           <KeyOutline sx={{ marginRight: 3 }} />
@@ -123,7 +123,7 @@ const handleEnable2FAClick = () => {
                         label='Code'
                         value={values.Code}
                         id='account-enable-2fa'
-                        // onChange={handleEnable2FaChange('test')}
+                        onChange={handleEnable2FaChange('Code')}
                         type={'text'}
                         endAdornment={
                           <InputAdornment position='end'>

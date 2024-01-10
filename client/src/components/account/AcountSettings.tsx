@@ -1,5 +1,5 @@
 // ** React Imports
-import { SyntheticEvent, useState } from 'react'
+import { SyntheticEvent, useState, useEffect } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -20,8 +20,8 @@ import TabInfo from './account-settings/TabInfo'
 import TabAccount from './account-settings/TabAccount'
 import TabSecurity from './account-settings/TabSecurity'
 
-// ** Third Party Styles Imports
-import 'react-datepicker/dist/react-datepicker.css'
+import authService from '../../services/auth.service'
+import { Navigate } from "react-router-dom";
 
 const Tab = styled(MuiTab)<TabProps>(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
@@ -43,10 +43,24 @@ const TabName = styled('span')(({ theme }) => ({
 
 const AccountSettings = () => {
   // ** State
-  const [value, setValue] = useState<string>('account')
+  const [value, setValue] = useState<string>('account');
+  const [redirect, setRedirect] = useState<string>('');
+
+
+  useEffect(() => {
+    const user = authService.getCurrentUser();
+
+    if (!user){
+		setRedirect('/home');
+	}
+  }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: string) => {
     setValue(newValue)
+  }
+
+  if (redirect === 'home') {
+    return <Navigate to={'/home'} />;
   }
 
   return (
