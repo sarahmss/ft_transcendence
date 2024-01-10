@@ -44,11 +44,9 @@ export const ProfilePicComponent = ({ currentUser }: ProfilePicProps) => {
   };
 
   const handleUploadClick = () => {
-	console.log(state.selectedFile.name);
 	const formData = new FormData();
 	formData.append('file', state.selectedFile);
 	const newProfilePic = userService.uploadProfilePic(state.selectedFile.name, formData);
-	console.log(newProfilePic);
   };
 
   return (

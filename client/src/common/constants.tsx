@@ -9,6 +9,8 @@ export const TwoFaLink = BackLink + "/2fa-auth"
 export const GameLink = BackLink + "/game"
 export const TwoFaDisableLink = BackLink + "/two-factor-auth/disable"
 export const TwoFaEnableLink = BackLink + "/two-factor-auth/enable"
+export const TwoFfaGenerateLink = BackLink + "/two-factor-auth/generate"
+
 export const FrontLogin = FrontLink + "/login";
 export const FrontGame = FrontLink + "/game";
 export const DefaultPic = "https://ssl.gstatic.com/accounts/ui/avatar_2x.png";

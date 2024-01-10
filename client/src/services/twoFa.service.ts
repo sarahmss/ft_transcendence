@@ -1,6 +1,10 @@
 import axios from 'axios';
 import AuthService from './auth.service';
-import { DefaultPic, TwoFaLink } from '../common/constants';
+import { DefaultPic,
+		TwoFaLink,
+		TwoFaDisableLink,
+		TwoFaEnableLink,
+		TwoFfaGenerateLink } from '../common/constants';
 
 class TwoFaService {
 
@@ -34,37 +38,29 @@ class TwoFaService {
 	}
 
 	generateQrCode() {
-        const authToken = AuthService.getAuthToken()
-        axios.get( "http://localhost:5000/2fa-auth/generate",
-            { headers: authToken })
-            .then((response) => {
-                localStorage.setItem("qrcode", response.data.url)
-            });
-    }
+		const authToken = AuthService.getAuthToken()
+		axios.get( TwoFfaGenerateLink,
+				{ headers: authToken })
+				.then((response) => {
+						localStorage.setItem("qrcode", response.data.url)
+				});
+		}
 
 
 	redirectToEnable2FA (code:string) {
-		const userID = AuthService.getAuthToken();
-		console.log(code);
-        axios.post( "http://localhost:5000/2fa-auth/enable",
-			{ code: code },
-            { headers: userID })
-            .then((response) => {
-                localStorage.setItem("qrcode", response.data.url)
-            })
-			.catch(error =>{
-				console.log(error);
-			});
+		const authToken = AuthService.getAuthToken();
+
+		axios.post( TwoFaEnableLink,
+					{ code: code },
+					{ headers: authToken });
 	};
 
-	redirectToDisable2FA (userId:string, code:string) {
+	redirectToDisable2FA (code:string) {
 		const authToken = AuthService.getAuthToken()
-        axios.post( "http://localhost:5000/2fa-auth/disable",
-			{ code: code },
-            { headers: authToken })
-            .then((response) => {
-                localStorage.setItem("qrcode", response.data.url)
-            });
+
+		axios.post( TwoFaDisableLink,
+					{ code: code },
+					{ headers: authToken });
 	};
 
 	reditectToDisable2Fa = () => {

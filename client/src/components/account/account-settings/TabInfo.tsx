@@ -16,11 +16,16 @@ import FormControl from '@mui/material/FormControl'
 import OutlinedInput from '@mui/material/OutlinedInput'
 import FormControlLabel from '@mui/material/FormControlLabel'
 
+import IUser from '../../../types/user.type'
+
 const CustomInput = forwardRef((props, ref) => {
   return <TextField inputRef={ref} label='Birth Date' fullWidth {...props} />
 })
 
-const TabInfo = () => {
+interface TabInfoProps {
+	currentUser: IUser | null;
+}
+const TabInfo: React.FC<TabInfoProps> = ({ currentUser }) => {
   // ** State
   const [date, setDate] = useState<Date | null | undefined>(null)
 

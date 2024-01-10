@@ -95,7 +95,7 @@ const NavBar: React.FC = () => {
               textDecoration: 'none',
             }}
           >
-            LOGO
+            TRANSCENDENCE
           </Typography>
 		  <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {isLogged ? (

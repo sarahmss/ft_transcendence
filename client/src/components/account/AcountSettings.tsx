@@ -22,6 +22,7 @@ import TabSecurity from './account-settings/TabSecurity'
 
 import authService from '../../services/auth.service'
 import { Navigate } from "react-router-dom";
+import IUser from '../../types/user.type'
 
 const Tab = styled(MuiTab)<TabProps>(({ theme }) => ({
   [theme.breakpoints.down('md')]: {
@@ -45,14 +46,17 @@ const AccountSettings = () => {
   // ** State
   const [value, setValue] = useState<string>('account');
   const [redirect, setRedirect] = useState<string>('');
-
+  const [currentUser, setCurrentUser] = useState<IUser | null>(null);
 
   useEffect(() => {
     const user = authService.getCurrentUser();
 
-    if (!user){
+    if (user) {
+		setCurrentUser(user);
+	} else {
 		setRedirect('/home');
 	}
+
   }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: string) => {
@@ -106,13 +110,13 @@ const AccountSettings = () => {
         </TabList>
 
         <TabPanel sx={{ p: 0 }} value='account'>
-          <TabAccount />
+          <TabAccount currentUser={currentUser}/>
         </TabPanel>
         <TabPanel sx={{ p: 0 }} value='security'>
-          <TabSecurity />
-        </TabPanel>
+			<TabSecurity currentUser={currentUser} />
+		</TabPanel>
         <TabPanel sx={{ p: 0 }} value='info'>
-          <TabInfo />
+          <TabInfo currentUser={currentUser}/>
         </TabPanel>
       </TabContext>
     </Card>

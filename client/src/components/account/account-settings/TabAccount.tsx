@@ -18,8 +18,13 @@ import CardContent from '@mui/material/CardContent'
 import FormControl from '@mui/material/FormControl'
 import Button, { ButtonProps } from '@mui/material/Button'
 
+import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined';import AddAPhotoOutlinedIcon from '@mui/icons-material/AddAPhotoOutlined';import OutlinedInput from '@mui/material/OutlinedInput'
+import InputAdornment from '@mui/material/InputAdornment'
+
+import IUser from '../../../types/user.type'
+import userService from '../../../services/user.service'
+
 // ** Icons Imports
-import Close from 'mdi-material-ui/Close'
 import { DefaultPic } from '../../../common/constants'
 
 const ImgStyled = styled('img')(({ theme }) => ({
@@ -46,20 +51,37 @@ const ResetButtonStyled = styled(Button)<ButtonProps>(({ theme }) => ({
   }
 }))
 
-const TabAccount = () => {
-  // ** State
-  const [openAlert, setOpenAlert] = useState<boolean>(true)
-  const [imgSrc, setImgSrc] = useState<string>(DefaultPic)
+interface TabAccountProps {
+	currentUser: IUser | null;
+}
 
-  const onChange = (file: ChangeEvent) => {
-    const reader = new FileReader()
-    const { files } = file.target as HTMLInputElement
+const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
+  const [imgSrc, setImgSrc] = useState<string>(currentUser?.profilePicture || DefaultPic);
+  const [file, setfile] = useState<File | undefined>(undefined);
+  const [selectedFile, setSelectedFile] = useState<boolean>(false);
+
+
+  const GetFile = (file: ChangeEvent<HTMLInputElement>) => {
+    const reader = new FileReader();
+    const { files } = file.target;
     if (files && files.length !== 0) {
-      reader.onload = () => setImgSrc(reader.result as string)
-
-      reader.readAsDataURL(files[0])
+      const selected = files[0];
+      reader.onload = () => setImgSrc(reader.result as string);
+      reader.readAsDataURL(selected);
+      setfile(selected);
+	  setSelectedFile(true);
     }
   }
+
+  const UploadFile = () => {
+	if (file)
+	{
+		const formData = new FormData();
+		formData.append('file', file);
+		const newProfilePic = userService.uploadProfilePic(file.name, formData);
+		console.log(newProfilePic);
+	}
+  };
 
   return (
     <CardContent>
@@ -68,29 +90,59 @@ const TabAccount = () => {
           <Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <ImgStyled src={imgSrc} alt='Profile Pic' />
-              <Box>
-                <ButtonStyled component='label' variant='contained' htmlFor='account-settings-upload-image' sx={{backgroundColor: '#B700cc'}}>
-                  Upload New Photo
-                  <input
-                    hidden
-                    type='file'
-                    onChange={onChange}
-                    accept='image/png, image/jpeg'
-                    id='account-settings-upload-image'
-                  />
-                </ButtonStyled>
-                <ResetButtonStyled color='secondary' variant='outlined' onClick={() => setImgSrc(DefaultPic)}>
-                  Reset
-                </ResetButtonStyled>
-                <Typography variant='body2' sx={{ marginTop: 5 }}>
-                  Allowed PNG or JPEG. Max size of 800K.
-                </Typography>
+				<Box><Grid container spacing={2}>
+					<Grid item xs={12}>
+						<Box display="flex" flexDirection="column" alignItems="center">
+						<ButtonStyled
+							component='label'
+							variant='contained'
+							htmlFor='account-settings-upload-image'
+							sx={{backgroundColor: '#B700cc'}}
+						>
+							Choose file
+							<input
+							hidden
+							type='file'
+							onChange={GetFile}
+							accept='image/png, image/jpeg'
+							id='account-settings-upload-image'
+							/>
+							<InputAdornment position='end'>
+							<IconButton edge='end' aria-label='qrCode' sx={{ color: 'common.white' }}>
+								<AddAPhotoOutlinedIcon />
+							</IconButton>
+							</InputAdornment>
+						</ButtonStyled>
+						</Box>
+					</Grid>
+
+					<Grid item xs={12}>
+						<Box display="flex" flexDirection="column" alignItems="center">
+						{/* Botão "Upload" */}
+						<ButtonStyled
+							component='label'
+							variant='contained'
+							htmlFor='account-settings-upload-image'
+							sx={{backgroundColor: '#B700cc'}}
+							onClick={UploadFile}
+							disabled={!selectedFile}
+						>
+							Upload
+							<InputAdornment position='end'>
+							<IconButton edge='end' aria-label='qrCode' sx={{ color: 'common.white' }}>
+								<CloudUploadOutlinedIcon />
+							</IconButton>
+							</InputAdornment>
+						</ButtonStyled>
+						</Box>
+					</Grid>
+					</Grid>
               </Box>
             </Box>
           </Grid>
 
           <Grid item xs={12} sm={6}>
-            <TextField fullWidth label='Username' placeholder='yourEmail' defaultValue='yourName' />
+            <TextField fullWidth label='Username' placeholder='userName' defaultValue='yourName' />
           </Grid>
           <Grid item xs={12} sm={6}>
             <TextField
