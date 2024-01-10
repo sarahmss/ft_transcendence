@@ -62,6 +62,7 @@ export class MembershipService {
 	}
 
 	async checkDirectRoomMembership(user1: User, user2: User): Promise<boolean> {
+		console.log("reach here!");
 		let result = await this.membershipRepository
 								.createQueryBuilder('membership')
 								.leftJoinAndSelect('membership.room', 'room')
@@ -71,6 +72,8 @@ export class MembershipService {
 												{ userId2: user2.userId })
 						    .andWhere('room.roomType = :roomType', { roomType: DIRECT })
 								.getOne();
+
+		console.log("aaaaa");
 
 		return !!result; // This trick is to cast the object to a boolean value
 	}
