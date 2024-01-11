@@ -23,16 +23,6 @@ import axios from 'axios';
 import IUser from '../../../types/user.type';
 import { reducer } from '../../../common/helper';
 
-
-interface State {
-	QrCodeImg: HTMLImageElement | null,
-	TwoFaEnabled: boolean,
-	QrCodeGenerated: boolean,
-	TwoFaDisable: boolean,
-	Code: string,
-}
-
-
 interface SendButtonProps {
 	code: string;
 	TwoFaEnabled: boolean;
@@ -43,35 +33,75 @@ const SendButton: React.FC<SendButtonProps> =({ code,
 	setTwoFaEnabled }) => {
 
 	const handleRedirectToEnable2Fa = () => {
-	  TwoFaService.redirectToEnable2FA(code);
-	  setTwoFaEnabled({TwoFaEnabled: true});
+		TwoFaService.redirectToEnable2FA(code);
+		setTwoFaEnabled({TwoFaEnabled: true});
 	};
 
 	const handleRedirectToDisable2Fa = () => {
-	  TwoFaService.redirectToDisable2FA(code);
-	  setTwoFaEnabled({TwoFaEnabled: false});
+		TwoFaService.redirectToDisable2FA(code);
+		setTwoFaEnabled({TwoFaEnabled: false});
 	};
 
 	return (
-	  <Box sx={{ display: 'flex', justifyContent: 'center', margin: '10px' }}>
+		<Box sx={{ display: 'flex', justifyContent: 'center', margin: '10px' }}>
 		<Button
-		  className="md-primary"
-		  variant="contained"
-		  size="small"
-		  sx={{ backgroundColor: '#B700cc' }}
-		  onClick={TwoFaEnabled ? handleRedirectToDisable2Fa : handleRedirectToEnable2Fa}
+			className="md-primary"
+			variant="contained"
+			size="small"
+			sx={{ backgroundColor: '#B700cc' }}
+			onClick={TwoFaEnabled ? handleRedirectToDisable2Fa : handleRedirectToEnable2Fa}
 		>
-		  Send
+			Send
 		</Button>
-	  </Box>
+		</Box>
 	);
-  };
+	};
+
+interface InsertCodeProps {
+	code: string;
+	TwoFaEnabled: boolean;
+	setTwoFaEnabled: React.Dispatch<React.SetStateAction<{ TwoFaEnabled: boolean }>>;
+	setCode: React.Dispatch<React.SetStateAction<{ code: string }>>;
+}
+const InsertCode: React.FC<InsertCodeProps> =({ code,
+	TwoFaEnabled,
+	setTwoFaEnabled,
+	setCode }) => {
+
+	const handle2FaChange = () => (event: ChangeEvent<HTMLInputElement>) => {
+		setCode({code: event.target.value })
+	}
+
+	return (
+		<FormControl fullWidth>
+		<InputLabel htmlFor='account-disable-2fa'>Code</InputLabel>
+		<OutlinedInput
+		label='Code'
+		value={code}
+		id='account-disable-2fa'
+		onChange={handle2FaChange}
+		type={'text'}
+		endAdornment={
+			<InputAdornment position='end'>
+			<IconButton edge='end' aria-label='qrCode'>
+				<QrCodeIcon />
+			</IconButton>
+			</InputAdornment>
+		}
+		/>
+		<SendButton
+			code={code}
+			TwoFaEnabled={TwoFaEnabled}
+			setTwoFaEnabled={setTwoFaEnabled}
+		/>
+	</FormControl>
+	);
+};
 
 
 interface TabSecurityProps {
 	currentUser: IUser | null;
 }
-
 const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 
 	useEffect(() => {
@@ -83,7 +113,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 		TwoFaDisable: false,
 		QrCodeImg: null,
 		Code: '',
-	  });
+		});
 
 	const getQrCode = () => {
 		const authTokenQr = AuthService.getAuthToken();
@@ -98,9 +128,9 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 						);
 						const imgElement = document.createElement('img');
 						imgElement.src = `data:image/png;base64,${imageBase64}`;
-			setState({ ...state, QrCodeImg: imgElement, QrCodeGenerated:true});
-			} else {
-				setState({ ...state, QrCodeGenerated:false});
+						setState({ ...state, QrCodeImg: imgElement, QrCodeGenerated:true});
+					} else {
+						setState({ ...state, QrCodeGenerated:false});
 					}
 				})
 				.catch(error => {
@@ -109,24 +139,15 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 		}
 	}
 
-	// Handle QrCode field
-	const handleEnable2FaChange = (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
-		setState({ ...state, [prop]: event.target.value })
-	}
-	const handleDisable2FaChange = (prop: keyof State) => (event: ChangeEvent<HTMLInputElement>) => {
-		setState({ ...state, [prop]: event.target.value })
-	}
-
 	const handleEnable2FAClick = () => {
-		// TwoFaService.generateQrCode();
-		// getQrCode();
-		setState({ ...state, QrCodeGenerated:true });
-
+		TwoFaService.generateQrCode();
+		getQrCode();
+		// setState({ ...state, QrCodeGenerated:true});
 	}
+
 	const handleDisable2FAClick = () => {
 		setState({ ...state, TwoFaDisable: true});
 	}
-
 	return (
 		<form>
 			<CardContent>
@@ -151,74 +172,43 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 						>
 							<LockOpenOutline sx={{ fontSize: '1.75rem', backgroundColor: '#B700cc'	}} />
 						</Avatar>
-			{state.QrCodeGenerated ? (
+						{state.QrCodeGenerated ? (
 							<Typography sx={{ fontWeight: 600, marginTop: 3.5, marginBottom: 3.5 }}>
 							{state.TwoFaEnabled ? (
 								state.TwoFaDisable ? (
 								<div>
 									To disable two-factor authentication, send the code.
 									<Grid item xs={12} sx={{ marginTop: 6 }}>
-									<FormControl fullWidth>
-										<InputLabel htmlFor='account-disable-2fa'>Code</InputLabel>
-										<OutlinedInput
-										label='Code'
-										value={state.Code}
-										id='account-disable-2fa'
-										onChange={handleDisable2FaChange('Code')}
-										type={'text'}
-										endAdornment={
-											<InputAdornment position='end'>
-											<IconButton edge='end' aria-label='qrCode'>
-												<QrCodeIcon />
-											</IconButton>
-											</InputAdornment>
-										}
-										/>
-										<SendButton
-											code={state.Code}
+										<InsertCode
+											code={state.code}
 											TwoFaEnabled={state.TwoFaEnabled}
 											setTwoFaEnabled={setState}
+											setCode={setState}
 										/>
-
-									</FormControl>
 									</Grid>
 								</div>
-								) : (
-								<div>
-									Two-factor authentication is enabled.
-								</div>
+								)
+								:
+								(
+									<div>
+										Two-factor authentication is enabled.
+									</div>
 								)
 							) : (
 								<div>
-								{state.QrCodeImg ? (
-									<img src={state.QrCodeImg.src} alt='' />
-								) : (
-									<div>{'Error Loading QR code...'}</div>
-								)}
-								<Grid item xs={12} sx={{ marginTop: 6 }}>
-									<FormControl fullWidth>
-									<InputLabel htmlFor='account-enable-2fa'>Code</InputLabel>
-									<OutlinedInput
-										label='Code'
-										value={state.Code}
-										id='account-enable-2fa'
-										onChange={handleEnable2FaChange('Code')}
-										type={'text'}
-										endAdornment={
-										<InputAdornment position='end'>
-											<IconButton edge='end' aria-label='qrCode'>
-											<QrCodeIcon />
-											</IconButton>
-										</InputAdornment>
-										}
-									/>
-										<SendButton
-											code={state.Code}
+									{state.QrCodeImg ? (
+										<img src={state.QrCodeImg.src} alt='' />
+									) : (
+										<div>{'Error Loading QR code...'}</div>
+									)}
+									<Grid item xs={12} sx={{ marginTop: 6 }}>
+										<InsertCode
+											code={state.code}
 											TwoFaEnabled={state.TwoFaEnabled}
 											setTwoFaEnabled={setState}
+											setCode={setState}
 										/>
-									</FormControl>
-								</Grid>
+									</Grid>
 								</div>
 							)}
 							</Typography>
@@ -238,30 +228,18 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 					</Box>
 				</Box>
 
-				<Box sx={{ mt: 5.75, display: 'flex',	justifyContent:'center'}}>
-					{ state.TwoFaEnabled ?
-						(
-							<Button
-								className="md-primary"
-								variant='contained'
-								size='large'
-								sx={{ marginRight: 3.5, backgroundColor: '#B700cc' }}
-								onClick={handleDisable2FAClick}>
-								Disable 2FA
-							</Button>
-						)
-						:
-						(
-							<Button
-								className="md-primary"
-								variant='contained'
-								size='large'
-								sx={{ marginRight: 3.5, backgroundColor: '#B700cc' }}
-								onClick={handleEnable2FAClick}>
-								Enable 2FA
-							</Button>
-						)
-					}
+				<Box sx={{display: 'flex',	justifyContent:'center'}}>
+				<Button
+					className="md-primary"
+					variant='contained'
+					size='large'
+					sx={{backgroundColor: '#B700cc' }}
+					onClick={state.TwoFaEnabled ?
+							(handleDisable2FAClick)
+							:
+							(handleEnable2FAClick)}>
+					{state.TwoFaEnabled ? ("Disable 2FA") : ("Enable 2Fa")}
+				</Button>
 				</Box>
 			</CardContent>
 		</form>
