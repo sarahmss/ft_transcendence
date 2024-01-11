@@ -36,7 +36,6 @@ interface TabSecurityProps {
 const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 
 	useEffect(() => {
-		getQrCode();
 	});
 
 	const [values, setValues] = useState<State>({
@@ -92,6 +91,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 
 	const handleEnable2FAClick = () => {
 		TwoFaService.generateQrCode();
+		getQrCode();
 	}
 	const handleDisable2FAClick = () => {
 		setValues({ ...values, TwoFaDisable: true});

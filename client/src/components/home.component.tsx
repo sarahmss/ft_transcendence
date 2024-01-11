@@ -1,15 +1,13 @@
 import { Component } from "react";
 import TransPong from '../assets/home.jpeg';
 import "./home.component.css"
-import AuthService from "../services/auth.service";
-import IUser from "../types/user.type";
 import {FrontLogin, FrontGame} from "./../common/constants";
-
+import { Grid, Card, Button, Link, Box } from "@mui/material";
+import ChatComponent from "./chat/chat.component";
 type Props = {};
 
 type State = {
 	content: string;
-	currentUser: IUser & { accessToken: string };
 	isLogged: boolean;
 }
 
@@ -19,47 +17,56 @@ export default class Home extends Component<Props, State> {
 
 		this.state = {
 			content: "Chat",
-			currentUser: { accessToken: "" },
 			isLogged: false,
 		};
 	}
 
-	componentDidMount() {
-        const currentUser = AuthService.getCurrentUser();
-
-        if (currentUser) 
-			this.setState({isLogged: true });
-		
-        this.setState({ currentUser: currentUser})
-    }
-
-
 	render() {
 		return (
-		  <div className="wrapper">
-			<div className="image-container">
-			  <img
-				src={TransPong}
-				alt="TransPong"
-				style={{ width: "100%", objectFit: "cover", height: "100%" }}
-			  />
-			</div>
+			<div >
+			<Grid container spacing={3}>
+				<Grid item xs={12} md={8}>
+				<div>
+					<img
+					src={TransPong}
+					alt="TransPong"
+					style={{ width: "100%", objectFit: "cover", height: "100%" }}
+					/>
+				</div>
+				</Grid>
+				<Grid item xs={12} md={6} lg={4}>
+					<ChatComponent/>
 
-			<div className="container">
-			  <section className="jumbotron">
-				<h3>{this.state.content}</h3>
-			  </section>
-			  {this.state.isLogged ? (
-					<a href={FrontGame}>
-						<button>Play</button>
-					</a>
-					) : (
-						<a href={FrontLogin}>
-							<button>Please, log in!</button>
-						</a>
-					)}
+					<Box sx={{
+						display: "flex",
+						justifyContent:"center"}}>
+					{this.state.isLogged ? (
+						<Link href={FrontGame}>
+						<Button
+							className="md-primary"
+							variant='contained'
+							size='large'
+							sx={{  backgroundColor: '#B700cc' }}
+							>
+							Play !
+						</Button>
+					</Link>
+				) : (
+					<Link href={FrontLogin}>
+						<Button
+							className="md-primary"
+							variant='contained'
+							size='large'
+							sx={{ backgroundColor: '#B700cc' }}
+							>
+							Please, Log In !
+						</Button>
+					</Link>
+				)}
+					</Box>
+				</Grid>
+			</Grid>
 			</div>
-		  </div>
 		);
-	  }
-	}
+		}
+}
