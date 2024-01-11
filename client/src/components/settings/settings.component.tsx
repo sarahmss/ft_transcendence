@@ -42,12 +42,13 @@ export default class Settings extends Component<Props, SettingsState> {
 	}
 
 	handleEnable2FAClick = () => {
-		TwoFaService.generateQrCode();
-		this.setState({
-			showLabelAndImage: true,
-		});
-		}
-
+			console.log("entrou cá");
+			TwoFaService.generateQrCode();
+			this.setState({
+				showLabelAndImage: true,
+			});
+	}
+	
 	render() {
 		if (this.state.redirect) {
 			return <Navigate to={this.state.redirect} />
