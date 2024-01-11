@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, useEffect, useReducer } from 'react'
+import { ChangeEvent, useReducer } from 'react'
 import {Box,
 		Grid,
 		Avatar,
@@ -103,10 +103,6 @@ interface TabSecurityProps {
 	currentUser: IUser | null;
 }
 const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
-
-	useEffect(() => {
-	});
-
 	const [state, setState] = useReducer(reducer, {
 		TwoFaEnabled: currentUser?.hasTwoFactorAuth || false,
 		QrCodeGenerated: currentUser?.hasTwoFactorAuth || false,
@@ -174,19 +170,21 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 						</Avatar>
 						{state.QrCodeGenerated ? (
 							<Typography sx={{ fontWeight: 600, marginTop: 3.5, marginBottom: 3.5 }}>
-							{state.TwoFaEnabled ? (
-								state.TwoFaDisable ? (
-								<div>
-									To disable two-factor authentication, send the code.
-									<Grid item xs={12} sx={{ marginTop: 6 }}>
-										<InsertCode
-											code={state.code}
-											TwoFaEnabled={state.TwoFaEnabled}
-											setTwoFaEnabled={setState}
-											setCode={setState}
-										/>
-									</Grid>
-								</div>
+							{state.TwoFaEnabled ?
+							(
+								state.TwoFaDisable ?
+								(
+									<div>
+										To disable two-factor authentication, send the code.
+										<Grid item xs={12} sx={{ marginTop: 6 }}>
+											<InsertCode
+												code={state.code}
+												TwoFaEnabled={state.TwoFaEnabled}
+												setTwoFaEnabled={setState}
+												setCode={setState}
+											/>
+										</Grid>
+									</div>
 								)
 								:
 								(
@@ -194,7 +192,9 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 										Two-factor authentication is enabled.
 									</div>
 								)
-							) : (
+							)
+							:
+							 (
 								<div>
 									{state.QrCodeImg ? (
 										<img src={state.QrCodeImg.src} alt='' />
@@ -224,7 +224,6 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 				Two-factor authentication adds an additional layer of security to your account by requiring more than just
 				a password to log in.
 				</Typography>
-
 					</Box>
 				</Box>
 
@@ -234,10 +233,8 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 					variant='contained'
 					size='large'
 					sx={{backgroundColor: '#B700cc' }}
-					onClick={state.TwoFaEnabled ?
-							(handleDisable2FAClick)
-							:
-							(handleEnable2FAClick)}>
+					onClick={state.TwoFaEnabled ? (handleDisable2FAClick)
+						: (handleEnable2FAClick)}>
 					{state.TwoFaEnabled ? ("Disable 2FA") : ("Enable 2Fa")}
 				</Button>
 				</Box>
