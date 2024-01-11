@@ -54,7 +54,7 @@ const AccountSettings = () => {
     if (user) {
 		setCurrentUser(user);
 	} else {
-		setRedirect('home');
+		setRedirect('/home');
 	}
 
   }, []);
