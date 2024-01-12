@@ -63,41 +63,32 @@ interface InsertCodeProps {
 	setTwoFaEnabled: React.Dispatch<React.SetStateAction<{ TwoFaEnabled: boolean }>>;
 	setCode: React.Dispatch<React.SetStateAction<{ code: string }>>;
 }
-const InsertCode: React.FC<InsertCodeProps> =({ code,
-	TwoFaEnabled,
-	setTwoFaEnabled,
-	setCode }) => {
 
-	const handle2FaChange = () => (event: ChangeEvent<HTMLInputElement>) => {
-		setCode({code: event.target.value })
-	}
+const InsertCode: React.FC<InsertCodeProps> = ({ code, TwoFaEnabled, setTwoFaEnabled, setCode }) => {
+	const handle2FaChange = (event: ChangeEvent<HTMLInputElement>) => {
+		setCode({ code: event.target.value });
+	};
 
 	return (
 		<FormControl fullWidth>
-		<InputLabel htmlFor='account-disable-2fa'>Code</InputLabel>
+		<InputLabel htmlFor='account-insert-code'>Code</InputLabel>
 		<OutlinedInput
-		label='Code'
-		value={code}
-		id='account-disable-2fa'
-		onChange={handle2FaChange}
-		type={'text'}
-		endAdornment={
+			label='Code'
+			id='account-insert-code'
+			onChange={handle2FaChange}
+			type={'text'}
+			endAdornment={
 			<InputAdornment position='end'>
-			<IconButton edge='end' aria-label='qrCode'>
+				<IconButton edge='end' aria-label='qrCode'>
 				<QrCodeIcon />
-			</IconButton>
+				</IconButton>
 			</InputAdornment>
-		}
+			}
 		/>
-		<SendButton
-			code={code}
-			TwoFaEnabled={TwoFaEnabled}
-			setTwoFaEnabled={setTwoFaEnabled}
-		/>
-	</FormControl>
+		<SendButton code={code} TwoFaEnabled={TwoFaEnabled} setTwoFaEnabled={setTwoFaEnabled} />
+		</FormControl>
 	);
-};
-
+	};
 
 interface TabSecurityProps {
 	currentUser: IUser | null;
@@ -106,59 +97,61 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 	const [state, setState] = useReducer(reducer, {
 		TwoFaEnabled: currentUser?.hasTwoFactorAuth || false,
 		QrCodeGenerated: currentUser?.hasTwoFactorAuth || false,
-		QrCodeImgAvailable:  false,
+		QrCodeImgAvailable:	false,
 		TwoFaDisable: false,
 		QrCodeImg: null,
 		Code: '',
 		});
 
-	const getQrCode = (): Promise<void> => {
-		return new Promise((resolve, reject) => {
-			const authTokenQr = AuthService.getAuthToken();
-			const localQr = localStorage.getItem("qrcode");
-
-			if (localQr) {
-			axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' })
-				.then((response) => {
-				if (response.data) {
-					const imageBase64 = btoa(
-					new Uint8Array(response.data)
-						.reduce((data, byte) => data + String.fromCharCode(byte), '')
-					);
-					const imgElement = document.createElement('img');
-					imgElement.src = `data:image/png;base64,${imageBase64}`;
-					setState({ ...state, QrCodeImg: imgElement, QrCodeImgAvailable: true });
-					resolve();
-				} else {
-					setState({ ...state, QrCodeImgAvailable: false });
-					reject(new Error("Unable to Get QrCode Img"));
-				}
-				})
-				.catch(error => {
-				console.log(error);
-				reject(error);
-				});
-			} else {
-			reject(new Error("Unavailable Qr Code"));
-			}
-		});
-		};
-
-		const handleEnable2FAClick = async () => {
-			try {
-			if (state.QrCodeGenerated === false) {
-				await TwoFaService.generateQrCode();
-				setState({ ...state, QrCodeGenerated: true });
-			}
-			await getQrCode();
-			} catch (error) {
-			console.error("Erro ao habilitar 2FA:", error);
-			}
-		};
+	const handleEnable2FAClick = async () => {
+		try {
+		if (state.QrCodeGenerated === false) {
+			await TwoFaService.generateQrCode();
+			setState({ ...state, QrCodeGenerated: true });
+		}
+		await getQrCode();
+		} catch (error) {
+		console.error("Erro ao habilitar 2FA:", error);
+		}
+	};
 
 	const handleDisable2FAClick = () => {
 		setState({ ...state, TwoFaDisable: true});
 	}
+
+	const getQrCode = async (): Promise<void> => {
+		const authTokenQr = AuthService.getAuthToken();
+		const localQr = localStorage.getItem("qrcode");
+
+		return new Promise<void>(async (resolve, reject) => {
+			if (localQr) {
+			try {
+				const response = await axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' });
+
+				if (response.data) {
+				const imageBase64 = btoa(
+					new Uint8Array(response.data)
+					.reduce((data, byte) => data + String.fromCharCode(byte), '')
+				);
+				const imgElement = document.createElement('img');
+				imgElement.src = `data:image/png;base64,${imageBase64}`;
+				setState({ ...state, QrCodeImg: imgElement, QrCodeImgAvailable: true });
+				resolve();
+				} else {
+				setState({ ...state, QrCodeImgAvailable: false });
+				reject(new Error("Unable to Get QrCode Img"));
+				}
+			} catch (error) {
+				console.log(error);
+				reject(error);
+			}
+			} else {
+			reject(new Error("Unavailable Qr Code"));
+			}
+		});
+	};
+
+
 	return (
 		<form>
 			<CardContent>
@@ -257,4 +250,5 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 		</form>
 	)
 }
+
 export default TabSecurity

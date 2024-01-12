@@ -33,8 +33,9 @@ const Loging2FaButton = ({userId, code, setState,
 	code: string;
 	setState: React.Dispatch<React.SetStateAction<State>>;
 }) => {
-	const handleAuthentication = () => {
-	const check = twoFaService.Login2Fa(code, userId);
+
+	const handleAuthentication = async () => {
+	const check = await twoFaService.login2Fa(code, userId);
 	setState({code:"", verified: check});
 	};
 

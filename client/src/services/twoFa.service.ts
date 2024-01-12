@@ -9,61 +9,63 @@ import { DefaultPic,
 
 class TwoFaService {
 
-	handleAuthentication(userId: string, code: string) {
-		axios
-			.post(
-				`${TwoFaLink} ${userId}`,
-				{ code: code })
-			.then((response) => {
-				document.cookie = response.data.cookie;
-			}).catch(() => {
-			});
+	async handleAuthentication(userId: string, code: string) {
+		try {
+			const response = await axios.post(
+			`${TwoFaLink} ${userId}`,
+			{ code: code }
+			);
+
+			document.cookie = response.data.cookie;
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
-	generateQrCode(): Promise<string> {
-		const authToken = AuthService.getAuthToken();
+	async generateQrCode(): Promise<string> {
+		try {
+			const authToken = AuthService.getAuthToken();
+			const response = await axios.get(TwoFaGenerateLink, { headers: authToken });
 
-		return axios.get(TwoFaGenerateLink, { headers: authToken })
-		  .then((response) => {
 			localStorage.setItem("qrcode", response.data.url);
 			return response.data.url;
-		  })
-		  .catch((error) => {
-			console.log(error);
+		} catch (error) {
+			console.error(error);
 			throw new Error("Error generating QrCode");
-		});
-	  }
+		}
+	}
 
 
-	redirectToEnable2FA (code:string) {
-		const authToken = AuthService.getAuthToken();
+	async redirectToEnable2FA(code: string) {
+		try {
+			const authToken = AuthService.getAuthToken();
+			await axios.post(TwoFaEnableLink, { code: code }, { headers: authToken });
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
-		axios.post( TwoFaEnableLink,
-					{ code: code },
-					{ headers: authToken });
-	};
+	async redirectToDisable2FA(code: string) {
+		try {
+			const authToken = AuthService.getAuthToken();
+			await axios.post(TwoFaDisableLink, { code: code }, { headers: authToken });
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
-	redirectToDisable2FA (code:string) {
-		const authToken = AuthService.getAuthToken()
-
-		axios.post( TwoFaDisableLink,
-					{ code: code },
-					{ headers: authToken });
-	};
-
-	Login2Fa (code:string, userId: string)
-	{
-		axios .post(`${TwoFaLoginLink}?user=${userId}`, { code: code })
-		.then((response) => {
+	async login2Fa(code: string, userId: string): Promise<boolean> {
+		try {
+			const response = await axios.post(`${TwoFaLoginLink}?user=${userId}`, { code: code });
 			document.cookie = response.data.cookie;
-			return (true);
-		})
-		.catch(() => {
-			return (false);
-		});
-		return (false);
-	};
+			return true;
+		} catch (error) {
+			console.error(error);
+			return false;
+		}
+	}
 }
+
 const twoFaService = new TwoFaService();
 
 export default twoFaService;

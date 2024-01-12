@@ -1,4 +1,4 @@
-import axios, { RawAxiosRequestHeaders }  from "axios";
+import axios, { RawAxiosRequestHeaders }	from "axios";
 import { BackLink, LocalSigninLink,
 		LocalSignupLink,
 		UserContentLink,
@@ -7,69 +7,91 @@ import "core-js/stable/atob";
 import { jwtDecode } from "jwt-decode";
 
 class AuthService {
-	LocalLogin(userName: string, password: string) {
-		return axios
-			.post(LocalSigninLink, {
-				userName,
-				password
-			})
-			.then(response => {
-				if (response.data.accessToken)
-				{
-					localStorage.setItem("accessToken", response.data.accessToken);
-					localStorage.setItem("id", response.data.id);
-					localStorage.setItem("Logged","local");
-				}
-				return response.data;
-			});
+	async LocalLogin(userName: string, password: string) {
+		try {
+		const response = await axios.post(LocalSigninLink, {
+			userName,
+			password,
+		});
+
+		if (response.data.accessToken) {
+			localStorage.setItem("accessToken", response.data.accessToken);
+			localStorage.setItem("id", response.data.id);
+			localStorage.setItem("Logged", "local");
+		}
+
+		return response.data;
+		} catch (error) {
+		console.error("Error during LocalLogin:", error);
+		throw error;
+		}
 	}
 
 	IntraLogin() {
 		localStorage.setItem("Logged", "intra");
 	}
 
-	logout() {
-		const authToken = this.getAuthToken();
-		localStorage.clear();
-		return axios.get(BackLink + "/auth/logout", { headers: authToken })
-	}
+	async logout() {
+		try {
+			const authToken = this.getAuthToken();
+			localStorage.clear();
+			await axios.get(BackLink + "/auth/logout", { headers: authToken });
+		} catch (error) {
+			console.error("Error during logout:", error);
+			throw error;
+		}
+		}
 
-	getIsLogged()
-	{
+	getIsLogged() {
 		const isLogged = localStorage.getItem("Logged");
-		if (isLogged)
-			return isLogged;
-
-		return null;
+		return isLogged || null;
 	}
 
-	register(userName: string, email: string, password: string, passwordConfirm: string) {
-		return axios.post(LocalSignupLink, {
+	async register(userName: string, email: string, password: string, passwordConfirm: string) {
+		try {
+			const response = await axios.post(LocalSignupLink, {
 			userName,
 			email,
 			password,
-		passwordConfirm: passwordConfirm
-		});
+			passwordConfirm: passwordConfirm,
+			});
+
+			return response.data;
+		} catch (error) {
+			console.error("Error during register:", error);
+			throw error;
+		}
 	}
+
+	async RequestCurrentUser() {
+		try {
+			const userId = this.getIdFromToken();
+			const authToken = this.getAuthToken();
+			const response = await axios.get(UserContentLink + userId, { headers: authToken });
+
+			localStorage.setItem("LoggedUser", JSON.stringify(response.data));
+
+			return response.data;
+		} catch (error) {
+			console.error("Error during RequestCurrentUser:", error);
+			throw error;
+		}
+		}
 
 	getCurrentUser() {
-		if (this.getIsLogged() != null)
-		{
-			this.RequestCurrentUser();
-			const userStr = localStorage.getItem("LoggedUser");
-			if (userStr)
-				return JSON.parse(userStr);
+		try {
+			if (this.getIsLogged() != null)
+			{
+				this.RequestCurrentUser();
+				const userStr = localStorage.getItem("LoggedUser");
+				if (userStr)
+					return JSON.parse(userStr);
+				return null;
+			}
+		} catch (error) {
+			console.error("Error during getCurrentUser:", error);
+      		throw error;
 		}
-		return null;
-	}
-
-	RequestCurrentUser() {
-		const userId = this.getIdFromToken();
-		const authToken = this.getAuthToken();
-		axios.get(UserContentLink + userId, { headers: authToken }).then((response) => {
-			localStorage.setItem("LoggedUser", JSON.stringify(response.data))
-			return response.data;
-		})
 	}
 
 	getCurrentUserId() {

@@ -3,42 +3,46 @@ import { BackLink, PublicContentLink } from '../common/constants';
 import AuthService from './auth.service';
 
 class UserService {
-	getPublicContent() {
-		return axios.get(PublicContentLink);
-	}
 
-	getUserBoard() {
-		const userId = AuthService.getCurrentUserId();
-		return axios.get(`${BackLink}/${userId}/profile`, { headers: AuthService.getAuthToken() });
-	}
-
-	uploadProfilePic(imgName: string, img: FormData) {
+	async uploadProfilePic(imgName: string, img: FormData): Promise<string | undefined> {
 		const userId = AuthService.getCurrentUserId();
 
-		axios.post(
+		try {
+			const response = await axios.post(
 			`${BackLink}/uploads/${userId}/profilePictures/${imgName}`,
 			img,
-			{headers: AuthService.getAuthToken()})
-			.then(response => {
+			{ headers: AuthService.getAuthToken() }
+			);
+
 			if (response.data.url) {
-				return (response.data.url);
+			return response.data.url;
 			}
-		});
+
+			return undefined;
+		} catch (error) {
+			console.error('Error during uploadProfilePic:', error);
+			throw error;
+		}
 	}
 
-	updateProfile(userName: string, profilePicture: string, email: string){
+	async updateProfile(userName: string, profilePicture: string, email: string): Promise<void> {
 		const userId = AuthService.getCurrentUserId();
 
-		axios.patch(
-			`${BackLink}/${userId}`,
-			{
-				userName: userName,
-				profilePicture: profilePicture,
-				email: email
-			},
-			{headers: AuthService.getAuthToken()});
+		try {
+			await axios.patch(
+				`${BackLink}/${userId}`,
+				{
+					userName: userName,
+					profilePicture: profilePicture,
+					email: email
+				},
+				{ headers: AuthService.getAuthToken() }
+			);
+		} catch (error) {
+			console.error('Error during updateProfile:', error);
+			throw error;
+		}
 	}
-
 	applyChanges() {
 		// Restante do código para aplicar as alterações...
 	};
