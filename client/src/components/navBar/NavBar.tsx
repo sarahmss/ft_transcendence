@@ -49,12 +49,12 @@ const NavBar: React.FC = () => {
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <SelfImprovementIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-          <Link to="/home" style={{textDecoration:'none', color:'white'}}>
+
             <Typography
               variant="h6"
               noWrap
               component="a"
-              href="#app-bar-with-responsive-menu"
+              href="/home"
               sx={{
                 mr: 2,
                 display: { xs: 'none', md: 'flex' },
@@ -68,7 +68,6 @@ const NavBar: React.FC = () => {
               TRANSCENDENCE
             </Typography>
 
-          </Link>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
@@ -81,12 +80,11 @@ const NavBar: React.FC = () => {
             </IconButton>
           </Box>
           <SelfImprovementIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-          <Link to="/home" style={{textDecoration:'none', color:'white'}}>
             <Typography
               variant="h5"
               noWrap
               component="a"
-              href="#app-bar-with-responsive-menu"
+              href="/home"
               sx={{
                 mr: 2,
                 display: { xs: 'flex', md: 'none' },
@@ -101,7 +99,6 @@ const NavBar: React.FC = () => {
               TRANSCENDENCE
             </Typography>
 
-          </Link>
 		  <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {isLogged ? (
               pagesLogged.map((page) => (
