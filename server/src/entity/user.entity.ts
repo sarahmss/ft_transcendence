@@ -19,6 +19,9 @@ export class User {
 	@Column({unique: false, nullable: true})
 	password: string;
 
+	@Column({unique: false, nullable: true})
+	secret2Fa: string;
+
 	@Column({ nullable: false, default: status.OFF})
 	status: status;
 

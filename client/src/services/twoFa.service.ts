@@ -20,32 +20,19 @@ class TwoFaService {
 			});
 	}
 
-	getQrCode(){
-		const authTokenQr = AuthService.getAuthToken();
-		const localQr = localStorage.getItem("qrcode");
+	generateQrCode(): Promise<string> {
+		const authToken = AuthService.getAuthToken();
 
-		if(localQr)
-		{
-			axios.get(localQr,
-			{headers : authTokenQr})
-			.then((response) => {
-				return (response);
-			})
-			.catch(error => {
-				console.log(error);
-			});
-		}
-		return (DefaultPic)
-	}
-
-	generateQrCode() {
-		const authToken = AuthService.getAuthToken()
-		axios.get( TwoFaGenerateLink,
-				{ headers: authToken })
-				.then((response) => {
-						localStorage.setItem("qrcode", response.data.url)
-				});
-		}
+		return axios.get(TwoFaGenerateLink, { headers: authToken })
+		  .then((response) => {
+			localStorage.setItem("qrcode", response.data.url);
+			return response.data.url;
+		  })
+		  .catch((error) => {
+			console.log(error);
+			throw new Error("Error generating QrCode");
+		});
+	  }
 
 
 	redirectToEnable2FA (code:string) {

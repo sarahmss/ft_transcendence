@@ -76,10 +76,10 @@ export class UsersService {
 		return user.status;
 	}
 
-	async getUserPassword(userId: string): Promise<string>
+	async get2FaSecret(userId: string): Promise<string>
 	{
 		const user = await this.checkUser(userId);
-		return user.password;
+		return user.secret2Fa;
 	}
 
 	/********************************* SET ******************************/
@@ -102,9 +102,9 @@ export class UsersService {
 		return this.setStatus(userId, status.PLAYING);
 	}
 
-	async setUserPassword(userId: string, password: string): Promise<User> {
+	async set2FaSecret(userId: string, secret: string): Promise<User> {
 		const user = await this.checkUser(userId);
-		user.password = password;
+		user.secret2Fa = secret;
 		return this.usersRepository.save(user);
 	}
 

@@ -28,13 +28,13 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 		this.makeDir(path);
 		if (user.has2FaAuth == false){
 			await qrCode.toFile(`${path}/qrcode.png`, otpauth);
-			this.usersService.setUserPassword(userId, secret);
+			this.usersService.set2FaSecret(userId, secret);
 		}
 	}
 
 	/********************************* VALIDATE ******************************/
 	async checkQrCode(userId: string, code: string){
-		const secret = await this.usersService.getUserPassword(userId);
+		const secret = await this.usersService.get2FaSecret(userId);
 		return authenticator.verify({token: code, secret:secret});
 	}
 

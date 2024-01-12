@@ -106,40 +106,55 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 	const [state, setState] = useReducer(reducer, {
 		TwoFaEnabled: currentUser?.hasTwoFactorAuth || false,
 		QrCodeGenerated: currentUser?.hasTwoFactorAuth || false,
+		QrCodeImgAvailable:  false,
 		TwoFaDisable: false,
 		QrCodeImg: null,
 		Code: '',
 		});
 
-	const getQrCode = () => {
-		const authTokenQr = AuthService.getAuthToken();
-		const localQr = localStorage.getItem("qrcode");
-		if (localQr) {
+	const getQrCode = (): Promise<void> => {
+		return new Promise((resolve, reject) => {
+			const authTokenQr = AuthService.getAuthToken();
+			const localQr = localStorage.getItem("qrcode");
+
+			if (localQr) {
 			axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' })
 				.then((response) => {
-					if (response.data) {
-						const imageBase64 = btoa(
-							new Uint8Array(response.data)
-								.reduce((data, byte) => data + String.fromCharCode(byte), '')
-						);
-						const imgElement = document.createElement('img');
-						imgElement.src = `data:image/png;base64,${imageBase64}`;
-						setState({ ...state, QrCodeImg: imgElement, QrCodeGenerated:true});
-					} else {
-						setState({ ...state, QrCodeGenerated:false});
-					}
+				if (response.data) {
+					const imageBase64 = btoa(
+					new Uint8Array(response.data)
+						.reduce((data, byte) => data + String.fromCharCode(byte), '')
+					);
+					const imgElement = document.createElement('img');
+					imgElement.src = `data:image/png;base64,${imageBase64}`;
+					setState({ ...state, QrCodeImg: imgElement, QrCodeImgAvailable: true });
+					resolve();
+				} else {
+					setState({ ...state, QrCodeImgAvailable: false });
+					reject(new Error("Unable to Get QrCode Img"));
+				}
 				})
 				.catch(error => {
-					console.log(error);
+				console.log(error);
+				reject(error);
 				});
-		}
-	}
+			} else {
+			reject(new Error("Unavailable Qr Code"));
+			}
+		});
+		};
 
-	const handleEnable2FAClick = () => {
-		TwoFaService.generateQrCode();
-		getQrCode();
-		// setState({ ...state, QrCodeGenerated:true});
-	}
+		const handleEnable2FAClick = async () => {
+			try {
+			if (state.QrCodeGenerated === false) {
+				await TwoFaService.generateQrCode();
+				setState({ ...state, QrCodeGenerated: true });
+			}
+			await getQrCode();
+			} catch (error) {
+			console.error("Erro ao habilitar 2FA:", error);
+			}
+		};
 
 	const handleDisable2FAClick = () => {
 		setState({ ...state, TwoFaDisable: true});
@@ -168,7 +183,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 						>
 							<LockOpenOutline sx={{ fontSize: '1.75rem', backgroundColor: '#B700cc'	}} />
 						</Avatar>
-						{state.QrCodeGenerated ? (
+						{state.QrCodeImgAvailable ? (
 							<Typography sx={{ fontWeight: 600, marginTop: 3.5, marginBottom: 3.5 }}>
 							{state.TwoFaEnabled ?
 							(

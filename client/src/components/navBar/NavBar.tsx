@@ -53,14 +53,14 @@ const NavBar: React.FC = () => {
             variant="h6"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="/"
             sx={{
               mr: 2,
               display: { xs: 'none', md: 'flex' },
               fontFamily: 'monospace',
               fontWeight: 700,
               letterSpacing: '.3rem',
-              color: 'inherit', // rgba(183, 0, 255, 0.8)
+              color: 'inherit', 
               textDecoration: 'none',
             }}
           >
@@ -82,7 +82,7 @@ const NavBar: React.FC = () => {
             variant="h5"
             noWrap
             component="a"
-            href="#app-bar-with-responsive-menu"
+            href="/"
             sx={{
               mr: 2,
               display: { xs: 'flex', md: 'none' },
