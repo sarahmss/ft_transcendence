@@ -1,4 +1,7 @@
-./Backend/node_modules
-./Backend/dist
+./server/node_modules
+./server/dist
+./client/node_modules
+./client/dist
+./node_modules
+./dist
 .env
-k.sh
