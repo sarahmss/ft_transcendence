@@ -4,6 +4,8 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 // import { LocalSignupLink } from "../../common/constants";
 import * as Yup from "yup";
 import AuthService from "../../services/auth.service";
+import { Link, Button, Card, CardContent, Box} from '@mui/material';
+import './css/login.component.css'
 
 type Props = {};
 
@@ -109,8 +111,8 @@ export default class Register extends Component<Props, State> {
 		};
 
 		return (
-			<div className="col-md-12">
-				<div className="card card-container">
+			<Card className="col-md-12" sx={{backgroundColor:'#B700cc'}}>
+				<Card className="card-container">
 					<img
 						src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
 						alt="profile-img"
@@ -171,9 +173,12 @@ export default class Register extends Component<Props, State> {
 										/>
 									</div>
 										<div className="form-group">
-										<button type="submit" className="btn btn-primary btn-block">
-										<span> Signup </span>
-										</button>
+										<Button
+											type="submit"
+											className="btn btn-primary btn-block"
+											sx={{backgroundColor:'#B700cc', color:'white'}}>
+											Signup
+										</Button>
 										</div>
 								</div>
 							)}
@@ -192,9 +197,13 @@ export default class Register extends Component<Props, State> {
 							)}
 						</Form>
 					</Formik>
-				</div>
-				<p className="lorem">Lorem ipsum dolor sit amet consectetur adipisicing elit. Excepturi impedit, dolorem id beatae cupiditate aliquid illo dicta, quisquam hic odit deserunt provident vitae repudiandae ratione, magni quos labore veritatis aliquam. Lorem ipsum dolor, sit amet consectetur adipisicing elit. A repellendus accusantium, facilis ab officiis sequi delectus, doloribus dolore porro, temporibus fugiat eaque. Officiis distinctio deserunt fuga aperiam adipisci blanditiis at?</p>
-			</div>
+			</Card>
+
+				<CardContent style={{ paddingLeft: 35, paddingTop: 25 }}>
+					<p className="lorem">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi laborum ad commodi quos voluptate perspiciatis consectetur a, sapiente nam ab necessitatibus, ipsa quidem? Id aliquam, eligendi quidem dolor perferendis error.</p>
+				</CardContent>
+			</Card>
+
 		);
 	}
 }

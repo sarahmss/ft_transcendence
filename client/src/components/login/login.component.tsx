@@ -2,7 +2,7 @@ import { Component, useReducer } from "react";
 import { Navigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link, Button, Card} from '@mui/material';
+import { Link, Card, CardContent, Box, Button, Divider} from '@mui/material';
 import { reducer } from "../../common/helper";
 import { IntraloginLink } from "../../common/constants";
 import './css/login.component.css'
@@ -55,7 +55,7 @@ const IntraLoginButton = () => {
 					variant="contained"
 					disabled={state.loading}
 					onClick={handleLoading}
-					size="medium"
+					size="large"
 					style={{minWidth:100}}
 					>
 					<Link href={IntraloginLink}>
@@ -144,7 +144,7 @@ export default class Login extends Component<Props, State> {
 		};
 
 		return (
-			<Card className="col-md-12" sx={{backgroundColor:'#6e10a8'}}>
+			<Card className="col-md-12" sx={{backgroundColor:'#B700cc'}}>
 				<Card className="card-container">
 					<img
 						src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
@@ -174,15 +174,30 @@ export default class Login extends Component<Props, State> {
 								/>
 							</div>
 
-							<div className="form-group">
-								<button type="submit" className="btn btn-primary btn-block button_login" disabled={loading}> Login
+							<Box className="form-group"
+								sx={{margin:'10px',
+								display: 'flex',
+								justifyContent:'center'}}>
+
+								<Button
+									type="submit"
+									className="btn btn-primary btn-block"
+									disabled={loading}
+									sx={{backgroundColor:'#B700cc', color:'white'}}>
+									Login
 									{loading && (
 										<span className="spinner-border spinner-border-sm"></span>
 									)}
-								</button>
-							</div>
+								</Button>
 
-							<IntraLoginButton/>
+							</Box>
+							<Box className="form-group"
+								sx={{margin:'15px',
+								display: 'flex',
+								justifyContent:'center'}}>
+
+								<IntraLoginButton/>
+							</Box>
 
 							{message && (
 								<div className="form-group">
@@ -195,7 +210,9 @@ export default class Login extends Component<Props, State> {
 						</Form>
 					</Formik>
 				</Card>
-				<p className="lorem">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi laborum ad commodi quos voluptate perspiciatis consectetur a, sapiente nam ab necessitatibus, ipsa quidem? Id aliquam, eligendi quidem dolor perferendis error.</p>
+				<CardContent style={{ paddingLeft: 35, paddingTop: 25 }}>
+					<p className="lorem">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi laborum ad commodi quos voluptate perspiciatis consectetur a, sapiente nam ab necessitatibus, ipsa quidem? Id aliquam, eligendi quidem dolor perferendis error.</p>
+				</CardContent>
 			</Card>
 		);
 	}
