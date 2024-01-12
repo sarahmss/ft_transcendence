@@ -111,6 +111,7 @@ export default class Login extends Component<Props, State> {
 
 		AuthService.LocalLogin(userName, password).then(
 			() => {
+				console.log("AAAAAAAA");
 				this.setState({
 				redirect: "/profile"
 				});

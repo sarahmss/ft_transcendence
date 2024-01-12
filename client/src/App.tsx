@@ -28,6 +28,7 @@ class App extends Component<Props, State> {
 
 				<Routes>
 					<Route path="/" element={<Home />} />
+					<Route path="/home" element={<Home />} />
 					<Route path="/login" element={<Login />} />
 					<Route path="/logout" element={<Logout />} />
 					<Route path='/2fa' element={<Login2Fa/>} />
