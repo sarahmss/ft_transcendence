@@ -48,7 +48,7 @@ export default class Settings extends Component<Props, SettingsState> {
 				showLabelAndImage: true,
 			});
 	}
-	
+
 	render() {
 		if (this.state.redirect) {
 			return <Navigate to={this.state.redirect} />
@@ -90,7 +90,7 @@ export default class Settings extends Component<Props, SettingsState> {
 				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.twoFAEnabled} onClick={this.handleEnable2FAClick}>
 					Enable 2FA
 				</Button>
-				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.update} onClick={userService.applyChanges}>
+				<Button className="md-primary" variant="contained" color="primary" disabled={!this.state.update}>
 					Update
 				</Button>
 				{this.state.showLabelAndImage && (

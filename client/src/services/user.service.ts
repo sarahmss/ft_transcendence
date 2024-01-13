@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { BackLink, PublicContentLink } from '../common/constants';
+import { BackLink, UserContentLink } from '../common/constants';
 import AuthService from './auth.service';
 
 class UserService {
@@ -29,8 +29,7 @@ class UserService {
 		const userId = AuthService.getCurrentUserId();
 
 		try {
-			await axios.patch(
-				`${BackLink}/${userId}`,
+			await axios.patch((UserContentLink + userId),
 				{
 					userName: userName,
 					profilePicture: profilePicture,
@@ -39,13 +38,10 @@ class UserService {
 				{ headers: AuthService.getAuthToken() }
 			);
 		} catch (error) {
-			console.error('Error during updateProfile:', error);
+			console.error('Error while updating profile:', error);
 			throw error;
 		}
 	}
-	applyChanges() {
-		// Restante do código para aplicar as alterações...
-	};
 }
 
 const userService = new UserService();

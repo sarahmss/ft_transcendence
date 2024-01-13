@@ -1,6 +1,6 @@
 export const BackLink = process.env.REACT_APP_BACK_HOST
 export const FrontLink = process.env.REACT_APP_FRONT_HOST
-export const PublicContentLink = BackLink + "/auth";
+
 export const IntraloginLink = BackLink + "/auth/login"
 export const LocalSignupLink = BackLink + "/auth/signup"
 export const LocalSigninLink = BackLink + "/auth/signin"
