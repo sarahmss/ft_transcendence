@@ -50,11 +50,16 @@ const NavBar: React.FC = () => {
     
   React.useEffect(() => {
     fetchData();
-  }, [globalVariable]);
+  }, []);
 
-  const handleLogoutClick = ()  => {
-    
-    fetchData();
+  const handleLogoutClick = async () => {
+    try {
+      console.log("entrou no try logOut 2");
+      await authService.logout();
+      fetchData();
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
   };
 
   const logout = () => {
@@ -118,7 +123,7 @@ const NavBar: React.FC = () => {
               pagesLogged.map((page) => (
                 <MenuItem key={page.label}>
                   {page.link === '/logout' ? (
-                    <Link to={page.link} style={{ textDecoration: 'none', color: 'inherit' }} onClick={handleLogoutClick}>
+                    <Link to={"/home"} style={{ textDecoration: 'none', color: 'inherit' }} onClick={handleLogoutClick}>
                       <Typography textAlign="center">{page.label}</Typography>
                     </Link>
                   ) : (
