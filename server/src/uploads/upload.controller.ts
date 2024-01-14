@@ -65,6 +65,7 @@ export class UploadsController {
 	file: Express.Multer.File,
 	@Param('userId') userId: string): Promise<any> {
 		const url = `/uploads/${userId}/profilePictures/${file.filename}`
+		this.usersService.updateProfilePic(userId, url);
 		return {url:url};
 	}
 

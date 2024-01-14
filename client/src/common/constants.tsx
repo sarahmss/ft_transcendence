@@ -1,6 +1,6 @@
 export const BackLink = process.env.REACT_APP_BACK_HOST
 export const FrontLink = process.env.REACT_APP_FRONT_HOST
-
+export const PublicContentLink = BackLink + "/auth";
 export const IntraloginLink = BackLink + "/auth/login"
 export const LocalSignupLink = BackLink + "/auth/signup"
 export const LocalSigninLink = BackLink + "/auth/signin"
@@ -12,6 +12,13 @@ export const TwoFaDisableLink = TwoFaLink + "/disable"
 export const TwoFaEnableLink = TwoFaLink + "/enable"
 export const TwoFaGenerateLink = TwoFaLink + "/generate"
 export const TwoFaLoginLink = TwoFaLink + "/login"
+
+
+export let globalVariable: string = 'Valor Inicial';
+
+export const setGlobalVariable = (newValue: string) => {
+  globalVariable = newValue;
+};
 
 
 export const FrontLogin = FrontLink + "/login";

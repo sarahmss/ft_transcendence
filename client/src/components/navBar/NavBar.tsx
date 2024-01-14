@@ -10,8 +10,11 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import authService from '../../services/auth.service';
-import { Link } from 'react-router-dom';
+import { Link} from 'react-router-dom';
+
 import { DefaultPic } from '../../common/constants';
+
+import {globalVariable, setGlobalVariable} from "../../common/constants";
 
 const pagesLogged = [
 	{ label: 'Profile', link: '/profile' },
@@ -29,16 +32,30 @@ const NavBar: React.FC = () => {
   const [profilePic, setProfilePic] = React.useState('');
 
 
+  const fetchData = async () => {
+    try {
+        const user = await authService.getCurrentUser();
+        console.log(user);
+        if (user) {
+          setIsLogged(true);
+          setProfilePic(user.profilePicture);
+        } else {
+          setIsLogged(false);
+          setProfilePic(DefaultPic);
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+    
   React.useEffect(() => {
-    const user = authService.getCurrentUser();
-    if (user) {
-      setIsLogged(true);
-	  setProfilePic(user.profilePicture);
-    } else {
-      setIsLogged(false);
-	  setProfilePic(DefaultPic);
-    }
-  }, []);
+    fetchData();
+  }, [globalVariable]);
+
+  const handleLogoutClick = ()  => {
+    
+    fetchData();
+  };
 
   const logout = () => {
 	//
@@ -96,13 +113,19 @@ const NavBar: React.FC = () => {
           >
             TRANSCENDENCE
           </Typography>
-		  <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-            {isLogged ? (
+        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          {isLogged ? (
               pagesLogged.map((page) => (
                 <MenuItem key={page.label}>
-                  <Link to={page.link} style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <Typography textAlign="center">{page.label}</Typography>
-                  </Link>
+                  {page.link === '/logout' ? (
+                    <Link to={page.link} style={{ textDecoration: 'none', color: 'inherit' }} onClick={handleLogoutClick}>
+                      <Typography textAlign="center">{page.label}</Typography>
+                    </Link>
+                  ) : (
+                    <Link to={page.link} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      <Typography textAlign="center">{page.label}</Typography>
+                    </Link>
+                  )}
                 </MenuItem>
               ))
             ) : (

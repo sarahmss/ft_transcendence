@@ -49,14 +49,22 @@ const AccountSettings = () => {
   const [currentUser, setCurrentUser] = useState<IUser | null>(null);
 
   useEffect(() => {
-    const user = authService.getCurrentUser();
-
-    if (user) {
-		setCurrentUser(user);
-	} else {
-		setRedirect('/home');
-	}
-
+    const fetchData = async () => {
+      try {
+        const user = await authService.getCurrentUser();
+  
+        if (user) {
+          setCurrentUser(user);
+        } else {
+          setRedirect('home');
+        }
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        // Handle the error as needed
+      }
+    };
+  
+    fetchData();
   }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: string) => {

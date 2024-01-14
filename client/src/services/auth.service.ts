@@ -3,10 +3,13 @@ import { BackLink, LocalSigninLink,
 		LocalSignupLink,
 		UserContentLink,
 		tokenData } from "../common/constants";
+
+import {globalVariable, setGlobalVariable} from "../common/constants";
 import "core-js/stable/atob";
 import { jwtDecode } from "jwt-decode";
-
+import { useState } from "react";
 class AuthService {
+	
 	async LocalLogin(userName: string, password: string) {
 		try {
 		const response = await axios.post(LocalSigninLink, {
@@ -32,15 +35,20 @@ class AuthService {
 	}
 
 	async logout() {
+		console.log("Entrou no auth - 3")
 		try {
+			console.log("Entrou no try do auth - 4")
 			const authToken = this.getAuthToken();
 			localStorage.clear();
+			console.log("limpou o local storage - 6")
+			setGlobalVariable("Limpado!")
+			console.log(globalVariable);
 			await axios.get(BackLink + "/auth/logout", { headers: authToken });
 		} catch (error) {
 			console.error("Error during logout:", error);
 			throw error;
 		}
-		}
+	}
 
 	getIsLogged() {
 		const isLogged = localStorage.getItem("Logged");
@@ -78,7 +86,25 @@ class AuthService {
 		}
 		}
 
-	getCurrentUser() {
+	async getCurrentUser() {
+		
+		try {
+			if (this.getIsLogged() != null)
+			{
+				console.log("Entrou no getCurrent user - 7")
+				await this.RequestCurrentUser();
+				const userStr = localStorage.getItem("LoggedUser");
+				if (userStr)
+					return JSON.parse(userStr);
+				return null;
+			}
+		} catch (error) {
+			console.error("Error during getCurrentUser:", error);
+      		throw error;
+		}
+	}
+
+	getCurrentUserPlay() {
 		try {
 			if (this.getIsLogged() != null)
 			{
@@ -94,8 +120,8 @@ class AuthService {
 		}
 	}
 
-	getCurrentUserId() {
-		const user = this.getCurrentUser();
+	async getCurrentUserId() {
+		const user = await this.getCurrentUser();
 		if (user && user.userId)
 			return user.userId;
 		return "";
@@ -103,6 +129,7 @@ class AuthService {
 
 	getAuthToken() {
 		if (this.getIsLogged() === "local") {
+			console.log("entrou no get authtoken - 5")
 			const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + localStorage.getItem("accessToken")};
 			return authToken;
 		} else if (this.getIsLogged() === "intra") {

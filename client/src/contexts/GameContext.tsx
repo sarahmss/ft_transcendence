@@ -140,7 +140,7 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
 
   useEffect(() => {
     gameSocket.on('connect', () => {
-		const storedPlayer = AuthService.getCurrentUser();
+		const storedPlayer = AuthService.getCurrentUserPlay();
 		if (!storedPlayer){
 			dispatch({ type: 'LOGGED', payload: false });
 			return;
@@ -160,7 +160,7 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
 		const player = players[gameSocket.id];
 		if (player)
 		{
-			const storedPlayer = AuthService.getCurrentUser();
+			const storedPlayer = AuthService.getCurrentUserPlay();
 			if (!storedPlayer){
 				dispatch({ type: 'LOGGED', payload: false });
 				return;
