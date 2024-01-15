@@ -79,10 +79,17 @@ export default class Register extends Component<Props, State> {
 			passwordConfirm
 			).then(
 			response => {
-				this.setState({
-				message: response.data.message,
-				successful: true
-				});
+				if (response.data && response.data.message) {
+					this.setState({
+						message: response.data.message,
+						successful: true
+					});
+				} else {
+					this.setState({
+						successful: false,
+						message: "Unexpected response formata"
+					});
+				}
 			},
 			error => {
 				const resMessage =

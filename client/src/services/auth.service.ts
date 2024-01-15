@@ -63,8 +63,8 @@ class AuthService {
 			password,
 			passwordConfirm: passwordConfirm,
 			});
-
-			return response.data;
+			console.log(response)
+			return response;
 		} catch (error) {
 			console.error("Error during register:", error);
 			throw error;
