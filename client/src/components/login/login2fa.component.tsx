@@ -124,8 +124,7 @@ export const Login2Fa = () => {
 
 	const [searchParams, setSearchParams] = useSearchParams();
 
-	// const userId = searchParams.get('user');
-	const userId = "test";
+	const userId = searchParams.get('user');
 
 	if (!userId) {
 		return <Navigate to="/" />;
