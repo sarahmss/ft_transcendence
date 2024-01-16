@@ -52,18 +52,18 @@ const AccountSettings = () => {
     const fetchData = async () => {
       try {
         const user = await authService.getCurrentUser();
-  
+
         if (user) {
           setCurrentUser(user);
         } else {
-          setRedirect('home');
+          setRedirect('ome');
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
         // Handle the error as needed
       }
     };
-  
+
     fetchData();
   }, []);
 

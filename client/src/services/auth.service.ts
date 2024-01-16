@@ -9,7 +9,7 @@ import "core-js/stable/atob";
 import { jwtDecode } from "jwt-decode";
 import { useState } from "react";
 class AuthService {
-	
+
 	async LocalLogin(userName: string, password: string) {
 		try {
 		const response = await axios.post(LocalSigninLink, {
@@ -87,7 +87,7 @@ class AuthService {
 		}
 
 	async getCurrentUser() {
-		
+
 		try {
 			if (this.getIsLogged() != null)
 			{
