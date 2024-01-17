@@ -4,10 +4,8 @@ import { BackLink, LocalSigninLink,
 		UserContentLink,
 		tokenData } from "../common/constants";
 
-import {globalVariable, setGlobalVariable} from "../common/constants";
 import "core-js/stable/atob";
 import { jwtDecode } from "jwt-decode";
-import { useState } from "react";
 class AuthService {
 
 	async LocalLogin(userName: string, password: string) {
@@ -35,14 +33,9 @@ class AuthService {
 	}
 
 	async logout() {
-		console.log("Entrou no auth - 3")
 		try {
-			console.log("Entrou no try do auth - 4")
 			const authToken = this.getAuthToken();
 			localStorage.clear();
-			console.log("limpou o local storage - 6")
-			setGlobalVariable("Limpado!")
-			console.log(globalVariable);
 			await axios.get(BackLink + "/auth/logout", { headers: authToken });
 		} catch (error) {
 			console.error("Error during logout:", error);

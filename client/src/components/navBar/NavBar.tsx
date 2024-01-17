@@ -14,8 +14,6 @@ import { Link} from 'react-router-dom';
 
 import { DefaultPic } from '../../common/constants';
 
-import {globalVariable, setGlobalVariable} from "../../common/constants";
-
 const pagesLogged = [
 	{ label: 'Profile', link: '/profile' },
 	{ label: 'Settings', link: '/settings' },
@@ -47,7 +45,7 @@ const NavBar: React.FC = () => {
         console.error("Error fetching user data:", error);
       }
     };
-    
+
   React.useEffect(() => {
     fetchData();
   }, []);

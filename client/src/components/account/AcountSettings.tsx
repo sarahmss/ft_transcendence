@@ -56,11 +56,10 @@ const AccountSettings = () => {
         if (user) {
           setCurrentUser(user);
         } else {
-          setRedirect('ome');
+          setRedirect('home');
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
-        // Handle the error as needed
       }
     };
 
