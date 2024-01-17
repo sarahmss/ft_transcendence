@@ -14,6 +14,9 @@ import { Membership } from 'src/entity/membership.entity';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/entity/user.entity';
 import { AuthModule } from 'src/auth/auth.module';
+import { HideMessageService } from './service/hide-message/hide-message.service';
+import { HideMessage } from 'src/entity/hideMessage.entity';
+import { ConnectedUserService } from './service/connected-user/connected-user.service';
 
 @Module({
 	imports: [ 
@@ -23,7 +26,9 @@ import { AuthModule } from 'src/auth/auth.module';
 										GroupRoom,
 										BlackList,
 										Membership,
-										User]),
+										User,
+										HideMessage,
+		]),
 		AuthModule
 	],
 
@@ -39,6 +44,8 @@ import { AuthModule } from 'src/auth/auth.module';
 		MessageService,
 		MembershipService,
 		UsersService,
+		HideMessageService,
+		ConnectedUserService,
 	],
 
 })

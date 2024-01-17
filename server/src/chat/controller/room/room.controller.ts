@@ -24,8 +24,8 @@ export class RoomController {
 		return await this.membershipService.getAll();
 	}
 
-	@Get('list_room/:id')
-	async getListRoom(@Param('id') userId: string) {
+	@Get('list_room/:userId')
+	async getListRoom(@Param('userId') userId: string) {
 		let membershipList = await this.membershipService.findMemberRooms(userId);
 		let roomList = [];
 		for (let k = 0; k < membershipList.length; k++)
@@ -89,12 +89,12 @@ export class RoomController {
 					))
 				return new ConflictException("This room already exists");
 		}
-		else {
-			// Group chat must have a name
-			if (roomCreationData.roomType == GROUP &&
-					!roomCreationData.roomName)
+		else if (roomCreationData.roomType == GROUP) {
+			if (!roomCreationData.roomName)
 				return new BadRequestException("If the room it's a group a name is required");
-			
+		}
+		else {
+			return new BadRequestException("Invalid room type!");
 		}
 				
 	}

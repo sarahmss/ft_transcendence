@@ -3,6 +3,7 @@ import { Body,
 	Delete,
 	Get,
 	HttpException,
+	InternalServerErrorException,
 	Patch, 
     Post} from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -18,11 +19,15 @@ export class MessageController {
 
 	@Post()
 	async message(@Body() message: createMessage) {
-		this.messageService.createMessage(message.message,
-																				message.room,
-																				message.user);
-
-		this.emitter.emit('message.create', message);
+		try {
+			this.messageService.createMessage(message.message,
+																					message.room,
+																					message.user);
+			this.emitter.emit('message.create', message);
+		}
+		catch {
+			throw new InternalServerErrorException();
+		}
 	}
 
 	@Get()

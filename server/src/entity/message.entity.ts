@@ -19,13 +19,13 @@ export class Message {
 	@JoinColumn({ name: 'room_id' })
 	roomId: Room;
 
-	@Column()
-	message: string;
-
 	@OneToMany(() => User, (entity: User) => entity.userId)
 	@JoinColumn({ name: 'user_id' })
 	userId: User;
 
 	@UpdateDateColumn({ type: 'timestamptz' })
 	timestamp: Date;
+
+	@Column()
+	message: string;
 }
