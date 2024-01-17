@@ -194,12 +194,6 @@ export class UsersService {
 		return this.usersRepository.save(newUser);
 		}
 
-		async updateProfilePic(userId: string, newProfilePic:string): Promise<User> {
-			const user = await this.checkUser(userId);
-			this.usersRepository.merge(user, {profilePicture: newProfilePic});
-			return this.usersRepository.save(user);
-		}
-
 		async update(userId: string, userDto: UpdateUserDto): Promise<User> {
 			const user = await this.checkUser(userId);
 			const invalidUpdate = await this.NameisNotUnique(userDto.userName);
