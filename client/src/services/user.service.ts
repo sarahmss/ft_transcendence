@@ -5,7 +5,7 @@ import AuthService from './auth.service';
 class UserService {
 
 	async uploadProfilePic(imgName: string, img: FormData): Promise<string | undefined> {
-		const userId = AuthService.getCurrentUserId();
+		const userId = AuthService.getIdFromToken();
 
 		try {
 			const response = await axios.post(
@@ -26,7 +26,7 @@ class UserService {
 	}
 
 	async updateProfile(userName: string, profilePicture: string, email: string): Promise<void> {
-		const userId = AuthService.getCurrentUserId();
+		const userId = AuthService.getIdFromToken();
 
 		try {
 			await axios.patch((UserContentLink + userId),

@@ -74,6 +74,7 @@ const ProfilePicComponent: React.FC<ProfilePicProps> = ({ setImgSrc, setUrl }) =
 			formData.append('file', file)
 			const newProfilePic = await userService.uploadProfilePic(file.name, formData)
 			setUrl({imgUrl: newProfilePic});
+			setSelectedFile(false);
 		}
 	}
 

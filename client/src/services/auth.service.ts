@@ -107,13 +107,6 @@ class AuthService {
 		}
 	}
 
-	async getCurrentUserId() {
-		const user = await this.getCurrentUser();
-		if (user && user.userId)
-			return user.userId;
-		return "";
-	}
-
 	getAuthToken() {
 		const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
 		return authToken;
