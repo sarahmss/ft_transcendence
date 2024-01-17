@@ -109,7 +109,7 @@ export default class Login extends Component<Props, State> {
 			loading: true
 		});
 
-		AuthService.LocalLogin(userName, password).then(
+		await AuthService.LocalLogin(userName, password).then(
 			() => {
 				this.setState({
 				redirect: "/"

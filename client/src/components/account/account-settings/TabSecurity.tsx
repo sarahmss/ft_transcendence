@@ -121,7 +121,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 
 	const getQrCode = async (): Promise<void> => {
 		const authTokenQr = AuthService.getAuthToken();
-		const localQr = localStorage.getItem("qrcode");
+		const localQr = sessionStorage.getItem("qrcode");
 
 		return new Promise<void>(async (resolve, reject) => {
 			if (localQr) {

@@ -27,7 +27,7 @@ class TwoFaService {
 			const authToken = AuthService.getAuthToken();
 			const response = await axios.get(TwoFaGenerateLink, { headers: authToken });
 
-			localStorage.setItem("qrcode", response.data.url);
+			sessionStorage.setItem("qrcode", response.data.url);
 			return response.data.url;
 		} catch (error) {
 			console.error(error);
@@ -60,7 +60,7 @@ class TwoFaService {
 			{ code: code })
 			.then((response) => {
 				document.cookie = response.data.cookie;
-				localStorage.setItem("Logged", "ok");
+				sessionStorage.setItem("Logged", "ok");
 			});
 			return true;
 		} catch (error) {

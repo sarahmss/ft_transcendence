@@ -165,7 +165,7 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
 				dispatch({ type: 'LOGGED', payload: false });
 				return;
 			}
-			localStorage.setItem(storedPlayer.userId, JSON.stringify(player));
+			sessionStorage.setItem(storedPlayer.userId, JSON.stringify(player));
 			dispatch({type: 'PLAYER', payload: players[gameSocket.id]});
 		}
 		else {

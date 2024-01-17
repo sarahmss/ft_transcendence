@@ -12,13 +12,10 @@ class AuthService {
 		try {
 			const response = await axios.post(LocalSigninLink, {
 				userName,
-				password,})
-			.then((response) => {
+				password,
+			});
 			document.cookie = response.data.cookie;
-			localStorage.setItem("Logged", "ok");
-		}).catch((error) => {
-			console.log(error);
-		});
+			sessionStorage.setItem("Logged", "ok");
 		} catch (error) {
 		console.error("Error during LocalLogin:", error);
 		throw error;
@@ -26,13 +23,13 @@ class AuthService {
 	}
 
 	IntraLogin() {
-		localStorage.setItem("Logged", "ok");
+		sessionStorage.setItem("Logged", "ok");
 	}
 
 	async logout() {
 		try {
 			const authToken = this.getAuthToken();
-			localStorage.clear();
+			sessionStorage.clear();
 			await axios.get(BackLink + "/auth/logout", { headers: authToken });
 		} catch (error) {
 			console.error("Error during logout:", error);
@@ -41,7 +38,7 @@ class AuthService {
 	}
 
 	getIsLogged() {
-		const isLogged = localStorage.getItem("Logged");
+		const isLogged = sessionStorage.getItem("Logged");
 		return isLogged || null;
 	}
 
@@ -67,7 +64,7 @@ class AuthService {
 			const authToken = this.getAuthToken();
 			const response = await axios.get(UserContentLink + userId, { headers: authToken });
 
-			localStorage.setItem("LoggedUser", JSON.stringify(response.data));
+			sessionStorage.setItem("LoggedUser", JSON.stringify(response.data));
 
 			return response.data;
 		} catch (error) {
@@ -83,7 +80,7 @@ class AuthService {
 			{
 				console.log("Entrou no getCurrent user - 7")
 				await this.RequestCurrentUser();
-				const userStr = localStorage.getItem("LoggedUser");
+				const userStr = sessionStorage.getItem("LoggedUser");
 				if (userStr)
 					return JSON.parse(userStr);
 				return null;
@@ -99,7 +96,7 @@ class AuthService {
 			if (this.getIsLogged() != null)
 			{
 				this.RequestCurrentUser();
-				const userStr = localStorage.getItem("LoggedUser");
+				const userStr = sessionStorage.getItem("LoggedUser");
 				if (userStr)
 					return JSON.parse(userStr);
 				return null;
