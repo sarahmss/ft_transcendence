@@ -56,8 +56,12 @@ class TwoFaService {
 
 	async login2Fa(code: string, userId: string): Promise<boolean> {
 		try {
-			const response = await axios.post(`${TwoFaLoginLink}?user=${userId}`, { code: code });
-			document.cookie = response.data.cookie;
+			const response = await axios.post(`${TwoFaLoginLink}?user=${userId}`,
+			{ code: code })
+			.then((response) => {
+				document.cookie = response.data.cookie;
+				localStorage.setItem("Logged", "ok");
+			});
 			return true;
 		} catch (error) {
 			console.error(error);

@@ -10,18 +10,15 @@ class AuthService {
 
 	async LocalLogin(userName: string, password: string) {
 		try {
-		const response = await axios.post(LocalSigninLink, {
-			userName,
-			password,
+			const response = await axios.post(LocalSigninLink, {
+				userName,
+				password,})
+			.then((response) => {
+			document.cookie = response.data.cookie;
+			localStorage.setItem("Logged", "ok");
+		}).catch((error) => {
+			console.log(error);
 		});
-
-		if (response.data.accessToken) {
-			localStorage.setItem("accessToken", response.data.accessToken);
-			localStorage.setItem("id", response.data.id);
-			localStorage.setItem("Logged", "local");
-		}
-
-		return response.data;
 		} catch (error) {
 		console.error("Error during LocalLogin:", error);
 		throw error;
@@ -29,7 +26,7 @@ class AuthService {
 	}
 
 	IntraLogin() {
-		localStorage.setItem("Logged", "intra");
+		localStorage.setItem("Logged", "ok");
 	}
 
 	async logout() {
@@ -121,25 +118,14 @@ class AuthService {
 	}
 
 	getAuthToken() {
-		if (this.getIsLogged() === "local") {
-			console.log("entrou no get authtoken - 5")
-			const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + localStorage.getItem("accessToken")};
-			return authToken;
-		} else if (this.getIsLogged() === "intra") {
-			const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
-			return authToken;
-		}
+		const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
+		return authToken;
 	}
 
 	getIdFromToken() {
-		if (this.getIsLogged() === "local") {
-			return localStorage.getItem("id");
-		} else if (this.getIsLogged() === "intra")
-		{
-			const cookie = document.cookie
-			const tokenData: tokenData = jwtDecode(cookie);
-			return tokenData.id;
-		}
+		const cookie = document.cookie
+		const tokenData: tokenData = jwtDecode(cookie);
+		return tokenData.id;
 	}
 }
 const authService = new AuthService();

@@ -86,7 +86,7 @@ export default class Login extends Component<Props, State> {
 		const currentUser = await AuthService.getCurrentUser();
 
 		if (currentUser) {
-			this.setState({ redirect: "/profile" });
+			this.setState({ redirect: "/" });
 		};
 	}
 
@@ -112,7 +112,7 @@ export default class Login extends Component<Props, State> {
 		AuthService.LocalLogin(userName, password).then(
 			() => {
 				this.setState({
-				redirect: "/profile"
+				redirect: "/"
 				});
 			},
 			error => {

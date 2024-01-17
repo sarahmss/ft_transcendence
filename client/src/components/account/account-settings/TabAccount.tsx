@@ -207,7 +207,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
 					<Grid item xs={12}>
 						<Button
 						variant='contained'
-						onClick={() => userService.updateProfile(state.name, state.profilePicture, state.email)}
+						onClick={() => userService.updateProfile(state.name, state.imgUrl, state.email)}
 						sx={{ marginRight: 3.5, backgroundColor: '#B700cc' }}>
 							Save Changes
 						</Button>

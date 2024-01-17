@@ -18,12 +18,12 @@ export class AuthService {
 				return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
 			}
 			const token = this.jwtService.sign({ id: user.userId });
-			response.cookie('accessToken', token, {
-				sameSite: 'Lax',
+			response.cookie('accessToken',
+								token,
+								{sameSite: 'lax', });
+			return response.status(200).json({
+				cookie: response.getHeader('set-cookie'),
 			});
-			return response.status(200).send({
-				id: user.userId,
-				accessToken: token})
 		} catch(error) {
 			return response.status(500).send(error);
 		}
@@ -35,9 +35,9 @@ export class AuthService {
 			return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
 		}
 		const token = this.jwtService.sign({ id: user.userId });
-		response.cookie('accessToken', token, {
-			sameSite: 'Lax',
-		});
+		response.cookie('accessToken',
+							token,
+							{sameSite: 'lax', });
 		return response.redirect(process.env.FRONT_URL);
 	}
 
