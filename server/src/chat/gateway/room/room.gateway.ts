@@ -21,7 +21,6 @@ import { MembershipService } from 'src/chat/service/membership/membership.servic
 import { Membership } from 'src/entity/membership.entity';
 
 import { BlacklistService } from 'src/chat/service/blacklist/blacklist.service';
-import { BlackList } from 'src/entity/blacklist.entity';
 
 import { createMessage } from 'src/chat/dto/Message.dto';
 import { Room } from 'src/entity/room.entity';
@@ -41,6 +40,7 @@ import { ConnectedUserService } from 'src/chat/service/connected-user/connected-
 		credentials: true,
 	},
 })
+
 export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	constructor(
@@ -116,15 +116,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('message')
 	handleMessage(client: Socket, payload: any) {
 		
-		// const message_created = this.messageService.createMessage(payload.message,
-		// 																													 payload.room,
-		// 																													 payload.user);
-		// if (!message_created)
-		// 	throw new Exception
-
 		// this.server.to(payload.room).emit("message-response", message_created);
 		// this.server.to(payload.room).emit();
 		client.emit("client-response", payload);
+		this.connectedUserService.getConnection(client.data.userId).emit("client-response", "service working");
 		this.server.emit("message-response", payload);
 	}
 
@@ -141,21 +136,29 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@OnEvent('message.create')
 	async handleMessageCreation(message: createMessage) {
 
+		let receivingClients: any;
+
 		const participantList = await this.membershipService.findParticipants(message.room.roomId);
 		const blackList = await this.blackListService.getBlockedUser(message.user);
+
+		if (blackList.length > 0) {
+			// If there is someone blocked => filter and get the allowed users
+			receivingClients = participantList.filter(
+				(participant) =>
+					!blackList.some((blocked) =>
+						participant.userId === blocked.blocked_user.userId));
+		}
+		else
+			// If everyone is allowed get everyone
+			receivingClients = participantList;
 
 		// Emit to a specific room
 		// Blacklist condition for trasnmission will be written here
 		// Since we cannot emit to message to those who are inside the blacklist
-		participantList.forEach((membershipData: Membership) => {
-
-			if (!blackList.find(
-						(bentry: BlackList) => bentry.blocked_user.userId === membershipData.userId)
-			) {
-				this.connectedUserService.getConnection(message.user.userId)
-					.to(message.room.roomId)
-					.emit("message_response", message);
-			}
+		receivingClients.forEach((membershipData: Membership) => {
+			let targetSocket: Socket = this.connectedUserService.getConnection(membershipData.userId);
+			if (targetSocket)
+					targetSocket.to(message.room.roomId).emit("message_response", message);
 		})
 	}
 }
