@@ -1,5 +1,5 @@
 
-import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Message } from './message.entity';
 import { User } from './user.entity';
 import { Room } from './room.entity';
@@ -10,15 +10,24 @@ export class HideMessage {
   @PrimaryGeneratedColumn('uuid', {name: 'view_id'})
   view_id: string;
 
+	@Column({name: 'message_id'})
+	messageId: string;
+
+	@Column({name: 'target_id'})
+	targetId: string;
+
+  @Column({name: "room_id"})
+  roomId: string;
+
   @ManyToOne(() => Message, (entity: Message) => entity.messageId )
   @JoinColumn({name: 'message_id'})
-  messageId: Message;
+  message: Message;
 
   @ManyToOne(() => User, (entity: User) => entity.userId)
   @JoinColumn({name: "target_id"})
-  targetId: User;
+  target: User;
 
   @ManyToOne(() => Room, (entity: Room) => entity.roomId)
   @JoinColumn({name: "room_id"})
-  roomId: Room;
+  room: Room;
 }

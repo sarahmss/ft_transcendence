@@ -9,21 +9,30 @@ import { Body,
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DeleteMessage, GetMessage, UpdateMessage, createMessage } from 'src/chat/dto/Message.dto';
 import { MessageService } from 'src/chat/service/message/message.service';
+import { UsersService } from 'src/users/users.service';
 
 @Controller('message')
 export class MessageController {
 
 	constructor (
 		private readonly messageService: MessageService,
+		private readonly userService: UsersService,
 		private readonly emitter: EventEmitter2) {}
+
+	@Get('all')
+	async getAll() {
+		return await this.messageService.getAllMessage();
+	}
 
 	@Post()
 	async message(@Body() message: createMessage) {
 		try {
-			this.messageService.createMessage(message.message,
-																					message.room,
-																					message.user);
-			this.emitter.emit('message.create', message);
+			const messageInstance = await this.messageService.createMessage(message.message,
+																																message.room,
+																																message.user);
+
+			const user = await this.userService.findById(message.user.userId);
+			this.emitter.emit('message.create', messageInstance, user.userName);
 		}
 		catch {
 			throw new InternalServerErrorException();

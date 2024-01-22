@@ -15,13 +15,19 @@ export class Message {
 	@PrimaryGeneratedColumn("uuid", {name: 'message_id'})
 	messageId: string;
 
+	@Column({name: 'room_id'})
+	roomId: string;
+
+	@Column({name: 'user_id'})
+	userId: string;
+
 	@ManyToOne(() => Room, (entity: Room) => entity.roomId)
 	@JoinColumn({ name: 'room_id' })
-	roomId: Room;
+	room: Room;
 
-	@OneToMany(() => User, (entity: User) => entity.userId)
+	@ManyToOne(() => User, (entity: User) => entity.userId)
 	@JoinColumn({ name: 'user_id' })
-	userId: User;
+	user: User;
 
 	@UpdateDateColumn({ type: 'timestamptz' })
 	timestamp: Date;

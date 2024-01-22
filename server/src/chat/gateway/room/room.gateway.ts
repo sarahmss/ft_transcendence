@@ -22,10 +22,11 @@ import { Membership } from 'src/entity/membership.entity';
 
 import { BlacklistService } from 'src/chat/service/blacklist/blacklist.service';
 
-import { createMessage } from 'src/chat/dto/Message.dto';
 import { Room } from 'src/entity/room.entity';
 import { ForbiddenException } from '@nestjs/common';
 import { ConnectedUserService } from 'src/chat/service/connected-user/connected-user.service';
+import { RoomService } from 'src/chat/service/room/room.service';
+import { Message } from 'src/entity/message.entity';
 
 // Handling blacklist will happen
 // in two fashions:
@@ -49,20 +50,21 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private readonly membershipService: MembershipService,
 		private readonly blackListService: BlacklistService,
 		private readonly connectedUserService: ConnectedUserService,
+		private readonly roomService: RoomService,
 	) {}
 
 	@WebSocketServer() server: Server;
 
-	private joinRooms(client: Socket, rooms: Set<string>): void {
+	private joinRooms(client: Socket, rooms: any[]): void {
 
 		// Join in all rooms
-		if (rooms.size !== 0)
+		if (rooms.length !== 0)
 			rooms.forEach((room) =>
 				client.join(room)
 			);
 
 		else {
-			console.log("the user it's not in any room");
+			console.log("The user it's not in any room");
 		}
 	}
 
@@ -85,18 +87,18 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 			client.data.userId = user.userId;
 
-			let roomSet: Set<string> = new Set();
+			let roomList = [];
 			this.connectedUserService.addConnection(user.userId, client);
 
 			const membershipRoom: Membership[] = await this.membershipService
 																												.findMemberRooms(user.userId);
 
 			membershipRoom.forEach((room) => {
-				roomSet.add(room.roomId);
+				roomList.push(room.roomId);
 			});
 
-			client.emit("room-list", roomSet);
-			this.joinRooms(client, roomSet);
+			client.emit("room-list", await this.roomService.findRoomWithArray(roomList));
+			this.joinRooms(client, roomList);
 		}
 		catch {
 			console.log("Connection has gone wrong!");
@@ -125,20 +127,30 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	// Emit the joined room to the client to append on room list of the client
 	@OnEvent('room.join')
-	sendRoomListUser(userId: string, room: Room) {
+	emitRoomJoined(userId: string, room: Room) {
 
 		this.connectedUserService
 			.getConnection(userId)
 			.emit("joined", room);
 	}
+
+	@OnEvent('room.create')
+	emitRoomToAllMembers(users: any, room: Room) {
+
+		users.forEach((user: any) => {
+			const conn = this.connectedUserService.getConnection(user.userId);
+			if (conn)
+				conn.emit("joined", room);
+		});
+	}
 	
 	// Will listen the event emitted by the emitter in the controller
 	@OnEvent('message.create')
-	async handleMessageCreation(message: createMessage) {
+	async handleMessageCreation(message: Message, author: string) {
 
 		let receivingClients: any;
 
-		const participantList = await this.membershipService.findParticipants(message.room.roomId);
+		const participantList = await this.membershipService.findParticipants(message.roomId);
 		const blackList = await this.blackListService.getBlockedUser(message.user);
 
 		if (blackList.length > 0) {
@@ -146,11 +158,12 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			receivingClients = participantList.filter(
 				(participant) =>
 					!blackList.some((blocked) =>
-						participant.userId === blocked.blocked_user.userId));
+						(participant.userId === blocked.blocked_user.userId || blocked.status === true)));
 		}
-		else
+		else {
 			// If everyone is allowed get everyone
 			receivingClients = participantList;
+		}
 
 		// Emit to a specific room
 		// Blacklist condition for trasnmission will be written here
@@ -158,7 +171,21 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		receivingClients.forEach((membershipData: Membership) => {
 			let targetSocket: Socket = this.connectedUserService.getConnection(membershipData.userId);
 			if (targetSocket)
-					targetSocket.to(message.room.roomId).emit("message_response", message);
+				// uncomment this line and delete the other
+				// targetSocket.to(message.room.roomId).emit("message-response", {
+				// 																				message: message.message,
+				// 																				messageId: message.messageId,
+				// 																				messageTimestamp: message.timestamp,
+				// 																				authorId: message.userId.userId,
+				// 																				author: author,
+				// });
+				targetSocket.emit("message-response", {
+																								message: message.message,
+																								messageId: message.messageId,
+																								messageTimestamp: message.timestamp,
+																								authorId: message.userId,
+																								author: author,
+				});
 		})
 	}
 }

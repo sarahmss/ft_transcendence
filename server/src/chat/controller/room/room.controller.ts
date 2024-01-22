@@ -1,9 +1,25 @@
-import { BadRequestException, Body, ConflictException, Controller, Get, InternalServerErrorException, NotFoundException, Param, Post } from '@nestjs/common';
+
+import { BadRequestException,
+	Body,
+	ConflictException,
+	Controller,
+	Delete,
+	Get,
+	InternalServerErrorException,
+	NotFoundException,
+	Param,
+	Post,
+	UnauthorizedException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { RoomCreationData } from 'src/chat/dto/room.dto';
+
+import { RoomCreationData, RoomJoinData } from 'src/chat/dto/room.dto';
 import { MembershipService } from 'src/chat/service/membership/membership.service';
+import { GroupRoom, Room } from 'src/entity/room.entity';
 import { RoomService } from 'src/chat/service/room/room.service';
+
 import { DIRECT, GROUP } from 'src/constants/roomType.constant';
+
+import * as bcrypt from 'bcrypt';
 
 @Controller('room')
 export class RoomController {
@@ -33,69 +49,117 @@ export class RoomController {
 		return roomList;
 	}
 
+	@Delete()
+	async deleteRoom(@Body('roomId') roomId: string) {
+		let room = await this.roomService.findRoom(roomId);
+		if (!room)
+			throw new NotFoundException();
+		this.roomService.deleteRoom(room);
+	}
+
 	@Post()
 	async createRoom(@Body() roomCreationData: RoomCreationData) {
-		
-		// Throw an exception if there is any error
 		let exception = await this.checkRoomCreationCondition(roomCreationData);
 		if (exception)
 			throw exception;
-
+		
 		try {
 			let room = await this.roomService.createRoom(roomCreationData);
 			this.membershipService.joinRoom(roomCreationData.user,
 				room,
 				roomCreationData.owner.userId
 			);
+
+			this.emitter.emit('room.create', roomCreationData.user, room);
 			return room;
 		}
-		catch {
-			throw new InternalServerErrorException("Error when creating a room");
+		catch ( error ) {
+			throw error;
 		}
 	}
 
-	// Some checks before creating a room
-	// Transfer this section to a validation pipeline later
+	@Post('join')
+	async joinRoom(@Body() userJoin: RoomJoinData) {
+		const room: Room = await this.roomService.findRoom(userJoin.room.roomId);
+		let exception = await this.checkRoomJoinCondition(userJoin, room);
+
+		if (exception)
+			throw exception;
+
+		try {
+			this.membershipService.joinSingleUser(userJoin.user, userJoin.room);
+			this.emitter.emit('room.join', userJoin.user.userId, room);
+		}
+		catch (error) {
+			throw error;
+		}
+	}
+
+	private async checkRoomJoinCondition(userJoin: RoomJoinData, room: Room) {
+
+		if (!room)
+			return new NotFoundException();
+
+		if (!this.membershipService.findMemberRoom(userJoin.user.userId, userJoin.room.roomId))
+			return new ConflictException('The user it\'s already in the room');
+
+		switch (room.roomType) {
+			case DIRECT:
+				return new UnauthorizedException('Joining a direct it\'s not allowed');
+
+			case GROUP:
+				const gRoom: GroupRoom = await this.roomService.findGroup(userJoin.room.roomId);
+				if (gRoom.isPrivate ||
+						gRoom.protected && !bcrypt.compareSync(userJoin.password, gRoom.password))
+					return new UnauthorizedException('The room is private or the wrong password is given');
+				break;
+
+			default:
+				return new BadRequestException('Invalid room type');
+		}
+	}
+
 	private async checkRoomCreationCondition(roomCreationData: RoomCreationData) {
 
-		// User existence check
 		if (!(await this.roomService.checkUser(roomCreationData.user)))
 			return new NotFoundException("Users not found");
 		
-		// The quantity of user in a room must be greater than 0
 		if (!roomCreationData.user.length)
 			return new BadRequestException("The user list must have at least 1 user");
 
 		let uniqueId = Array.from(new Set(roomCreationData.user.map(user => user["userId"])));
 
-		// The owner should be in the room to be able to join
 		if (!uniqueId.find((id) => id === roomCreationData.owner.userId))
 			return new BadRequestException("The owner must be a member");
 
-		// Check if everyone is unique
 		if (uniqueId.length !== roomCreationData.user.length)
 			return new ConflictException("A user cannot enter in the same room multiple times");
 
-		// Check direct messaging room
-		if (roomCreationData.roomType === DIRECT) {
-			// There should be only only 2 members
-			if (roomCreationData.user.length != 2)
-				return new BadRequestException("Direct messaging should have only 2 participants")
+		switch (roomCreationData.roomType) {
+			case DIRECT:
+				return this.validateDirectRoom(roomCreationData);
 
-			// Check if the room already exists
-			if (await this.membershipService.checkDirectRoomMembership(
-						roomCreationData.user[0],
-						roomCreationData.user[1]
-					))
-				return new ConflictException("This room already exists");
+			case GROUP:
+				return this.validadeGroupRoom(roomCreationData);
+
+			default:
+				throw new BadRequestException("Invalid room type!");
 		}
-		else if (roomCreationData.roomType == GROUP) {
+	}
+
+	async validateDirectRoom (roomCreationData: RoomCreationData) {
+		if (roomCreationData.user.length != 2)
+			return new BadRequestException("Direct messaging should have only 2 participants")
+
+		if (await this.membershipService.checkDirectRoomMembership(
+					roomCreationData.user[0],
+					roomCreationData.user[1]
+				))
+			return new ConflictException("This room already exists");
+	}
+
+	async validadeGroupRoom (roomCreationData: RoomCreationData) {
 			if (!roomCreationData.roomName)
 				return new BadRequestException("If the room it's a group a name is required");
-		}
-		else {
-			return new BadRequestException("Invalid room type!");
-		}
-				
 	}
 }

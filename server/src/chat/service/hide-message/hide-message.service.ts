@@ -15,33 +15,16 @@ export class HideMessageService {
 
   async createHideEntry(message: Message, room: Room, user: User) {
     const entry = this.hideMessageRepository.create({
-      messageId: message,
-      targetId: user
+      message: message,
+      target: user
     });
     
-    const result = await this.hideMessageRepository.insert(entry);
-    return result.raw;
+    await this.hideMessageRepository.insert(entry);
   }
-
-  // Get entry by messageId for testing
-  // async getHideEntryByMessageId(messageId: string) {
-  //   return this.hideMessageRepository.find(
-  //     {
-  //       where: {
-  //         messageId: {messageId}
-  //       }
-  //     }
-  //   );
-  // }
 
   // Get the entry by roomId
   async getHideEntryByRoom (roomId: string) {
     return this.hideMessageRepository.find(
-      {
-        where: { 
-          roomId: {roomId}
-        }
-      }
-    );
+      { where: { room: { roomId } } });
   }
 }

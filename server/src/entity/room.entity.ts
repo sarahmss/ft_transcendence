@@ -37,9 +37,12 @@ export class GroupRoom {
 	@PrimaryGeneratedColumn('uuid', { name: 'group_chat_id' })
 	roomGId: string;
 
-	@OneToOne(() => User, (entity: User) => entity.userId)
+	@Column({name: 'room_id'})
+	roomId: string;
+
+	@OneToOne(() => Room, (entity: Room) => entity.roomId)
 	@JoinColumn( {name: 'room_id'})
-	roomId: Room;
+	room: Room;
 
 	@Column( {default: true, name: "is_private" } )
 	isPrivate: boolean;
@@ -58,9 +61,11 @@ export class DirectRoom {
 							{ name: 'direct_chat_id' })
 	roomDId: string;
 
+	@Column({name: 'room_id'})
+	roomId: string;
+
 	@OneToOne( () => Room,
 			  (entity: Room) => entity.roomId )
 	@JoinColumn( { name: 'room_id'} )
-	roomId: Room;
-
+	room: Room;
 }

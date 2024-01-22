@@ -14,10 +14,7 @@ export class MembershipService {
 
 	async joinRoom(user: User[],
 				   room: Room,
-				   owner: string
-				  ) {
-
-		console.log(user);
+				   owner: string) {
 		for (let k = 0; k < user.length ; k++) {
 
 			let owner_status: boolean = false;
@@ -26,14 +23,21 @@ export class MembershipService {
 				owner_status = true;
 
 
-			let member = this.membershipRepository.create({userId: user[k].userId,
-														roomId: room.roomId,
-			room: room,
-			user: user[k],
-			owner: owner_status});
+			let member = this.membershipRepository.create({
+				roomId: room.roomId,
+				userId: user[k].userId,
+				room: room,
+				user: user[k],
+				owner: owner_status
+			});
 
 			await this.membershipRepository.insert(member);
 		}
+	}
+
+	async joinSingleUser (user: User, room: Room) {
+		let member = this.membershipRepository.create({user: user, room: room});
+		await this.membershipRepository.insert(member);
 	}
 
 	async getAll() {
@@ -66,18 +70,21 @@ export class MembershipService {
 		return this.membershipRepository.find({where: {roomId: roomId }});
 	}
 
+
 	async checkDirectRoomMembership(user1: User, user2: User): Promise<boolean> {
 		let result = await this.membershipRepository
 								.createQueryBuilder('membership')
 								.leftJoinAndSelect('membership.room', 'room')
 								.where('membership.userId = :userId1',
 												{userId1: user1.userId})
-						    .andWhere('membership.roomId IN (SELECT roomId FROM membership WHERE userId = :userId2)',
+						    .andWhere('membership.room_Id IN (SELECT room_Id FROM membership WHERE user_Id = :userId2)',
 												{ userId2: user2.userId })
 						    .andWhere('room.roomType = :roomType', { roomType: DIRECT })
 								.getOne();
+		return !!result; // This trick is to cast the object to a boolean value :P
+	}
 
-
-		return !!result; // This trick is to cast the object to a boolean value
+	async deleteMembershipByRoom(roomId: string) {
+		this.membershipRepository.delete({roomId: roomId});
 	}
 }
