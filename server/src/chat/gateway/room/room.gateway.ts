@@ -127,20 +127,22 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	// Emit the joined room to the client to append on room list of the client
 	@OnEvent('room.join')
-	emitRoomJoined(userId: string, room: Room) {
+	@OnEvent('room.leave')
+	emitRoomToSingleMember(userId: string, room: Room, emission_event: string) {
 
 		this.connectedUserService
 			.getConnection(userId)
-			.emit("joined", room);
+			.emit(emission_event, room);
 	}
 
 	@OnEvent('room.create')
-	emitRoomToAllMembers(users: any, room: Room) {
+	@OnEvent('room.delete')
+	emitRoomToAllMembers(users: any, room: Room, emission_event: string) {
 
 		users.forEach((user: any) => {
 			const conn = this.connectedUserService.getConnection(user.userId);
 			if (conn)
-				conn.emit("joined", room);
+				conn.emit(emission_event, room);
 		});
 	}
 	

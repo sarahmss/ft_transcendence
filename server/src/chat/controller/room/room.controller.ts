@@ -49,12 +49,24 @@ export class RoomController {
 		return roomList;
 	}
 
-	@Delete()
+	@Delete('deleteRoom')
 	async deleteRoom(@Body('roomId') roomId: string) {
 		let room = await this.roomService.findRoom(roomId);
 		if (!room)
 			throw new NotFoundException();
-		this.roomService.deleteRoom(room);
+		await this.roomService.deleteRoom(room);
+		this.emitter.emit('room.delete', room, "left");
+	}
+
+	@Delete('leave')
+	async leaveRoom(@Body('roomId') roomId: string,
+		@Body('userId') userId: string){
+		let room = await this.roomService.findRoom(roomId);
+		if (!room)
+			throw new NotFoundException();
+		await this.membershipService.leaveRoom(userId, roomId);
+		this.emitter.emit('room.leave', room, "left");
+		
 	}
 
 	@Post()
@@ -70,7 +82,7 @@ export class RoomController {
 				roomCreationData.owner.userId
 			);
 
-			this.emitter.emit('room.create', roomCreationData.user, room);
+			this.emitter.emit('room.create', roomCreationData.user, room, "joined");
 			return room;
 		}
 		catch ( error ) {
@@ -88,7 +100,7 @@ export class RoomController {
 
 		try {
 			this.membershipService.joinSingleUser(userJoin.user, userJoin.room);
-			this.emitter.emit('room.join', userJoin.user.userId, room);
+			this.emitter.emit('room.join', userJoin.user.userId, room, "joined");
 		}
 		catch (error) {
 			throw error;

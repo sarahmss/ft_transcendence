@@ -52,8 +52,8 @@ export class MembershipService {
 		await this.membershipRepository.update({userId: user.userId, roomId: room.roomId}, { admin: false });
 	}
 
-	async leaveRoom(user: User, room: Room) {
-		await this.membershipRepository.delete({userId: user.userId, roomId: room.roomId});
+	async leaveRoom(userId: string, roomId: string) {
+		await this.membershipRepository.delete({userId: userId, roomId: roomId});
 	}
 
 	async findMemberRooms(userId: string) {
@@ -85,6 +85,6 @@ export class MembershipService {
 	}
 
 	async deleteMembershipByRoom(roomId: string) {
-		this.membershipRepository.delete({roomId: roomId});
+		await this.membershipRepository.delete({roomId: roomId});
 	}
 }

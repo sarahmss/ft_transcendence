@@ -92,24 +92,19 @@ export class RoomService {
 		switch (room.roomType) {
 
 			case GROUP:
-				this.groupRepository.delete(
-					await this.groupRepository.findOne(
-						{where: {roomId: room.roomId}
-					}));
+				await this.groupRepository.delete(
+					{roomId: room.roomId});
 				break;
 
 			case DIRECT:
-				this.directRepository.delete(
-					await this.directRepository.findOne({
-						where: {roomId: room.roomId}
-					}));
+				await this.directRepository.delete(
+						{roomId: room.roomId});
 				break;
-
 		}
 
-		this.membershipService.deleteMembershipByRoom(
+		await this.membershipService.deleteMembershipByRoom(
 			room.roomId);
 
-		this.roomRepository.delete(room);
+		await this.roomRepository.delete({roomId: room.roomId});
 	}
 }
