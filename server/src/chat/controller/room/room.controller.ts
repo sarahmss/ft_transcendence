@@ -53,7 +53,7 @@ export class RoomController {
 	async deleteRoom(@Body('roomId') roomId: string) {
 		let room = await this.roomService.findRoom(roomId);
 		if (!room)
-			throw new NotFoundException();
+			throw new NotFoundException("Room not found");
 		await this.roomService.deleteRoom(room);
 		this.emitter.emit('room.delete', room, "left");
 	}
@@ -63,7 +63,7 @@ export class RoomController {
 		@Body('userId') userId: string){
 		let room = await this.roomService.findRoom(roomId);
 		if (!room)
-			throw new NotFoundException();
+			throw new NotFoundException("Room not found");
 		await this.membershipService.leaveRoom(userId, roomId);
 		this.emitter.emit('room.leave', room, "left");
 		

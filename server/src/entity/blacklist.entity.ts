@@ -1,14 +1,16 @@
 
-import { Column,
+import {
+	AfterLoad,
+	Column,
 	CreateDateColumn,
 	Entity,
 	JoinColumn,
 	ManyToOne,
 	PrimaryGeneratedColumn} from 'typeorm';
+
 import { User } from './user.entity';
 import { Room } from './room.entity';
 import { LOCAL_BLOCK } from 'src/constants/blackListType.constant';
-
 
 @Entity()
 export class BlackList {
@@ -48,6 +50,13 @@ export class BlackList {
 
 	@Column({ type: 'timestamptz',
 			nullable: true,
-			default: (Date.now() + 600000) })
+			default: new Date(Date.now() + 600000) })
 	block_end: Date;
+
+	@AfterLoad()
+	async updateStatus() {
+		if (Date.now() > this.block_end.getTime())
+			this.status = false;
+		console.log("woah");
+	}
 }

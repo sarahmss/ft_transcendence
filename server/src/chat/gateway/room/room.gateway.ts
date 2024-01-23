@@ -149,11 +149,9 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	// Will listen the event emitted by the emitter in the controller
 	@OnEvent('message.create')
-	async handleMessageCreation(message: Message, author: string, blackList: any) {
+	async handleMessageCreation(message: Message, author: string, blackList: any, participantList: any) {
 
 		let receivingClients: any;
-
-		const participantList = await this.membershipService.findParticipants(message.roomId);
 
 		if (blackList.length > 0) {
 			// If there is someone blocked => filter and get the allowed users

@@ -45,7 +45,7 @@ export class BlacklistService {
 		return blackListEntry;
 	}
 
-	async createInBulk(blocker: User, blocked_users: Set<User>, room: Room, blockType: number) {
+	async createInBulk(blocker: User, blocked_users: User[], room: Room, blockType: number) {
 		blocked_users.forEach(async (blocked: User) => {
 			await this.createBlackListEntry(blocker,
 																				blocked,
@@ -63,21 +63,33 @@ export class BlacklistService {
 	}
 	
 	async unblockById(blackListId: string) {
-		this.blackListRepository.update({
-			blackListId: blackListId },
-			{ status: false });
+		await this.blackListRepository.update({
+							blackListId: blackListId },
+								{ status: false });
 
 	}
 
 	async blockById(blackListId: string) {
-		this.blackListRepository.update({
-			blackListId: blackListId },
-			{ status: true });
+		await this.blackListRepository.update({
+						blackListId: blackListId },
+							{ status: true });
 	}
 
 	async updateDuration(blackListId: string, duration: number) {
+		if (duration)
+			duration = 300000;
 		this.blackListRepository.update({
 			blackListId: blackListId},
 			{block_end: Date.now() + duration});
+	}
+
+	async updateDurationInBulk(blackListIds: BlackList[], duration: number) {
+		blackListIds.forEach(async (instance: BlackList) => {
+			this.updateDuration(instance.blackListId, duration);
+		});
+	}
+
+	async getAll() {
+		return this.blackListRepository.find();
 	}
 }

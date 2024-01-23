@@ -1,14 +1,14 @@
 
 import { BadRequestException, Body,
-  ConflictException,
   Controller,
+  Get,
   NotFoundException,
   Post } from '@nestjs/common';
-import { validateHeaderName } from 'http';
 
 import { BlacklistService } from 'src/chat/service/blacklist/blacklist.service';
 import { RoomService } from 'src/chat/service/room/room.service';
 import { GLOBAL_BLOCK, LOCAL_BLOCK } from 'src/constants/blackListType.constant';
+import { BlackList } from 'src/entity/blacklist.entity';
 import { User } from 'src/entity/user.entity';
 import { UsersService } from 'src/users/users.service';
 
@@ -21,8 +21,13 @@ export class BlacklistController {
     private readonly userService: UsersService,
     private readonly roomService: RoomService) {}
 
+  @Get()
+  async getAll() {
+    return await this.blackListService.getAll();
+  }
+
   //Single blackList
-  @Post()
+  @Post("single")
   async createBlackList(@Body('blockerId') blocker: string,
     @Body('blockedId') blocked: string,
     @Body('room') room: string,
@@ -37,6 +42,7 @@ export class BlacklistController {
                                                             blocked,
                                                             room,
                                                             blockType)
+    // Renew if there is an existing entry
     if (existingBlackList) {
 
       await this.blackListService
@@ -63,7 +69,7 @@ export class BlacklistController {
   }
 
   // Bulk blacklisting
-  @Post()
+  @Post("bulk")
   async createBlackListBulk(@Body('blockerId') blockerId: string,
     @Body('blockedIds') blockedIds: string[],
     @Body('roomId') roomId: string,
@@ -74,6 +80,8 @@ export class BlacklistController {
       throw new BadRequestException("Incomplete information given");
    
     const blocker = <User> await this.userService.findById(blockerId);
+    if (!blocker)
+      throw new NotFoundException('User not found')
 
     const userList = new Set<User>();
     blockedIds.forEach(async (userId: string) => {
@@ -86,8 +94,24 @@ export class BlacklistController {
     const roomTarget = await this.roomService.findRoom(roomId);
     
     if (!(roomTarget))
-      throw new NotFoundException("room Not found");
+      throw new NotFoundException("Room Not found");
 
-    this.blackListService.createInBulk(blocker, userList, roomTarget, blockType);
+    const existingBlackList = await this.blackListService.getBlockedUser(blocker);
+
+    const renewUsers = existingBlackList.filter((existingBlock: BlackList) => {
+      [...userList].some((user: User) => (
+        user.userId === existingBlock.blockedId
+      ))
+    });
+
+    const newEntryUsers = [...userList].filter((user: User) => {
+      !existingBlackList.some((blocked) => (
+        user.userId === blocked.blockedId
+      ))
+    });
+
+    this.blackListService.updateDurationInBulk(renewUsers, duration);
+
+    this.blackListService.createInBulk(blocker, newEntryUsers, roomTarget, blockType);
    }
 }
