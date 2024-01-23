@@ -7,6 +7,8 @@ import { User } from 'src/entity/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { In, Repository } from 'typeorm';
 import { MembershipService } from '../membership/membership.service';
+import * as bcrypt from 'bcrypt';
+import { MessageService } from '../message/message.service';
 
 @Injectable()
 export class RoomService {
@@ -17,6 +19,7 @@ export class RoomService {
 		@InjectRepository(DirectRoom) private readonly directRepository: Repository<DirectRoom>,
 		@Inject(UsersService) private readonly userService: UsersService,
 		@Inject(MembershipService) private readonly membershipService: MembershipService,
+		@Inject(MessageService) private readonly messageService: MessageService,
 	) {}
 
 	async checkUser(userList: User[]): Promise<boolean> {
@@ -30,12 +33,18 @@ export class RoomService {
 		return true;
 	}
 
-	async createGroupRoom(room: Room, isPrivate: boolean) {
+	async createGroupRoom(room: Room, isPrivate: boolean, password: string) {
 
 		let groupRoom = this.groupRepository.create({
 			roomId: room.roomId,
 			room: room,
-			isPrivate: isPrivate})
+			isPrivate: isPrivate,
+			password: password,
+		});
+
+		if (groupRoom.password)
+			groupRoom.protected = true;
+
 		await this.groupRepository.insert(groupRoom);
 	}
 
@@ -61,7 +70,7 @@ export class RoomService {
 		await this.roomRepository.insert(room);
 
 		if (room.roomType == GROUP)
-			this.createGroupRoom(room, roomCreationData.isPrivate);
+			this.createGroupRoom(room, roomCreationData.isPrivate, roomCreationData.password);
 		else if (room.roomType == DIRECT)
 			this.createDirectRoom(room);
 		return room;
@@ -105,6 +114,23 @@ export class RoomService {
 		await this.membershipService.deleteMembershipByRoom(
 			room.roomId);
 
+		await this.messageService.deleteAllRoomMessage(room.roomId);
+
 		await this.roomRepository.delete({roomId: room.roomId});
+	}
+
+	async setPassRoom (password: string, roomId: string) {
+		this.groupRepository.update(
+			{roomId: roomId},
+			{password: bcrypt.hashSync(password, 10),
+				protected: true})
+	}
+
+	async unsetPassRoom (roomId: string) {
+		this.groupRepository.update(
+			{roomId: roomId},
+			{password: null,
+				protected: false}
+		)
 	}
 }

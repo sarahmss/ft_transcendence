@@ -5,9 +5,9 @@ import { BadRequestException,
 	Controller,
 	Delete,
 	Get,
-	InternalServerErrorException,
 	NotFoundException,
 	Param,
+	Patch,
 	Post,
 	UnauthorizedException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
@@ -18,8 +18,8 @@ import { GroupRoom, Room } from 'src/entity/room.entity';
 import { RoomService } from 'src/chat/service/room/room.service';
 
 import { DIRECT, GROUP } from 'src/constants/roomType.constant';
-
 import * as bcrypt from 'bcrypt';
+
 
 @Controller('room')
 export class RoomController {
@@ -105,6 +105,49 @@ export class RoomController {
 		catch (error) {
 			throw error;
 		}
+	}
+
+	@Patch('set_pass')
+	async setPassword(
+		@Body('userId') requestorId: string,
+		@Body('password') password: string,
+		@Body('roomId') roomId: string) {
+
+		const room = await this.roomService.findRoom(roomId);
+
+		let member = await this.membershipService.findMemberRoom(requestorId, roomId);
+		if (!member || !(member.admin || member.owner))
+			throw new UnauthorizedException("Requestor doesn't have enough rights or doesn't belong to the room");
+
+		if (!room)
+			throw new NotFoundException("Room not found.");
+
+		if (room.roomType == DIRECT)
+			throw new BadRequestException("Can't set passwords on direct rooms");
+
+		await this.roomService.setPassRoom(password, roomId);
+		return "Password set";
+	}
+
+	@Patch('remove')
+	async unsetPassword(
+		@Body('userId') requestorId: string,
+		@Body('roomId') roomId: string) {
+
+		let member = await this.membershipService.findMemberRoom(requestorId, roomId);
+		if (!member || !(member.admin || member.owner))
+			throw new UnauthorizedException("Requestor doesn't have enough rights or doesn't belong to the room");
+
+		const room = await this.roomService.findRoom(roomId);
+
+		if (!room)
+			throw new NotFoundException("Room not found.");
+
+		if (room.roomType == DIRECT)
+			throw new BadRequestException("Can't set passwords on direct rooms");
+
+		await this.roomService.unsetPassRoom(roomId);
+		
 	}
 
 	private async checkRoomJoinCondition(userJoin: RoomJoinData, room: Room) {

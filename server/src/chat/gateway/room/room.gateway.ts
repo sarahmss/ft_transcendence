@@ -20,8 +20,6 @@ import { MembershipService } from 'src/chat/service/membership/membership.servic
 
 import { Membership } from 'src/entity/membership.entity';
 
-import { BlacklistService } from 'src/chat/service/blacklist/blacklist.service';
-
 import { Room } from 'src/entity/room.entity';
 import { ForbiddenException } from '@nestjs/common';
 import { ConnectedUserService } from 'src/chat/service/connected-user/connected-user.service';
@@ -48,7 +46,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private readonly authService: AuthService,
 		private readonly userService: UsersService,
 		private readonly membershipService: MembershipService,
-		private readonly blackListService: BlacklistService,
 		private readonly connectedUserService: ConnectedUserService,
 		private readonly roomService: RoomService,
 	) {}
@@ -126,6 +123,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	// Emit the joined room to the client to append on room list of the client
+	// Join => event name: joined
+	// Leave => event name: left
 	@OnEvent('room.join')
 	@OnEvent('room.leave')
 	emitRoomToSingleMember(userId: string, room: Room, emission_event: string) {
@@ -135,6 +134,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			.emit(emission_event, room);
 	}
 
+	// Create => event name: joined
+	// Delete => event name: left
 	@OnEvent('room.create')
 	@OnEvent('room.delete')
 	emitRoomToAllMembers(users: any, room: Room, emission_event: string) {
@@ -148,12 +149,11 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	// Will listen the event emitted by the emitter in the controller
 	@OnEvent('message.create')
-	async handleMessageCreation(message: Message, author: string) {
+	async handleMessageCreation(message: Message, author: string, blackList: any) {
 
 		let receivingClients: any;
 
 		const participantList = await this.membershipService.findParticipants(message.roomId);
-		const blackList = await this.blackListService.getBlockedUser(message.user);
 
 		if (blackList.length > 0) {
 			// If there is someone blocked => filter and get the allowed users

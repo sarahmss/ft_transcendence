@@ -20,6 +20,8 @@ export class RoomCreationData {
 	owner: User;
 
 	roomName: string;
+
+	password?: string;
 }
 
 export class RoomJoinData {
@@ -29,5 +31,5 @@ export class RoomJoinData {
 	@IsNotEmpty()
 	user: User;
 
-	password: string;
+	password?: string;
 }

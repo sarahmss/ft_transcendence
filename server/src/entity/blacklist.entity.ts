@@ -7,6 +7,7 @@ import { Column,
 	PrimaryGeneratedColumn} from 'typeorm';
 import { User } from './user.entity';
 import { Room } from './room.entity';
+import { LOCAL_BLOCK } from 'src/constants/blackListType.constant';
 
 
 @Entity()
@@ -14,6 +15,15 @@ export class BlackList {
 
 	@PrimaryGeneratedColumn('uuid', {name: 'black_list_id'})
 	blackListId: string;
+
+	@Column({name: 'blocker'})
+	blockerId: string;
+
+	@Column({name: 'blocked_user'})
+	blockedId: string;
+
+	@Column({name: 'room_id'})
+	roomId: string;
 
 	@ManyToOne(() => User, (entity: User) => entity.userId)
 	@JoinColumn({name: 'blocker'})
@@ -25,16 +35,19 @@ export class BlackList {
 
 	@ManyToOne(() => Room, (entity: Room) => entity.roomId)
 	@JoinColumn({name: 'room_id'})
-	roomId: Room
+	room: Room;
 
 	@Column({ default: true })
 	status: boolean;
+
+	@Column({default: LOCAL_BLOCK})
+	blockType: number;
 
 	@CreateDateColumn({ type: 'timestamptz' })
 	start_end: Date;
 
 	@Column({ type: 'timestamptz',
 			nullable: true,
-			default: null })
+			default: (Date.now() + 600000) })
 	block_end: Date;
 }

@@ -61,7 +61,7 @@ export class MembershipService {
 	}
 
 	async findMemberRoom(userId: string, roomId: string) {
-		return this.membershipRepository.find({where: {userId: userId,
+		return this.membershipRepository.findOne({where: {userId: userId,
 													roomId: roomId}});
 	}
 

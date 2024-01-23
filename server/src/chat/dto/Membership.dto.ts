@@ -1,5 +1,4 @@
-import { IsNotEmpty, Max, Min } from "class-validator";
-import { JOIN, LEAVE } from "src/constants/roomType.constant";
+import { IsNotEmpty } from "class-validator";
 
 export class MembershipDto {
 
@@ -8,9 +7,4 @@ export class MembershipDto {
 
 	@IsNotEmpty()
 	roomId: string;
-
-	@IsNotEmpty()
-	@Min(JOIN)
-	@Max(LEAVE)
-	action: number;
 }

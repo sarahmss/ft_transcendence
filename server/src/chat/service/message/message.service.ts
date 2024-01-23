@@ -20,7 +20,6 @@ export class MessageService {
 		messageInstance.room = room;
 		messageInstance.user = user;
 
-		console.log((await this.messageRepository.insert(messageInstance)).raw);
 		return messageInstance;
 	}
 
@@ -28,8 +27,7 @@ export class MessageService {
 		return await this.messageRepository.findOne({where: {messageId: messageId}});
 	}
 
-	async findMessage(user: User,
-					 room: Room,
+	async findRoomMessage(room: Room,
 					 quant: number = 25): Promise<Message[]> {
 
 		return this.messageRepository.find({ where:
@@ -68,5 +66,9 @@ export class MessageService {
 	async getAllMessage() {
 		return this.messageRepository
 			.find();
+	}
+
+	async deleteAllRoomMessage(roomId: string) {
+		await this.messageRepository.delete({roomId: roomId});
 	}
 }

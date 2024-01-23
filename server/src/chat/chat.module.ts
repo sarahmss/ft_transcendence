@@ -17,6 +17,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { HideMessageService } from './service/hide-message/hide-message.service';
 import { HideMessage } from 'src/entity/hideMessage.entity';
 import { ConnectedUserService } from './service/connected-user/connected-user.service';
+import { BlacklistController } from './controller/blacklist/blacklist.controller';
 
 @Module({
 	imports: [ 
@@ -34,7 +35,8 @@ import { ConnectedUserService } from './service/connected-user/connected-user.se
 
 	controllers: [
 		RoomController,
-		MessageController
+		MessageController,
+		BlacklistController
 	],
 
 	providers: [

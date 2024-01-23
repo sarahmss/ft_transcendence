@@ -6,6 +6,7 @@ import { Message } from 'src/entity/message.entity';
 import { User } from 'src/entity/user.entity';
 import { Room } from 'src/entity/room.entity';
 
+// This service will be used to filter out messages from the target user
 @Injectable()
 export class HideMessageService {
 
@@ -16,7 +17,14 @@ export class HideMessageService {
   async createHideEntry(message: Message, room: Room, user: User) {
     const entry = this.hideMessageRepository.create({
       message: message,
-      target: user
+      messageId: message.messageId,
+
+      room: room,
+      roomId: room.roomId,
+
+      target: user,
+      targetId: user.userId,
+
     });
     
     await this.hideMessageRepository.insert(entry);
@@ -25,6 +33,6 @@ export class HideMessageService {
   // Get the entry by roomId
   async getHideEntryByRoom (roomId: string) {
     return this.hideMessageRepository.find(
-      { where: { room: { roomId } } });
+      { where: { room: { roomId: roomId } } });
   }
 }
