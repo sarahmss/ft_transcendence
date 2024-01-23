@@ -7,6 +7,8 @@ import { DefaultPic,
 		TwoFaGenerateLink,
 		TwoFaLoginLink } from '../common/constants';
 
+import fetchData from '../components/navBar/NavBar';
+
 class TwoFaService {
 
 	async handleAuthentication(userId: string, code: string) {
@@ -62,6 +64,7 @@ class TwoFaService {
 				document.cookie = response.data.cookie;
 				sessionStorage.setItem("Logged", "ok");
 			});
+			
 			return true;
 		} catch (error) {
 			console.error(error);

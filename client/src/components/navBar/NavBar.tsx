@@ -14,6 +14,9 @@ import { Link} from 'react-router-dom';
 
 import { DefaultPic } from '../../common/constants';
 
+import {useSelector, useDispatch} from "react-redux";
+import {addUser, userLog} from "../../services/reduce";
+
 const pagesLogged = [
 	{ label: 'Profile', link: '/profile' },
 	{ label: 'Settings', link: '/settings' },
@@ -21,14 +24,15 @@ const pagesLogged = [
 ];
 
 const pagesUnlogged = [
-	{ label: 'Login', link: '/login' },
+  { label: 'Login', link: '/login' },
 	{ label: 'Signup', link: '/register' },
 ];
 
 const NavBar: React.FC = () => {
   const [isLogged, setIsLogged] = React.useState(false);
   const [profilePic, setProfilePic] = React.useState('');
-
+  let users = useSelector(userLog);
+  
 
   const fetchData = async () => {
     try {
@@ -44,24 +48,26 @@ const NavBar: React.FC = () => {
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
-    };
+  };
 
   React.useEffect(() => {
     fetchData();
-  }, []);
+    console.log("Hello")
+  }, [users]);
 
-  const handleLogoutClick = async () => {
-    try {
-      console.log("entrou no try logOut 2");
-      await authService.logout();
-      fetchData();
-    } catch (error) {
-      console.error('Error during logout:', error);
-    }
-  };
 
+  // const handleLogoutClick = async () => {
+  //   try {
+  //     console.log("entrou no try logOut 2");
+  //     await authService.logout();
+  //     fetchData();
+  //   } catch (error) {
+  //     console.error('Error during logout:', error);
+  //   }
+  // };
+  
   const logout = () => {
-	//
+    //
 	};
 
   return (
@@ -83,7 +89,7 @@ const NavBar: React.FC = () => {
               color: 'inherit',
               textDecoration: 'none',
             }}
-          >
+            >
             TRANSCENDENCE
           </Typography>
 
@@ -94,7 +100,7 @@ const NavBar: React.FC = () => {
               aria-controls="menu-appbar"
               aria-haspopup="true"
               color="inherit"
-            >
+              >
             </IconButton>
           </Box>
           <SelfImprovementIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
@@ -113,33 +119,27 @@ const NavBar: React.FC = () => {
               color: 'inherit',
               textDecoration: 'none',
             }}
-          >
+            >
             TRANSCENDENCE
           </Typography>
         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
           {isLogged ? (
-              pagesLogged.map((page) => (
-                <MenuItem key={page.label}>
-                  {page.link === '/logout' ? (
-                    <Link to={"/home"} style={{ textDecoration: 'none', color: 'inherit' }} onClick={handleLogoutClick}>
-                      <Typography textAlign="center">{page.label}</Typography>
-                    </Link>
-                  ) : (
+            pagesLogged.map((page) => (
+              <MenuItem key={page.label}>
                     <Link to={page.link} style={{ textDecoration: 'none', color: 'inherit' }}>
                       <Typography textAlign="center">{page.label}</Typography>
                     </Link>
-                  )}
                 </MenuItem>
               ))
-            ) : (
-              pagesUnlogged.map((page) => (
-                <MenuItem key={page.label}>
+              ) : (
+                pagesUnlogged.map((page) => (
+                  <MenuItem key={page.label}>
                   <Link to={page.link} style={{ textDecoration: 'none', color: 'inherit' }}>
                     <Typography textAlign="center">{page.label}</Typography>
                   </Link>
                 </MenuItem>
               ))
-            )}
+              )}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Profile Picture">

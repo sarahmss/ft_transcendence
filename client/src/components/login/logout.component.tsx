@@ -2,15 +2,18 @@ import { useEffect } from "react";
 import { Navigate } from "react-router-dom";
 
 import AuthService from "../../services/auth.service";
+import {useSelector, useDispatch} from "react-redux";
+import {addUser, userLog} from "../../services/reduce";
 
 const Logout = () => {
-  console.log("Entrou antes Useeffect 1")
+  const users = useSelector(userLog);
+	const dispatch = useDispatch();
+
   useEffect(() => {
     const logOut = async () => {
       try {
-        console.log("entrou no try logOut 2")
         await AuthService.logout();
-
+        dispatch(addUser("logOut"));
       } catch (error) {
         console.error('Error during logout:', error);
       }

@@ -1,5 +1,6 @@
 import { Component } from "react";
 import { Routes, Route } from "react-router-dom";
+import {useSelector} from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
@@ -13,6 +14,8 @@ import Login2Fa from "./components/login/login2fa.component";
 import Logout from "./components/login/logout.component";
 import { GameProvider } from './contexts/GameContext';
 import AccountSettings from "./components/account/AcountSettings";
+import { Provider } from 'react-redux';
+import store from './services/store';
 
 type Props = {};
 
@@ -24,24 +27,26 @@ class App extends Component<Props, State> {
 		return (
 
 			<div>
-				<NavBar/>
+				<Provider store ={store}>
+					<NavBar/>
 
-				<Routes>
-					<Route path="/" element={<Home />} />
-					<Route path="/home" element={<Home />} />
-					<Route path="/login" element={<Login />} />
-					<Route path="/logout" element={<Logout />} />
-					<Route path='/2fa' element={<Login2Fa/>} />
-					<Route path="/register" element={<Register />} />
-					<Route path="/profile" element={<Profile />} />
-					<Route path="/settings" element={<AccountSettings />} />
-					<Route path="/game" element={
-								<div>
-								<GameProvider>
-									<Pong />
-								</GameProvider>
-								</div>
-							} /> </Routes>
+					<Routes>
+						<Route path="/" element={<Home />} />
+						<Route path="/home" element={<Home />} />
+						<Route path="/login" element={<Login />} />
+						<Route path="/logout" element={<Logout />} />
+						<Route path='/2fa' element={<Login2Fa/>} />
+						<Route path="/register" element={<Register />} />
+						<Route path="/profile" element={<Profile />} />
+						<Route path="/settings" element={<AccountSettings />} />
+						<Route path="/game" element={
+							<div>
+									<GameProvider>
+										<Pong />
+									</GameProvider>
+									</div>
+								} /> </Routes>
+				</Provider>
 			</div>
 
 		);
