@@ -76,7 +76,8 @@ export class BlacklistService {
 	}
 
 	async updateDuration(blackListId: string, duration: number) {
-		if (duration)
+
+		if (duration || duration < 0)
 			duration = 300000;
 		this.blackListRepository.update({
 			blackListId: blackListId},
