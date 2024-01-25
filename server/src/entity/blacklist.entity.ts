@@ -1,6 +1,7 @@
 
 import {
 	AfterLoad,
+	BeforeUpdate,
 	Column,
 	CreateDateColumn,
 	Entity,
@@ -53,10 +54,10 @@ export class BlackList {
 			default: new Date(Date.now() + 600000) })
 	block_end: Date;
 
-	@AfterLoad()
-	async updateStatus() {
-		if (Date.now() > this.block_end.getTime())
+	@BeforeUpdate()
+	async checkTime() {
+		const now = new Date();
+		if (now.getTime() > this.block_end.getTime())
 			this.status = false;
-		console.log("woah");
 	}
 }

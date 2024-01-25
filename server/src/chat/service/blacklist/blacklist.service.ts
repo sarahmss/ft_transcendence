@@ -1,5 +1,5 @@
 
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -14,7 +14,8 @@ export class BlacklistService {
 		@InjectRepository(BlackList) private readonly blackListRepository: Repository<BlackList>
 	) {}
 
-	async checkExistence(blockerId: string,
+	async checkExistence(
+		blockerId: string,
 		blockedId: string,
 		roomId: string,
 		blockType: number) {
@@ -27,7 +28,11 @@ export class BlacklistService {
 		}});
 	}
 
-	async createBlackListEntry(blocker: User, blocked_user: User, room: Room, blockType: number) {
+	async createBlackListEntry(
+		blocker: User,
+		blocked_user: User,
+		room: Room,
+		blockType: number) {
 
 		if (blocker.userId === blocked_user.userId)
 			return null;
@@ -45,7 +50,12 @@ export class BlacklistService {
 		return blackListEntry;
 	}
 
-	async createInBulk(blocker: User, blocked_users: User[], room: Room, blockType: number) {
+	async createInBulk(
+		blocker: User,
+		blocked_users: User[],
+		room: Room,
+		blockType: number) {
+
 		blocked_users.forEach(async (blocked: User) => {
 			await this.createBlackListEntry(blocker,
 																				blocked,
@@ -56,17 +66,20 @@ export class BlacklistService {
 
 	// Get the list of the blocked user by the user
 	async getBlockedUser(blocker: User) {
-		return await this.blackListRepository.find({
-			where: [{blocker: blocker, status: true },
-							{blocked_user: blocker, status: true}],
-		});
+
+		return this.blackListRepository
+			.createQueryBuilder('block')
+			.where('block.status = true')
+			.andWhere('block.block_end > :timeNow', {timeNow: new Date()})
+			.andWhere('block.blocker = :id', {id: blocker.userId})
+			.orWhere('block.blocked_user = :id', {id: blocker.userId})
+			.getMany();
 	}
 	
 	async unblockById(blackListId: string) {
 		await this.blackListRepository.update({
 							blackListId: blackListId },
 								{ status: false });
-
 	}
 
 	async blockById(blackListId: string) {
@@ -77,11 +90,12 @@ export class BlacklistService {
 
 	async updateDuration(blackListId: string, duration: number) {
 
-		if (duration || duration < 0)
+		if (!duration || duration < 0)
 			duration = 300000;
-		this.blackListRepository.update({
-			blackListId: blackListId},
-			{block_end: Date.now() + duration});
+		this.blackListRepository.update(
+			{blackListId: blackListId},
+			{block_end: new Date(Date.now() + duration),
+				status: true});
 	}
 
 	async updateDurationInBulk(blackListIds: BlackList[], duration: number) {
@@ -92,5 +106,14 @@ export class BlacklistService {
 
 	async getAll() {
 		return this.blackListRepository.find();
+	}
+
+	async getValid() {
+
+		return this.blackListRepository
+			.createQueryBuilder('block')
+			.where('block.status = true')
+			.andWhere('block.block_end > :timeNow', {timeNow: new Date()})
+			.getMany();
 	}
 }

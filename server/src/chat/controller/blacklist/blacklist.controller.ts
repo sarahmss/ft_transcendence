@@ -21,6 +21,11 @@ export class BlacklistController {
     private readonly userService: UsersService,
     private readonly roomService: RoomService) {}
 
+  @Get("valid")
+  async getValid() {
+    return await this.blackListService.getValid();
+  }
+  
   @Get()
   async getAll() {
     return await this.blackListService.getAll();
