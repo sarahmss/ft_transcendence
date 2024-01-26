@@ -53,11 +53,4 @@ export class BlackList {
 			nullable: true,
 			default: new Date(Date.now() + 600000) })
 	block_end: Date;
-
-	@BeforeUpdate()
-	async checkTime() {
-		const now = new Date();
-		if (now.getTime() > this.block_end.getTime())
-			this.status = false;
-	}
 }

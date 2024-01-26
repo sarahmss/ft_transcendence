@@ -7,7 +7,6 @@ import { Column,
 	OneToOne,
 	PrimaryGeneratedColumn } from 'typeorm';
 
-import { User } from './user.entity';
 import { Membership } from './membership.entity';
 
 

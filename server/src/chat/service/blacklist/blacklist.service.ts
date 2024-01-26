@@ -1,11 +1,12 @@
 
-import { MoreThan, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { Room } from 'src/entity/room.entity';
 import { User } from 'src/entity/user.entity';
 import { BlackList } from 'src/entity/blacklist.entity';
+import { GLOBAL_BLOCK, LOCAL_BLOCK } from 'src/constants/blackListType.constant';
 
 @Injectable()
 export class BlacklistService {
@@ -65,12 +66,15 @@ export class BlacklistService {
 	}
 
 	// Get the list of the blocked user by the user
-	async getBlockedUser(blocker: User) {
+	async getBlockedUser(blocker: User, room: Room) {
 
 		return this.blackListRepository
 			.createQueryBuilder('block')
 			.where('block.status = true')
 			.andWhere('block.block_end > :timeNow', {timeNow: new Date()})
+			.andWhere('block.blocktype = :type', {type: LOCAL_BLOCK})
+			.andWhere('block.room_id = :rid', {rid: room.roomId})
+			.orWhere('block.blocktype = :type', {type: GLOBAL_BLOCK})
 			.andWhere('block.blocker = :id', {id: blocker.userId})
 			.orWhere('block.blocked_user = :id', {id: blocker.userId})
 			.getMany();
@@ -80,12 +84,6 @@ export class BlacklistService {
 		await this.blackListRepository.update({
 							blackListId: blackListId },
 								{ status: false });
-	}
-
-	async blockById(blackListId: string) {
-		await this.blackListRepository.update({
-						blackListId: blackListId },
-							{ status: true });
 	}
 
 	async updateDuration(blackListId: string, duration: number) {

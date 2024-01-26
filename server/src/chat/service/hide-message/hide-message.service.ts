@@ -16,7 +16,7 @@ export class HideMessageService {
   ) {}
 
   async createHideEntry(message: Message, room: Room, user: User) {
-    const entry = this.hideMessageRepository.create({
+    const entry: HideMessage = this.hideMessageRepository.create({
       message: message,
       messageId: message.messageId,
 
@@ -36,8 +36,10 @@ export class HideMessageService {
       const entry: HideMessage = this.hideMessageRepository.create({
         message: message,
         messageId: message.messageId,
+
         room: room,
         roomId: room.roomId,
+
         target: user.user,
         targetId: user.userId,
       });

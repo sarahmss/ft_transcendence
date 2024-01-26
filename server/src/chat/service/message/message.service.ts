@@ -14,11 +14,15 @@ export class MessageService {
 						room: Room,
 						user: User): Promise<Message> {
 
-		let messageInstance = this.messageRepository.create()
+		let messageInstance: Message = this.messageRepository.create({
+				message: message,
+				room: room,
+				user: user,
+				roomId: room.roomId,
+				userId: user.userId,
+			});
 
-		messageInstance.message = message;
-		messageInstance.room = room;
-		messageInstance.user = user;
+		let inserted = await this.messageRepository.insert(messageInstance);
 
 		return messageInstance;
 	}

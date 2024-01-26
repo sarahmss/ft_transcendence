@@ -3,7 +3,9 @@ import { BadRequestException, Body,
   Controller,
   Get,
   NotFoundException,
+  Patch,
   Post } from '@nestjs/common';
+import { isEmpty } from 'class-validator';
 
 import { BlacklistService } from 'src/chat/service/blacklist/blacklist.service';
 import { RoomService } from 'src/chat/service/room/room.service';
@@ -42,6 +44,7 @@ export class BlacklistController {
     if (!(blocker && blocked && room))
       throw new BadRequestException("Incomplete information given.");
 
+    blockType = this.setType(blockType);
     const existingBlackList = await this.blackListService
                                           .checkExistence(blocker,
                                                             blocked,
@@ -88,6 +91,8 @@ export class BlacklistController {
     if (!blocker)
       throw new NotFoundException('User not found')
 
+    blockType = this.setType(blockType);
+
     const userList = new Set<User>();
     blockedIds.forEach(async (userId: string) => {
       const user = await this.userService.findById(userId);
@@ -101,7 +106,8 @@ export class BlacklistController {
     if (!(roomTarget))
       throw new NotFoundException("Room Not found");
 
-    const existingBlackList = await this.blackListService.getBlockedUser(blocker);
+    const existingBlackList = await this.blackListService
+                                          .getBlockedUser(blocker, roomTarget);
 
     const renewUsers = existingBlackList.filter((existingBlock: BlackList) => {
       [...userList].some((user: User) => (
@@ -118,5 +124,39 @@ export class BlacklistController {
     this.blackListService.updateDurationInBulk(renewUsers, duration);
 
     this.blackListService.createInBulk(blocker, newEntryUsers, roomTarget, blockType);
+
+    return "blocked in bulk";
    }
+
+  @Patch('unblock')
+  async unblockBlackList(@Body('blockerId') blockerId: string,
+    @Body('blockedIds') blockedId: string,
+    @Body('roomId') roomId: string,
+    @Body('blockType') blockType: number) {
+
+    if (!(blockedId && blockerId))
+      throw new BadRequestException("Incomplete information given");
+
+    if (blockType === LOCAL_BLOCK && isEmpty(roomId))
+      throw new BadRequestException("Room level unblocking requires the roomId");
+
+    blockType = this.setType(blockType);
+
+    const entry = await this.blackListService.checkExistence(blockerId,
+      blockedId,
+      roomId,
+      blockType);
+
+    if (!entry)
+      throw new NotFoundException("Black list entry doesn\'t not exist");
+
+    this.blackListService.unblockById(entry.blackListId);
+    return "unblocked";
+  }
+
+  private setType(roomType: number) {
+    if (!roomType || !(roomType === LOCAL_BLOCK || roomType === GLOBAL_BLOCK))
+      return LOCAL_BLOCK;
+    return roomType;
+  }
 }

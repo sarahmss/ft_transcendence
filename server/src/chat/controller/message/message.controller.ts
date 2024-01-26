@@ -19,6 +19,8 @@ import { HideMessageService } from 'src/chat/service/hide-message/hide-message.s
 import { MembershipService } from 'src/chat/service/membership/membership.service';
 import { MessageService } from 'src/chat/service/message/message.service';
 import { RoomService } from 'src/chat/service/room/room.service';
+import { BlackList } from 'src/entity/blacklist.entity';
+import { Membership } from 'src/entity/membership.entity';
 import { UsersService } from 'src/users/users.service';
 
 @Controller('message')
@@ -39,7 +41,7 @@ export class MessageController {
 	}
 
 	@Post()
-	async message(@Body() message: createMessage) {
+	async message(@Body('message') message: createMessage) {
 		try {
 			const user = await this.userService.findById(message.userId);
 			const room = await this.roomService.findRoom(message.roomId);
@@ -51,24 +53,29 @@ export class MessageController {
 																																room,
 																																user);
 
-			const blackList = await this.blackListService.getBlockedUser(user);
-			const participantList = await this.membershipService.findParticipants(message.roomId);
+			const blackList: BlackList[] = await this.blackListService
+																									.getBlockedUser(user, room);
 
-			const hideMessageClients = participantList.filter(
-				(participant) =>
-					blackList.some((blocked) =>  
-						(participant.userId === blocked.blockedId ||
-						(participant.userId === blocked.blockerId && blocked.blockerId !== message.userId))));
+			const participantList: Membership[] = await this.membershipService
+																												.findParticipants(message.roomId);
 
-			this.hideMessageService
-				.createHideEntryBulk(messageInstance,
-															room,
-															hideMessageClients);
+			if (blackList.length > 0){
+				const hideMessageClients = participantList.filter(
+					(participant) =>
+						blackList.some((blocked) =>  
+							(participant.userId === blocked.blockedId ||
+							(participant.userId === blocked.blockerId && blocked.blockerId !== message.userId))));
 
+				this.hideMessageService
+					.createHideEntryBulk(messageInstance,
+																room,
+																hideMessageClients);
+			}
 			this.emitter.emit('message.create',
 													messageInstance,
 													user.userName,
-													blackList);
+													blackList,
+													participantList);
 		}
 		catch (error) {
 			throw error;

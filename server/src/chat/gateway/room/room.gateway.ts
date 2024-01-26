@@ -25,6 +25,7 @@ import { ForbiddenException } from '@nestjs/common';
 import { ConnectedUserService } from 'src/chat/service/connected-user/connected-user.service';
 import { RoomService } from 'src/chat/service/room/room.service';
 import { Message } from 'src/entity/message.entity';
+import { BlackList } from 'src/entity/blacklist.entity';
 
 // Handling blacklist will happen
 // in two fashions:
@@ -51,19 +52,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	) {}
 
 	@WebSocketServer() server: Server;
-
-	private joinRooms(client: Socket, rooms: any[]): void {
-
-		// Join in all rooms
-		if (rooms.length !== 0)
-			rooms.forEach((room) =>
-				client.join(room)
-			);
-
-		else {
-			console.log("The user it's not in any room");
-		}
-	}
 
 	private async checkUser(token: string) {
 
@@ -95,7 +83,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			});
 
 			client.emit("room-list", await this.roomService.findRoomWithArray(roomList));
-			this.joinRooms(client, roomList);
 		}
 		catch {
 			console.log("Connection has gone wrong!");
@@ -111,12 +98,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		client.disconnect();
 	}
 
-	// Payload is data sent by the client
+	// Test listener
 	@SubscribeMessage('message')
 	handleMessage(client: Socket, payload: any) {
 		
-		// this.server.to(payload.room).emit("message-response", message_created);
-		// this.server.to(payload.room).emit();
 		client.emit("client-response", payload);
 		this.connectedUserService.getConnection(client.data.userId).emit("client-response", "service working");
 		this.server.emit("message-response", payload);
@@ -149,43 +134,38 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	// Will listen the event emitted by the emitter in the controller
 	@OnEvent('message.create')
-	async handleMessageCreation(message: Message, author: string, blackList: any, participantList: any) {
+	async handleMessageCreation(message: Message,
+		author: string,
+		blackList: any,
+		participantList: any) {
 
 		let receivingClients: any;
 
 		if (blackList.length > 0) {
 			// If there is someone blocked => filter and get the allowed users
 			receivingClients = participantList.filter(
-				(participant) =>
-					!blackList.some((blocked) =>
-						(participant.userId === blocked.blocked_user.userId || blocked.status === true)));
+				(participant: Membership) =>
+					!blackList.some((blocked: BlackList) =>
+						(participant.userId === blocked.blockedId)));
 		}
 		else {
-			// If everyone is allowed get everyone
+			// If there is no one blocked
 			receivingClients = participantList;
 		}
 
-		// Emit to a specific room
-		// Blacklist condition for trasnmission will be written here
-		// Since we cannot emit to message to those who are inside the blacklist
+		// Emit the message to the user
 		receivingClients.forEach((membershipData: Membership) => {
-			let targetSocket: Socket = this.connectedUserService.getConnection(membershipData.userId);
+			let targetSocket: Socket = this.connectedUserService
+																				.getConnection(membershipData.userId);
 			if (targetSocket)
-				// uncomment this line and delete the other
-				// targetSocket.to(message.room.roomId).emit("message-response", {
-				// 																				message: message.message,
-				// 																				messageId: message.messageId,
-				// 																				messageTimestamp: message.timestamp,
-				// 																				authorId: message.userId.userId,
-				// 																				author: author,
-				// });
-				targetSocket.emit("message-response", {
-																								message: message.message,
-																								messageId: message.messageId,
-																								messageTimestamp: message.timestamp,
-																								authorId: message.userId,
-																								author: author,
-				});
-		})
+				targetSocket.emit("message-response",
+													{
+														message: message.message,
+														messageId: message.messageId,
+														messageTimestamp: message.timestamp,
+														authorId: message.userId,
+														author: author,
+													});
+		});
 	}
 }

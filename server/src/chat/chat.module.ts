@@ -18,6 +18,8 @@ import { HideMessageService } from './service/hide-message/hide-message.service'
 import { HideMessage } from 'src/entity/hideMessage.entity';
 import { ConnectedUserService } from './service/connected-user/connected-user.service';
 import { BlacklistController } from './controller/blacklist/blacklist.controller';
+import { BanService } from './service/ban/ban.service';
+import { BanController } from './controller/ban/ban.controller';
 
 @Module({
 	imports: [ 
@@ -36,7 +38,8 @@ import { BlacklistController } from './controller/blacklist/blacklist.controller
 	controllers: [
 		RoomController,
 		MessageController,
-		BlacklistController
+		BlacklistController,
+		BanController
 	],
 
 	providers: [
@@ -48,6 +51,7 @@ import { BlacklistController } from './controller/blacklist/blacklist.controller
 		UsersService,
 		HideMessageService,
 		ConnectedUserService,
+		BanService,
 	],
 
 })
