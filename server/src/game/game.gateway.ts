@@ -4,6 +4,7 @@ import { GameService } from './game.service';
 import { PlayerModel } from './game.service';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
+
 @WebSocketGateway ({
 	namespace: '/game',
 	cors: {
@@ -93,7 +94,8 @@ export class GameGateway
 
 		@SubscribeMessage('addOnQueue')
 				handleAddOnQueue(client: Socket): void {
-						this.gameService.addOnQueue(client, this.server);
+					this.gameService.logger.log(`User no banco em addOnQueue: ${JSON.stringify(client.data.user)}`);	
+					this.gameService.addOnQueue(client, this.server);
 				}
 
 		@SubscribeMessage('execMatch')

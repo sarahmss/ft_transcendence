@@ -30,4 +30,13 @@ export class User {
 
 	@Column({ default: false, nullable: false})
 	has2FaAuth: boolean;
+
+	@Column({ nullable: false, default: 0 })
+    gamesWonToLevelUp: number;
+
+	@Column({ nullable: false, default: 0 })
+    totalGamesWon: number;
+
+    @Column({ nullable: false, default: 1 }) 
+    level: number;
 }

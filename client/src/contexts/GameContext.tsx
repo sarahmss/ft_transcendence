@@ -19,6 +19,8 @@ interface Room {
 	name: string;
 	player1?: string;
 	player2?: string;
+  player1Name: string;
+  player2Name: string;
 	spectators?: Record<string, any>;
 }
 
@@ -126,7 +128,7 @@ const initialState: State = {
   isUserLogged: true,
   players: {},
   current_player: { name: '' },
-  current_room: { name: '' },
+  current_room: { name: '', player1Name: '', player2Name: '' },
   rooms: {},
   messages: [],
   match: {},
@@ -145,11 +147,31 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
 			dispatch({ type: 'LOGGED', payload: false });
 			return;
 		}
+    // verificar se um item com o userId desse storedPlayer já existe,
+    // se sim, quer dizer que já houve um setItem desse usuario - então
+    // a probabilidade é que essa é uma reconexão do socket desse usuario
+    // (passa o player salvo no localStorage com o userId do storedPlayer
+    // como chave). Do contrario (nao tem item no localStorage com essa userId),
+    // essa é a primeira vez que o socket está logando no
+    // contexto do Game, então é preciso ir pro login e salvar esse player
+    // no array de players pela primeira vez
 		if (storedPlayer !== null) {
-			gameSocket.emit('reconnect', storedPlayer);
+      const storedPlayerSocketString = localStorage.getItem(storedPlayer.userId);
+      if (storedPlayerSocketString)
+      {
+        const storedPlayerSocket = JSON.parse(storedPlayerSocketString);
+        console.log('Jogador ja existe e é uma reconexão.');
+        console.log('StoredPlayerSocket: ', storedPlayerSocket);
+        // gameSocket.emit('reconnect', storedPlayer);
+        gameSocket.emit('reconnect', storedPlayerSocket);
+      }
+      else
+      {
+        console.log('Jogador ainda nao existe e precisa logar.');
+        gameSocket.emit('login', storedPlayer.userName);
+      }
+      dispatch({ type: 'CONNECTED', payload: true });
 		}
-		gameSocket.emit('login', storedPlayer.userName);
-		dispatch({ type: 'CONNECTED', payload: true });
 	});
 
 	gameSocket.on('disconnect', () => {
@@ -158,6 +180,7 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
 
 	gameSocket.on('PlayersRefresh', (players) => {
 		const player = players[gameSocket.id];
+    console.log('Players: ', players);
 		if (player)
 		{
 			const storedPlayer = AuthService.getCurrentUserPlay();

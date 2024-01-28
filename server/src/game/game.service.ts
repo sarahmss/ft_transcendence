@@ -1,5 +1,8 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Server, Socket } from 'socket.io';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../entity/user.entity';
 
 class GameModel {
 	players: Record<string, PlayerModel>;
@@ -82,10 +85,15 @@ class MatchModel {
 @Injectable()
 export class GameService {
 
+	constructor(
+		@InjectRepository(User)
+		private readonly usersRepository: Repository<User>,
+	) {}
+
     public logger: Logger = new Logger('AppGateway');
     public gameConfig = {
-        width: 580,
-        height: 320,
+        width: 640,
+        height: 420,
     };
 
 	public game: GameModel = new GameModel();
@@ -290,7 +298,18 @@ export class GameService {
 		match[playerNumbers] = { ...match[playerNumbers], direction };
 	}
 
-	leaveRoomInit(client: Socket, server: Server): void {
+	matchesToLevelUp(currentLevel: number): number {
+		if(currentLevel < 5) {
+			return 5;
+		} else {
+
+			const baseGame = 5;// quantidade inicial de partidas necessárias
+			const increment = 2;// incremento a cada 3 níveis
+			return baseGame + increment * Math.floor((currentLevel - 5) / 3);
+		}
+	}
+
+	async leaveRoomInit(client: Socket, server: Server) {
 
 		const clientId = client.id;
 		const roomId = this.game.players[client.id].room;
@@ -302,13 +321,41 @@ export class GameService {
 			{
 				const playerNumbers = 'player' + (client.id === room.player1 ? 1 : 2);
 				room[playerNumbers] = undefined;
+				// aqui é um dos jogadores saindo, daí já atualiza informações de 
+				// gamesWon e level (talvez) no banco de dados
 				if (match) {
 					match[playerNumbers] = undefined;
 					if (match.status !== 'END') {
+						// ou seja, alguem pressionou o botao ANTES de chegar ao fim da pontuacao da partida
+						// ou seja, esse alguem desistiu. Ninguem ganha?
+						// no Match History ficaria como? dá desistencia apenas?
 						match.status = 'END';
 						match.message = `Player ${
 						  this.game.players[client.id].name
 						} left the match.`;
+					}
+					else {
+						// ou seja, cai aqui quando o status de match já está como 'END'
+						// ou seja: jogo terminou porque atingiu o limite da pontuacao -> alguem VENCEU
+						// resta saber quem...
+						if (playerNumbers === 'player1' && match.score1 > match.score2) {
+							client.data.user.gamesWonToLevelUp += 1;
+							client.data.user.totalGamesWon += 1;
+						} else if (playerNumbers === 'player2' && match.score2 > match.score1) {
+							client.data.user.totalGamesWon += 1;
+							client.data.user.gamesWonToLevelUp += 1;
+						}
+						// verifica se tem partidas ganhas o suficiente pra
+						// subir de level
+						if (client.data.user.gamesWonToLevelUp >= this.matchesToLevelUp(client.data.user.level)) {
+							client.data.user.level += 1;
+							client.data.user.gamesWonToLevelUp = 0;
+						}
+						console.log('Games Won desse client de nome ', JSON.stringify(client.data.user.totalGamesWon));
+						//const userRepository = getRepository(User);
+						//await userRepository.save(client.data.user); //será que ele travou ao voltar por conta desse await?
+						await this.usersRepository.save(client.data.user);
+						console.log('CONSEGUIMOS SALVAR O USUARIO NO BANCO DEPOIS DA PARTIDA');
 					}
 				}
             }
@@ -405,8 +452,8 @@ export class GameService {
       ball.x = gameConfig.width / 2;
       ball.y = gameConfig.height / 2;
 
-	  if (match.score1 === 10 || match.score2 === 10) {
-		const playerNumber = match.score1 === 10 ? 1 : 2;
+	  if (match.score1 === 5 || match.score2 === 5) {
+		const playerNumber = match.score1 === 5 ? 1 : 2;
 		const playerSocketId = this.game.rooms[roomId][`player${playerNumber}`];
 		match.status = 'END';
 		match.message = `The player ${this.game.players[playerSocketId].name} won.`;

@@ -193,7 +193,8 @@ class PongGame extends React.Component<{}, PongGameState> {
 		const context = this.context as State;
         const match = context.match;
 		const current_player = context.current_player;
-        const { message } = match;
+        const current_room = context.current_room;
+		const { message } = match;
         return (
             <>
                 <div id="pong-game-container"></div>
@@ -203,12 +204,34 @@ class PongGame extends React.Component<{}, PongGameState> {
                     </div>
                 }
 				{(current_player.state && current_player.state === 'watching') &&
+						<>
+							<div>
+								<button onClick={leaveRoom}> Leave Room </button>
+							</div>
+							{/* simplificar essa condicao com a de baixo (||) */}
+							{/* as demais informações da tela podem ser deixadas aqui */}
+							{/* em vez de em Pong.tsx */}
+
+							{/* algo como: */}
+							<div>
+								<p>{current_room.player1Name} vs {current_room.player2Name}</p>
+							</div>
+						</>
+					}
+				{ (current_player.state && current_player.state === 'in_game') &&
+					<>
 						<div>
 							<button onClick={leaveRoom}> Leave Room </button>
 						</div>
-					}
-				{ (current_player.state && current_player.state === 'in_game') &&
-					<button onClick={leaveRoom}> Leave Room </button>
+						{/* simplificar essa condicao com a de baixo (||) */}
+						{/* as demais informações da tela podem ser deixadas aqui */}
+						{/* em vez de em Pong.tsx */}
+
+						{/* algo como: */}
+						<div>
+							<p>{current_room.player1Name} vs {current_room.player2Name}</p>
+						</div>
+					</>
 				}
 				{ ( current_player.state === 'watching' && match.status !== 'START' && match.status !== 'PLAY' ) &&
 					<div className='game-message'>
