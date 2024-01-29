@@ -5,6 +5,12 @@ import Rooms from './Rooms';
 import Queue from './Queue';
 import Customizing from './Customizing';
 import PongGame from './Game';
+import {
+	Button,
+	Grid,
+	Card
+} from '@mui/material';
+
 import { Navigate } from 'react-router-dom';
 
 const Pong: React.FC = () => {
@@ -18,7 +24,15 @@ const Pong: React.FC = () => {
     	  {current_player?.name && !current_player?.state && (
     	    <span className='list-title'>
     	      {!current_player?.state && !current_player?.room && (
-    	        <button onClick={addOnQueue}>Enter a game</button>
+    	        //<button onClick={addOnQueue}>Enter a game</button>
+				<Button
+					variant="contained"
+					size="large"
+					onClick={addOnQueue}
+					sx={{backgroundColor:"#B700cc", mb:5}}
+				>
+					Enter a game
+				</Button>
     	      )}
     	    </span>
     	  )}
