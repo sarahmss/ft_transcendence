@@ -4,6 +4,7 @@ import { Message } from 'src/entity/message.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/entity/user.entity';
 import { Room } from 'src/entity/room.entity';
+import { isEmpty } from 'class-validator';
 
 @Injectable()
 export class MessageService {
@@ -41,15 +42,15 @@ export class MessageService {
 													take: quant});
 	}
 
-	async findMessageWithPage(user: User,
+	async findMessageWithPage(
 							  room: Room,
 							  page: number,
 							  quant: number = 25): Promise<Message[]> {
 
-		if (page < 0)
+		if (isEmpty(page) || page < 0)
 			page = 0;
 
-		return await this.messageRepository.find({ where:
+		return this.messageRepository.find({ where:
 										   		 {user: user, room: room},
 													order:
 														{ timestamp: 'DESC' },
@@ -59,7 +60,7 @@ export class MessageService {
 
 	async updateMessage(messageId: string,
 					   newMessage: string) {
-		return await this.messageRepository.update({messageId: messageId},
+		return this.messageRepository.update({messageId: messageId},
 												   {message: newMessage});
 	}
 

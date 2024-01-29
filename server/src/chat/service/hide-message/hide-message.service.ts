@@ -52,4 +52,12 @@ export class HideMessageService {
     return this.hideMessageRepository.find(
       { where: { room: { roomId: roomId } } });
   }
+
+  async getHideEntriesByRoomAndUser(room: Room, user: User) {
+    return this.hideMessageRepository.find({where:
+      {room: room,
+      target: user}
+    });
+    
+  }
 }

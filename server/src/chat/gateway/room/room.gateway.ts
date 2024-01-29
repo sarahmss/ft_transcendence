@@ -26,6 +26,7 @@ import { ConnectedUserService } from 'src/chat/service/connected-user/connected-
 import { RoomService } from 'src/chat/service/room/room.service';
 import { Message } from 'src/entity/message.entity';
 import { BlackList } from 'src/entity/blacklist.entity';
+import { Ban } from 'src/entity/ban.entity';
 
 // Handling blacklist will happen
 // in two fashions:
@@ -137,7 +138,9 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async handleMessageCreation(message: Message,
 		author: string,
 		blackList: any,
-		participantList: any) {
+		participantList: any[],
+		banList: any[]
+	) {
 
 		let receivingClients: any;
 
@@ -146,7 +149,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			receivingClients = participantList.filter(
 				(participant: Membership) =>
 					!blackList.some((blocked: BlackList) =>
-						(participant.userId === blocked.blockedId)));
+						(participant.userId === blocked.blockedId)) ||
+					!banList.some((banEntry: Ban) =>
+						(banEntry.banId === participant.userId)
+					));
 		}
 		else {
 			// If there is no one blocked

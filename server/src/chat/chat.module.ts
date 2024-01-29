@@ -20,10 +20,12 @@ import { ConnectedUserService } from './service/connected-user/connected-user.se
 import { BlacklistController } from './controller/blacklist/blacklist.controller';
 import { BanService } from './service/ban/ban.service';
 import { BanController } from './controller/ban/ban.controller';
+import { Ban } from 'src/entity/ban.entity';
 
 @Module({
 	imports: [ 
-		TypeOrmModule.forFeature([Message,
+		TypeOrmModule.forFeature([
+										Message,
 										Room,
 										DirectRoom,
 										GroupRoom,
@@ -31,6 +33,7 @@ import { BanController } from './controller/ban/ban.controller';
 										Membership,
 										User,
 										HideMessage,
+										Ban,
 		]),
 		AuthModule
 	],

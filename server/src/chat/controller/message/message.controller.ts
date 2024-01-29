@@ -5,7 +5,8 @@ import { Body,
 	HttpException,
 	NotFoundException,
 	Patch, 
-  Post} from '@nestjs/common';
+  Post,
+  UnauthorizedException} from '@nestjs/common';
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
@@ -13,14 +14,18 @@ import { DeleteMessage,
 	GetMessage,
 	UpdateMessage,
 	createMessage } from 'src/chat/dto/Message.dto';
+import { BanService } from 'src/chat/service/ban/ban.service';
 
 import { BlacklistService } from 'src/chat/service/blacklist/blacklist.service';
 import { HideMessageService } from 'src/chat/service/hide-message/hide-message.service';
 import { MembershipService } from 'src/chat/service/membership/membership.service';
 import { MessageService } from 'src/chat/service/message/message.service';
 import { RoomService } from 'src/chat/service/room/room.service';
+import { Ban } from 'src/entity/ban.entity';
 import { BlackList } from 'src/entity/blacklist.entity';
+import { HideMessage } from 'src/entity/hideMessage.entity';
 import { Membership } from 'src/entity/membership.entity';
+import { Message } from 'src/entity/message.entity';
 import { UsersService } from 'src/users/users.service';
 
 @Controller('message')
@@ -33,6 +38,7 @@ export class MessageController {
 		private readonly userService: UsersService,
 		private readonly roomService: RoomService,
 		private readonly hideMessageService: HideMessageService,
+		private readonly banService: BanService,
 		private readonly emitter: EventEmitter2) {}
 
 	@Get('all')
@@ -49,6 +55,11 @@ export class MessageController {
 			if (!user || !room)
 				throw new NotFoundException();
 
+			const banList = await this.banService.findBanRoomUser(room);
+			const exception = this.banService.checkBanListIfUserBan(banList, user);
+			if (exception)
+				throw exception;
+
 			const messageInstance = await this.messageService.createMessage(message.message,
 																																room,
 																																user);
@@ -60,11 +71,18 @@ export class MessageController {
 																												.findParticipants(message.roomId);
 
 			if (blackList.length > 0){
-				const hideMessageClients = participantList.filter(
-					(participant) =>
-						blackList.some((blocked) =>  
-							(participant.userId === blocked.blockedId ||
-							(participant.userId === blocked.blockerId && blocked.blockerId !== message.userId))));
+
+				const hideMessageClients =
+					participantList.filter(
+						(participant) =>
+							blackList.some((blocked) =>  
+								(participant.userId === blocked.blockedId ||
+								(participant.userId === blocked.blockerId &&
+								blocked.blockerId !== message.userId))) ||
+							banList.some((banEntry: Ban) => (
+								(banEntry.banId === participant.userId)
+							))
+					);
 
 				this.hideMessageService
 					.createHideEntryBulk(messageInstance,
@@ -90,18 +108,41 @@ export class MessageController {
 		if (!user || !room)
 			throw new NotFoundException('User or Room not found');
 
-		return await this.messageService.findRoomMessage(
-																			room,
-																		  roomAndUser.quant);
+		const messages = await this.messageService.findMessageWithPage(
+			room,
+			roomAndUser.page,
+			roomAndUser.quant
+		);
+
+		// const messages = await this.messageService.findRoomMessage(
+		// 																						room,
+		// 																					  roomAndUser.quant);
+
+		const hideMessages = await this.hideMessageService.getHideEntriesByRoomAndUser(room, user);
+
+		if (hideMessages.length > 0) {
+			const filteredMessages = messages.filter(
+				(message: Message) =>
+					!hideMessages.some((hide: HideMessage) =>
+						(message.messageId === hide.messageId))
+			);
+
+			return filteredMessages;
+		}
+
+		return messages;
 	}
 
 	@Patch()
 	async updateMessage(@Body() updateMessage: UpdateMessage) {
 
 		let message = await this.messageService.findMessageById(updateMessage.messageId);
-
 		if (!message)
 			throw new HttpException('Message doesn\'t exist!', 404);
+
+		const ban = await this.banService.findBanById(message.roomId, message.userId);
+		if (ban)
+			throw new UnauthorizedException("The user is banned for the time being");
 
 		return this.messageService.updateMessage(message.messageId, 
 												 updateMessage.newMessage);
@@ -115,6 +156,11 @@ export class MessageController {
 		if (!message)
 			throw new HttpException('Message doesn\'t exist!', 404);
 
+		const ban = await this.banService.findBanById(message.roomId, message.userId);
+		if (ban)
+			throw new UnauthorizedException("The user is banned for the time being");
+
 		this.messageService.deleteMessage(message.messageId);
+		return "The message has been deleted";
 	}
 }

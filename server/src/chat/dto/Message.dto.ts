@@ -22,6 +22,8 @@ export class GetMessage {
 	@IsNotEmpty()
 	roomId: string;
 
+	page: number;
+
 	quant: number;
 }
 
