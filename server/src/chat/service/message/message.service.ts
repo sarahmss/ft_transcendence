@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from 'src/entity/user.entity';
 import { Room } from 'src/entity/room.entity';
 import { isEmpty } from 'class-validator';
+import DOMPurify from 'dompurify';
 
 @Injectable()
 export class MessageService {
@@ -15,8 +16,10 @@ export class MessageService {
 						room: Room,
 						user: User): Promise<Message> {
 
+		const sanitizedInput = DOMPurify.sanitize(message);
+
 		let messageInstance: Message = this.messageRepository.create({
-				message: message,
+				message: sanitizedInput,
 				room: room,
 				user: user,
 				roomId: room.roomId,
@@ -51,7 +54,7 @@ export class MessageService {
 			page = 0;
 
 		return this.messageRepository.find({ where:
-										   		 {user: user, room: room},
+										   		 {room: room},
 													order:
 														{ timestamp: 'DESC' },
 													take: quant,
@@ -60,8 +63,11 @@ export class MessageService {
 
 	async updateMessage(messageId: string,
 					   newMessage: string) {
-		return this.messageRepository.update({messageId: messageId},
-												   {message: newMessage});
+
+		const sanitizedInput = DOMPurify.sanitize(newMessage);
+		return this.messageRepository.update(
+																	{messageId: messageId},
+																   {message: sanitizedInput});
 	}
 
 	async deleteMessage(messageId: string) {
