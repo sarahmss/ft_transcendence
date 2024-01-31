@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Message } from 'src/entity/message.entity';
-import { Repository } from 'typeorm';
+import { Repository, UpdateDateColumn } from 'typeorm';
 import { User } from 'src/entity/user.entity';
 import { Room } from 'src/entity/room.entity';
 import { isEmpty } from 'class-validator';
+import * as xssFilters from 'xss-filters';
 
 @Injectable()
 export class MessageService {
@@ -15,8 +16,9 @@ export class MessageService {
 						room: Room,
 						user: User): Promise<Message> {
 
+		const sanitizedMessage = xssFilters.inHTMLData(message);
 		let messageInstance: Message = this.messageRepository.create({
-				message: message,
+				message: sanitizedMessage,
 				room: room,
 				user: user,
 				roomId: room.roomId,
@@ -51,7 +53,7 @@ export class MessageService {
 			page = 0;
 
 		return this.messageRepository.find({ where:
-										   		 {user: user, room: room},
+										   		 {room: room},
 													order:
 														{ timestamp: 'DESC' },
 													take: quant,
@@ -60,8 +62,11 @@ export class MessageService {
 
 	async updateMessage(messageId: string,
 					   newMessage: string) {
-		return this.messageRepository.update({messageId: messageId},
-												   {message: newMessage});
+
+		const sanitizedMessage = xssFilters.inHTMLData(newMessage);
+		return this.messageRepository.update(
+																	{messageId: messageId},
+																   {message: sanitizedMessage});
 	}
 
 	async deleteMessage(messageId: string) {
