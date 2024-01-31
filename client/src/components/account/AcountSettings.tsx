@@ -14,11 +14,13 @@ import MuiTab, { TabProps } from '@mui/material/Tab'
 import AccountOutline from 'mdi-material-ui/AccountOutline'
 import LockOpenOutline from 'mdi-material-ui/LockOpenOutline'
 import InformationOutline from 'mdi-material-ui/InformationOutline'
+import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 
 // ** Demo Tabs Imports
 import TabInfo from './account-settings/TabInfo'
 import TabAccount from './account-settings/TabAccount'
 import TabSecurity from './account-settings/TabSecurity'
+import TabStatus from './account-settings/TabStatus'
 
 import authService from '../../services/auth.service'
 import { Navigate } from "react-router-dom";
@@ -114,6 +116,15 @@ const AccountSettings = () => {
               </Box>
             }
           />
+          <Tab
+            value='status'
+            label={
+              <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <MilitaryTechOutlinedIcon />
+                <TabName>Status</TabName>
+              </Box>
+            }
+          />
         </TabList>
 
         <TabPanel sx={{ p: 0 }} value='account'>
@@ -124,6 +135,9 @@ const AccountSettings = () => {
 		</TabPanel>
         <TabPanel sx={{ p: 0 }} value='info'>
           <TabInfo currentUser={currentUser}/>
+        </TabPanel>
+        <TabPanel sx={{ p: 0 }} value='status'>
+            <TabStatus currentUser={currentUser}/>
         </TabPanel>
       </TabContext>
     </Card>

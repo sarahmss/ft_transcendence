@@ -150,11 +150,12 @@ export class UsersService {
 	}
 
 
-	async NameisNotUnique(userName: string) {
-		if (!userName) {
+	async NameisNotUnique(newUserName: string, oldUserName:string) {
+
+		if (!newUserName || newUserName == oldUserName) {
 			return false;
 		}
-		const user = await this.findByUserName(userName)
+		const user = await this.findByUserName(newUserName)
 		if (user) {
 			return true;
 		}
@@ -196,7 +197,7 @@ export class UsersService {
 
 		async update(userId: string, userDto: UpdateUserDto): Promise<User> {
 			const user = await this.checkUser(userId);
-			const invalidUpdate = await this.NameisNotUnique(userDto.userName);
+			const invalidUpdate = await this.NameisNotUnique(userDto.userName, user.userName);
 			if (invalidUpdate){
 				throw new UnprocessableEntityException();
 			}
