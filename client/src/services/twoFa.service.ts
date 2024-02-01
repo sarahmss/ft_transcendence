@@ -1,13 +1,10 @@
 import axios from 'axios';
 import AuthService from './auth.service';
-import { DefaultPic,
-		TwoFaLink,
+import { TwoFaLink,
 		TwoFaDisableLink,
 		TwoFaEnableLink,
 		TwoFaGenerateLink,
 		TwoFaLoginLink } from '../common/constants';
-
-import fetchData from '../components/navBar/NavBar';
 
 class TwoFaService {
 
@@ -64,7 +61,7 @@ class TwoFaService {
 				document.cookie = response.data.cookie;
 				sessionStorage.setItem("Logged", "ok");
 			});
-			
+
 			return true;
 		} catch (error) {
 			console.error(error);

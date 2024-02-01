@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { useState, ChangeEvent, InputHTMLAttributes, SyntheticEvent, useReducer } from 'react'
+import React, { useReducer } from 'react'
 
 // ** MUI Imports
 import Table from '@mui/material/Table';
@@ -11,13 +11,6 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import IUser from '../../../types/user.type'
 import Box from '@mui/material/Box';
-
-
-import userService from '../../../services/user.service'
-
-// ** Icons Imports
-import { DefaultPic } from '../../../common/constants'
-import { reducer } from '../../../common/helper'
 
 interface TabStatusProps {
 	currentUser: IUser | null
@@ -43,13 +36,6 @@ const rows = [
 
 const TabStatus: React.FC<TabStatusProps> = ({ currentUser }) => {
 
-	const [state, setState] = useReducer(reducer, {
-		imgSrc: (currentUser?.profilePicture || DefaultPic),
-		imgUrl: (currentUser?.profilePicture || undefined),
-		name: (currentUser?.userName || "name"),
-		email: (currentUser?.email || "email"),
-	});
-
   const text = "texto";
   const anotherText = "texto";
 
@@ -67,7 +53,7 @@ const TabStatus: React.FC<TabStatusProps> = ({ currentUser }) => {
             },
           }}
         >
-          <Paper elevation={3}  style={{padding: '10px', }}> 
+          <Paper elevation={3}  style={{padding: '10px', }}>
             <span style={{ color: '#FF0000' }}>Red({text})</span>
             <br />
             <span style={{ color: '#000000' }}>White({anotherText})</span>

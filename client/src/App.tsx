@@ -1,6 +1,5 @@
 import { Component } from "react";
 import { Routes, Route } from "react-router-dom";
-import {useSelector} from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 

@@ -14,8 +14,8 @@ import { Link} from 'react-router-dom';
 
 import { DefaultPic } from '../../common/constants';
 
-import {useSelector, useDispatch} from "react-redux";
-import {addUser, userLog} from "../../services/reduce";
+import {useSelector} from "react-redux";
+import {userLog} from "../../services/reduce";
 
 const pagesLogged = [
 	{ label: 'Profile', link: '/profile' },
@@ -32,7 +32,7 @@ const NavBar: React.FC = () => {
   const [isLogged, setIsLogged] = React.useState(false);
   const [profilePic, setProfilePic] = React.useState('');
   let users = useSelector(userLog);
-  
+
 
   const fetchData = async () => {
     try {
@@ -65,7 +65,7 @@ const NavBar: React.FC = () => {
   //     console.error('Error during logout:', error);
   //   }
   // };
-  
+
   const logout = () => {
     //
 	};

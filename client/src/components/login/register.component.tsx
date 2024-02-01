@@ -1,10 +1,8 @@
 import { Component } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-// import axios from "axios";
-// import { LocalSignupLink } from "../../common/constants";
 import * as Yup from "yup";
 import AuthService from "../../services/auth.service";
-import { Link, Button, Card, CardContent, Box} from '@mui/material';
+import {Button, Card, CardContent} from '@mui/material';
 import './css/login.component.css'
 
 type Props = {};

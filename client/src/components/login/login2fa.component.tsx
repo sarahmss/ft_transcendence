@@ -21,7 +21,6 @@ import LockOpenOutline from 'mdi-material-ui/LockOpenOutline'
 import { Navigate, useSearchParams } from "react-router-dom";
 import { reducer } from "../../common/helper";
 import twoFaService from "../../services/twoFa.service";
-import { Verified } from "@mui/icons-material";
 
 import {useSelector, useDispatch} from "react-redux";
 import {addUser, userLog} from "../../services/reduce";

@@ -17,7 +17,6 @@ import InformationOutline from 'mdi-material-ui/InformationOutline'
 import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 
 // ** Demo Tabs Imports
-import TabInfo from './account-settings/TabInfo'
 import TabAccount from './account-settings/TabAccount'
 import TabSecurity from './account-settings/TabSecurity'
 import TabStatus from './account-settings/TabStatus'
@@ -133,9 +132,6 @@ const AccountSettings = () => {
         <TabPanel sx={{ p: 0 }} value='security'>
 			<TabSecurity currentUser={currentUser} />
 		</TabPanel>
-        <TabPanel sx={{ p: 0 }} value='info'>
-          <TabInfo currentUser={currentUser}/>
-        </TabPanel>
         <TabPanel sx={{ p: 0 }} value='status'>
             <TabStatus currentUser={currentUser}/>
         </TabPanel>
