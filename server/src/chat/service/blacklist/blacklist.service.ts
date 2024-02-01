@@ -72,9 +72,9 @@ export class BlacklistService {
 			.createQueryBuilder('block')
 			.where('block.status = true')
 			.andWhere('block.block_end > :timeNow', {timeNow: new Date()})
-			.andWhere('block.blocktype = :type', {type: LOCAL_BLOCK})
+			.andWhere('block.block_type = :type', {type: LOCAL_BLOCK})
 			.andWhere('block.room_id = :rid', {rid: room.roomId})
-			.orWhere('block.blocktype = :type', {type: GLOBAL_BLOCK})
+			.orWhere('block.block_type = :type', {type: GLOBAL_BLOCK})
 			.andWhere('block.blocker = :id', {id: blocker.userId})
 			.orWhere('block.blocked_user = :id', {id: blocker.userId})
 			.getMany();

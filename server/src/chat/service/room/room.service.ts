@@ -40,10 +40,8 @@ export class RoomService {
 			room: room,
 			isPrivate: isPrivate,
 			password: password,
+			protected: !!password
 		});
-
-		if (groupRoom.password)
-			groupRoom.protected = true;
 
 		await this.groupRepository.insert(groupRoom);
 	}
@@ -53,6 +51,7 @@ export class RoomService {
 		let directRoom = this.directRepository.create({
 			roomId: room.roomId,
 			room: room});
+
 		await this.directRepository.insert(directRoom);
 	}
 
@@ -62,9 +61,10 @@ export class RoomService {
 
 		if (room.roomType == DIRECT) {
 			// Filter the owner and get the other end user
-			let participant = await this.userService.findById(roomCreationData.user.filter(
-																user => user.userId != roomCreationData.owner.userId)[0].userId);
-			room.roomName = participant.userName;
+			// let participant = await this.userService.findById(roomCreationData.user.filter(
+			// 													user => user.userId != roomCreationData.owner.userId)[0].userId);
+			// room.roomName = participant.userName;
+			room.roomName = null;
 		}
 		
 		await this.roomRepository.insert(room);

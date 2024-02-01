@@ -68,7 +68,7 @@ export class MessageController {
 																									.getBlockedUser(user, room);
 
 			const participantList: Membership[] = await this.membershipService
-																												.findParticipants(message.roomId);
+																												.findParticipants(message.roomId, user.userId);
 
 			if (blackList.length > 0){
 

@@ -16,7 +16,7 @@ export class Room {
 	@PrimaryGeneratedColumn('uuid')
 	roomId: string;
 
-	@Column({ default: 'Default name'} )
+	@Column({nullable: true})
 	roomName: string;
 
 	@Column()

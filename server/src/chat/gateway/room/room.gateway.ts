@@ -132,10 +132,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				conn.emit(emission_event, room);
 		});
 	}
-	
+
 	// Will listen the event emitted by the emitter in the controller
 	@OnEvent('message.create')
-	async handleMessageCreation(message: Message,
+	async handleMessageEmission(message: Message,
 		author: string,
 		blackList: any,
 		participantList: any[],

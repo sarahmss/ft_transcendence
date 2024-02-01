@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Message } from 'src/entity/message.entity';
-import { Repository, UpdateDateColumn } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from 'src/entity/user.entity';
 import { Room } from 'src/entity/room.entity';
 import { isEmpty } from 'class-validator';
@@ -17,6 +17,7 @@ export class MessageService {
 						user: User): Promise<Message> {
 
 		const sanitizedMessage = xssFilters.inHTMLData(message);
+
 		let messageInstance: Message = this.messageRepository.create({
 				message: sanitizedMessage,
 				room: room,
@@ -25,7 +26,7 @@ export class MessageService {
 				userId: user.userId,
 			});
 
-		let inserted = await this.messageRepository.insert(messageInstance);
+		await this.messageRepository.insert(messageInstance);
 
 		return messageInstance;
 	}

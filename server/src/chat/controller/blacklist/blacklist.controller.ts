@@ -44,6 +44,9 @@ export class BlacklistController {
     if (!(blocker && blocked && room))
       throw new BadRequestException("Incomplete information given.");
 
+    if (blocker === blocked)
+      throw new BadRequestException("The blocker and the blocked are the same");
+
     blockType = this.setType(blockType);
     const existingBlackList = await this.blackListService
                                           .checkExistence(blocker,
@@ -86,6 +89,9 @@ export class BlacklistController {
 
     if (!(blockedIds.length > 0 && blockerId && roomId ))
       throw new BadRequestException("Incomplete information given");
+
+    if (blockedIds.some((id) => (id === blockerId)))
+      throw new BadRequestException("The blockler cannot block itself");
    
     const blocker = <User> await this.userService.findById(blockerId);
     if (!blocker)

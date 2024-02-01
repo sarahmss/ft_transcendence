@@ -198,7 +198,7 @@ export class RoomController {
 				return this.validadeGroupRoom(roomCreationData);
 
 			default:
-				throw new BadRequestException("Invalid room type!");
+				return new BadRequestException("Invalid room type!");
 		}
 	}
 

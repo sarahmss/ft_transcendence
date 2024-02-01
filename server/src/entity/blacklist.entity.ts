@@ -41,7 +41,7 @@ export class BlackList {
 	@Column({ default: true })
 	status: boolean;
 
-	@Column({default: LOCAL_BLOCK})
+	@Column({default: LOCAL_BLOCK, name: 'block_type'})
 	blockType: number;
 
 	@CreateDateColumn({ type: 'timestamptz' })

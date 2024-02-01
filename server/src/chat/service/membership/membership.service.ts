@@ -4,7 +4,7 @@ import { DIRECT } from 'src/constants/roomType.constant';
 import { Membership } from 'src/entity/membership.entity';
 import { Room } from 'src/entity/room.entity';
 import { User } from 'src/entity/user.entity';
-import { Repository } from 'typeorm';
+import { Equal, Not, Repository } from 'typeorm';
 
 @Injectable()
 export class MembershipService {
@@ -45,11 +45,15 @@ export class MembershipService {
 	}
 
 	async giveAdmin(user: User, room: Room) {
-		await this.membershipRepository.update({userId: user.userId, roomId: room.roomId}, { admin: true });
+		await this.membershipRepository.update(
+			{userId: user.userId, roomId: room.roomId},
+			{ admin: true });
 	}
 
 	async removeAdmin(user: User, room: Room) {
-		await this.membershipRepository.update({userId: user.userId, roomId: room.roomId}, { admin: false });
+		await this.membershipRepository.update(
+			{userId: user.userId, roomId: room.roomId},
+			{ admin: false });
 	}
 
 	async leaveRoom(userId: string, roomId: string) {
@@ -65,9 +69,10 @@ export class MembershipService {
 													roomId: roomId}});
 	}
 
-
-	async findParticipants(roomId: string) {
-		return this.membershipRepository.find({where: {roomId: roomId }});
+	async findParticipants(roomId: string, userId: string) {
+		return this.membershipRepository.find({where:
+			{ roomId: roomId, userId: Not(Equal(userId)) }
+		});
 	}
 
 
