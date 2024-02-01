@@ -36,11 +36,15 @@ const NavBar: React.FC = () => {
 
   const fetchData = async () => {
     try {
-        const user = await authService.getCurrentUser();
+      //const authTokenQr = authService.getAuthToken();
+      const user = await authService.getCurrentUser();
         console.log(user);
         if (user) {
           setIsLogged(true);
-          setProfilePic(user.profilePicture);
+          const photoProfile = await authService.getProfilePicture(user.profilePicture);
+          const teste = photoProfile instanceof HTMLImageElement ? photoProfile.src : '';
+          setProfilePic(teste);
+          console.log("http://localhost:5000" + user.profilePicture);
         } else {
           setIsLogged(false);
           setProfilePic(DefaultPic);

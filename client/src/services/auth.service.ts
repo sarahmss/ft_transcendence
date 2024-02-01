@@ -125,6 +125,23 @@ class AuthService {
 		const tokenData: tokenData = jwtDecode(cookie);
 		return tokenData.id;
 	}
+
+	async getProfilePicture(localQr: string) {
+		const authTokenQr = this.getAuthToken();
+		localQr = "http://localhost:5000" + localQr;
+		const response = await axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' });
+		if (response.data) {
+			const imageBase64 = btoa(
+				new Uint8Array(response.data)
+				.reduce((data, byte) => data + String.fromCharCode(byte), '')
+			)
+			const imgElement = document.createElement('img');
+			imgElement.src = `data:image/png;base64,${imageBase64}`;
+			console.log(imgElement);
+			return imgElement;
+		}
+		return "";
+	}
 }
 const authService = new AuthService();
 
