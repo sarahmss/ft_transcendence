@@ -1,15 +1,22 @@
 import axios, { RawAxiosRequestHeaders }	from "axios";
+// import {useSelector, useDispatch} from "react-redux";
+// import {addUser, userLog} from './reduceStore';
+
 import { BackLink, LocalSigninLink,
 		LocalSignupLink,
 		UserContentLink,
 		tokenData } from "../common/constants";
 
-import "core-js/stable/atob";
-import { jwtDecode } from "jwt-decode";
+		
+		import "core-js/stable/atob";
+		import { jwtDecode } from "jwt-decode";
+		
 class AuthService {
-
+			
 	async LocalLogin(userName: string, password: string) {
 		try {
+			console.log(LocalSigninLink, userName, password);
+
 			const response = await axios.post(LocalSigninLink, {
 				userName,
 				password,
@@ -60,6 +67,7 @@ class AuthService {
 
 	async RequestCurrentUser() {
 		try {
+			console.log("Entrou aqui");
 			const userId = this.getIdFromToken();
 			const authToken = this.getAuthToken();
 			const response = await axios.get(UserContentLink + userId, { headers: authToken });

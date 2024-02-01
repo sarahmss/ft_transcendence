@@ -21,6 +21,12 @@ import LockOpenOutline from 'mdi-material-ui/LockOpenOutline'
 import { Navigate, useSearchParams } from "react-router-dom";
 import { reducer } from "../../common/helper";
 import twoFaService from "../../services/twoFa.service";
+import { Verified } from "@mui/icons-material";
+
+import {useSelector, useDispatch} from "react-redux";
+import {addUser, userLog} from "../../services/reduce";
+
+
 
 interface State {
 	code: string;
@@ -33,10 +39,18 @@ const Loging2FaButton = ({userId, code, setState,
 	code: string;
 	setState: React.Dispatch<React.SetStateAction<State>>;
 }) => {
+	const users = useSelector(userLog);
+	const dispatch = useDispatch();
 
 	const handleAuthentication = async () => {
 	const check = await twoFaService.login2Fa(code, userId);
 	setState({code:"", verified: check});
+	if (check)
+	{
+		console.log("First: ",users);
+		dispatch(addUser("ai"));
+		console.log("Second: ",users);
+	}
 	};
 
 	return (
@@ -78,6 +92,17 @@ const TwoFactorAuthContent: React.FC<TwoFactorAuthContentProps> = ({
 		}
 	};
 
+	const [state, setStates] = useReducer(reducer, {
+		code: "",
+		verified: false,
+	});
+
+	const [searchParams, setSearchParams] = useSearchParams();
+
+	const userId = searchParams.get('user');
+
+	console.log(userId);
+
 	return (
 		<>
 			<CardContent style={{ paddingLeft: 35, paddingTop: 25 }}>
@@ -88,7 +113,8 @@ const TwoFactorAuthContent: React.FC<TwoFactorAuthContentProps> = ({
 						fontWeight: 500,
 					}}
 				>
-					Enter two-factor authentication code below
+						Enter two-factor authentication code below
+
 
 					<Grid item xs={12} sx={{ marginTop: 6 }}>
 						<FormControl fullWidth>
