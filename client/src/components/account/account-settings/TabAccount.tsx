@@ -177,6 +177,7 @@ interface TabAccountProps {
 }
 
 const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
+	
 
 	const [state, setState] = useReducer(reducer, {
 		imgSrc: (currentUser?.profilePicture || DefaultPic),
@@ -184,6 +185,11 @@ const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
 		name: (currentUser?.userName || "name"),
 		email: (currentUser?.email || "email"),
 	});
+
+	React.useEffect(() => {
+		
+	});
+	
 
 	return (
 		<CardContent>

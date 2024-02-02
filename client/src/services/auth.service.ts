@@ -2,6 +2,7 @@ import axios, { RawAxiosRequestHeaders }	from "axios";
 // import {useSelector, useDispatch} from "react-redux";
 // import {addUser, userLog} from './reduceStore';
 
+
 import { BackLink, LocalSigninLink,
 		LocalSignupLink,
 		UserContentLink,
@@ -128,7 +129,8 @@ class AuthService {
 
 	async getProfilePicture(localQr: string) {
 		const authTokenQr = this.getAuthToken();
-		localQr = "http://localhost:5000" + localQr;
+		localQr = BackLink + localQr;
+		console.log(localQr);
 		const response = await axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' });
 		if (response.data) {
 			const imageBase64 = btoa(

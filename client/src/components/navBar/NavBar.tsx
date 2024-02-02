@@ -12,7 +12,8 @@ import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import authService from '../../services/auth.service';
 import { Link} from 'react-router-dom';
 
-import { DefaultPic } from '../../common/constants';
+
+import { DefaultPic, pictureStarter } from '../../common/constants';
 
 import {useSelector, useDispatch} from "react-redux";
 import {addUser, userLog} from "../../services/reduce";
@@ -41,10 +42,12 @@ const NavBar: React.FC = () => {
         console.log(user);
         if (user) {
           setIsLogged(true);
-          const photoProfile = await authService.getProfilePicture(user.profilePicture);
-          const teste = photoProfile instanceof HTMLImageElement ? photoProfile.src : '';
-          setProfilePic(teste);
-          console.log("http://localhost:5000" + user.profilePicture);
+          if (user.profilePicture != pictureStarter)
+          {
+            const photoProfile = await authService.getProfilePicture(user.profilePicture);
+            const teste = photoProfile instanceof HTMLImageElement ? photoProfile.src : '';
+            setProfilePic(teste);
+          }
         } else {
           setIsLogged(false);
           setProfilePic(DefaultPic);
