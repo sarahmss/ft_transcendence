@@ -1,6 +1,12 @@
 import Phaser from 'phaser';
 import React, { Component } from 'react';
 import { gameLoaded, GameContext, leaveRoom, sendKey, State } from '../../contexts/GameContext';
+import {
+	Button,
+	Stack,
+	Box,
+	Typography
+} from '@mui/material';
 
 interface PongGameState {
 	eventListenerAdded: boolean;
@@ -196,49 +202,61 @@ class PongGame extends React.Component<{}, PongGameState> {
         const current_room = context.current_room;
 		const { message } = match;
         return (
-            <>
-                <div id="pong-game-container"></div>
+            <Box display="flex" sx={{ flexDirection:"column", alignItems:"center", margin:'auto', width:'fit-content'}}>
+                <Box id="pong-game-container"></Box>
                 { (message && current_player.state === 'in_game') &&
-                    <div className='game-message'>
+                    <Box className='game-message'>
                         <h4>{message}</h4>
-                    </div>
+                    </Box>
                 }
 				{(current_player.state && current_player.state === 'watching') &&
 						<>
-							<div>
-								<button onClick={leaveRoom}> Leave Room </button>
-							</div>
+							<Box>
+								<Button
+									onClick={leaveRoom}
+									sx={{ backgroundColor:"#B700cc", color: "#fff" }}
+								>
+									Leave Room
+								</Button>
+								{/* <button onClick={leaveRoom}> Leave Room </button> */}
+							</Box>
 							{/* simplificar essa condicao com a de baixo (||) */}
 							{/* as demais informações da tela podem ser deixadas aqui */}
 							{/* em vez de em Pong.tsx */}
 
 							{/* algo como: */}
-							<div>
-								<p>{current_room.player1Name} vs {current_room.player2Name}</p>
-							</div>
+							<Box>
+								<Typography variant="body1" color="#B700cc" fontWeight="bold" >{current_room.player1Name} vs {current_room.player2Name}</Typography>
+							</Box>
 						</>
 					}
 				{ (current_player.state && current_player.state === 'in_game') &&
 					<>
-						<div>
-							<button onClick={leaveRoom}> Leave Room </button>
-						</div>
-						{/* simplificar essa condicao com a de baixo (||) */}
-						{/* as demais informações da tela podem ser deixadas aqui */}
-						{/* em vez de em Pong.tsx */}
+						<Box>
+								<Button
+									onClick={leaveRoom}
+									sx={{ backgroundColor:"#B700cc", color: "#fff" }}
+								>
+									Leave Room
+								</Button>
+								{/* <button onClick={leaveRoom}> Leave Room </button> */}
+							</Box>
+							{/* simplificar essa condicao com a de baixo (||) */}
+							{/* as demais informações da tela podem ser deixadas aqui */}
+							{/* em vez de em Pong.tsx */}
 
-						{/* algo como: */}
-						<div>
-							<p>{current_room.player1Name} vs {current_room.player2Name}</p>
-						</div>
+							{/* algo como: */}
+							<Box>
+								<Typography variant="body1" color="#B700cc" fontWeight="bold" >{current_room.player1Name} vs {current_room.player2Name}</Typography>
+							</Box>
 					</>
 				}
 				{ ( current_player.state === 'watching' && match.status !== 'START' && match.status !== 'PLAY' ) &&
-					<div className='game-message'>
-						<h4>Open room - Waiting for a match... </h4>
-					</div>
+					<Box className='game-message'>
+						<Typography variant="h4">Open room - Waiting for a match... </Typography>
+					</Box>
 				}
-            </>
+            </Box>
         ); 
     }
 };

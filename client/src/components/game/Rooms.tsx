@@ -12,7 +12,7 @@ const Rooms: React.FC = () => {
   const { current_player, rooms } = useContext(GameContext) as State;
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={2} sx={{ margin: 'auto' }}>
       <Box component="span" sx={{width: 100, height: 100}}>
         Open Rooms
       </Box>

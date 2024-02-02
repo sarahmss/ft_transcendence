@@ -3,6 +3,7 @@ import { Server, Socket } from 'socket.io';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
+import { UsersService } from '../users/users.service';
 
 class GameModel {
 	players: Record<string, PlayerModel>;
@@ -88,7 +89,8 @@ export class GameService {
 	constructor(
 		@InjectRepository(User)
 		private readonly usersRepository: Repository<User>,
-	) {}
+		private readonly usersService: UsersService
+		) {}
 
     public logger: Logger = new Logger('AppGateway');
     public gameConfig = {
@@ -351,11 +353,26 @@ export class GameService {
 							client.data.user.level += 1;
 							client.data.user.gamesWonToLevelUp = 0;
 						}
+						//mudar isso para uma função própria e só chamar com o client que venceu a partida...
+						// fazer esse resgate do user do banco antes de alterar
+						// variaveis dele, e só fazer essas alterações se findById tiver
+						// conseguido encontrar o user no banco...
+						// acho que só precisaria gravar o userId no objeto do array players
+						// porque daí é só "trocar" isso na reconexão e fazer essa chamada
+						// na hora de gravar como já tá fazendo
 						console.log('Games Won desse client de nome ', JSON.stringify(client.data.user.totalGamesWon));
-						//const userRepository = getRepository(User);
-						//await userRepository.save(client.data.user); //será que ele travou ao voltar por conta desse await?
-						await this.usersRepository.save(client.data.user);
-						console.log('CONSEGUIMOS SALVAR O USUARIO NO BANCO DEPOIS DA PARTIDA');
+						const user = await this.usersService.findById(client.data.user.userId);
+						if (user) {
+							user.gamesWonToLevelUp = client.data.user.gamesWonToLevelUp;
+							user.totalGamesWon = client.data.user.totalGamesWon;
+							user.level = client.data.user.level;
+							//const userRepository = getRepository(User);
+							//await userRepository.save(client.data.user); //será que ele travou ao voltar por conta desse await?
+							await this.usersRepository.save(client.data.user);
+							console.log('CONSEGUIMOS SALVAR O USUARIO NO BANCO DEPOIS DA PARTIDA');
+						}
+						else
+							console.log('NÃO ENCONTRAMOS ESSE USER NO BANCO');
 					}
 				}
             }
@@ -373,7 +390,14 @@ export class GameService {
 					// partida antes de fazer o delete
 					// isso inclui: nomes dos jogadores (player1Name e player2Name armazenado em this.game.rooms[roomId])
 					// score1, score2, timeStartMatch armazenado em match (timeStartMatch pra ser usado pra calcular o tempo que a partida levou)
-					
+					// vai ter que criar um match,
+					// resgatar o user do banco e alterar/adicionar
+					// esse match à ele (dependendendo se for o usuario perdedor ou vencedor (acho que))
+					// e pelo jeito vai ter que criar e gravar esse match nos respectivos users do banco
+					// ANTES DAQUI, porque nesse contexto aqui já estaríamos na perspectiva
+					// do jogador que resta na sala pra sair, entao o outro nao passa por aqui, e pode
+					// ser tanto o perdedor quanto o vencedor...
+
 					delete this.game.match[roomId];
                 }
 				delete this.game.rooms[roomId];
