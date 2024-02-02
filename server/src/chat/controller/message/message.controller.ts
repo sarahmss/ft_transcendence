@@ -93,7 +93,9 @@ export class MessageController {
 													messageInstance,
 													user.userName,
 													blackList,
-													participantList);
+													participantList,
+													banList
+			);
 		}
 		catch (error) {
 			throw error;

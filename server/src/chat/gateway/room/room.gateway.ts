@@ -115,9 +115,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@OnEvent('room.leave')
 	emitRoomToSingleMember(userId: string, room: Room, emission_event: string) {
 
-		this.connectedUserService
-			.getConnection(userId)
-			.emit(emission_event, room);
+		const conn = this.connectedUserService
+			.getConnection(userId);
+		if (conn)
+			conn.emit(emission_event, room);
 	}
 
 	// Create => event name: joined
@@ -137,7 +138,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@OnEvent('message.create')
 	async handleMessageEmission(message: Message,
 		author: string,
-		blackList: any,
+		blackList: any[],
 		participantList: any[],
 		banList: any[]
 	) {
