@@ -27,6 +27,7 @@ import { RoomService } from 'src/chat/service/room/room.service';
 import { Message } from 'src/entity/message.entity';
 import { BlackList } from 'src/entity/blacklist.entity';
 import { Ban } from 'src/entity/ban.entity';
+import { Blob } from 'buffer';
 
 // Handling blacklist will happen
 // in two fashions:
@@ -149,11 +150,12 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// If there is someone blocked => filter and get the allowed users
 			receivingClients = participantList.filter(
 				(participant: Membership) =>
-					!blackList.some((blocked: BlackList) =>
-						(participant.userId === blocked.blockedId)) ||
+					(!blackList.some((blocked: BlackList) =>
+						(participant.userId === blocked.blockedId ||
+						participant.userId === blocked.blockerId)) &&
 					!banList.some((banEntry: Ban) =>
-						(banEntry.banId === participant.userId)
-					));
+						(banEntry.banId === participant.userId))
+				));
 		}
 		else {
 			// If there is no one blocked
