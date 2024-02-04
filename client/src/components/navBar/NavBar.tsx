@@ -37,7 +37,6 @@ const NavBar: React.FC = () => {
 
   const fetchData = async () => {
     try {
-      //const authTokenQr = authService.getAuthToken();
       const user = await authService.getCurrentUser();
         console.log(user);
         if (user) {

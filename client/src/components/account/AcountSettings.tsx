@@ -54,6 +54,7 @@ const AccountSettings = () => {
     const fetchData = async () => {
       try {
         const user = await authService.getCurrentUser();
+        console.log("user AcountSettings: ", user);
 
         if (user) {
           setCurrentUser(user);
@@ -128,16 +129,16 @@ const AccountSettings = () => {
         </TabList>
 
         <TabPanel sx={{ p: 0 }} value='account'>
-          <TabAccount currentUser={currentUser}/>
+          {currentUser && <TabAccount currentUser={currentUser}/>}
         </TabPanel>
         <TabPanel sx={{ p: 0 }} value='security'>
-			<TabSecurity currentUser={currentUser} />
+			{currentUser && <TabSecurity currentUser={currentUser} />}
 		</TabPanel>
         <TabPanel sx={{ p: 0 }} value='info'>
-          <TabInfo currentUser={currentUser}/>
+          { currentUser && <TabInfo currentUser={currentUser}/>}
         </TabPanel>
         <TabPanel sx={{ p: 0 }} value='status'>
-            <TabStatus currentUser={currentUser}/>
+            {currentUser && <TabStatus currentUser={currentUser}/>}
         </TabPanel>
       </TabContext>
     </Card>

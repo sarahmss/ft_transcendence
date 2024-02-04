@@ -185,11 +185,10 @@ const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
 		name: (currentUser?.userName || "name"),
 		email: (currentUser?.email || "email"),
 	});
-
-	React.useEffect(() => {
-		
-	});
 	
+	React.useEffect(() => {
+		console.log("tabAcount", currentUser);
+	  }, []);
 
 	return (
 		<CardContent>
