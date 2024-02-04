@@ -3,7 +3,8 @@ import { BackLink, UserContentLink } from '../common/constants';
 import AuthService from './auth.service';
 
 class UserService {
-
+	
+	
 	async uploadProfilePic(imgName: string, img: FormData): Promise<string | undefined> {
 		const userId = AuthService.getIdFromToken();
 

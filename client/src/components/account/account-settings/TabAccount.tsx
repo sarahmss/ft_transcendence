@@ -13,12 +13,16 @@ import Button, { ButtonProps } from '@mui/material/Button'
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined'
 import AddAPhotoOutlinedIcon from '@mui/icons-material/AddAPhotoOutlined'
 import InputAdornment from '@mui/material/InputAdornment'
+import authService from '../../../services/auth.service'
 
 import IUser from '../../../types/user.type'
 import userService from '../../../services/user.service'
 
+import {useSelector, useDispatch} from "react-redux";
+import {addUser, userLog} from "../../../services/reduce";
+
 // ** Icons Imports
-import { DefaultPic } from '../../../common/constants'
+import { DefaultPic, pictureStarter } from '../../../common/constants'
 import { reducer } from '../../../common/helper'
 
 const ImgStyled = styled('img')(({ theme }) => ({
@@ -178,17 +182,45 @@ interface TabAccountProps {
 
 const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
 	
-
+	let users = useSelector(userLog);
+	const dispatch = useDispatch();
 	const [state, setState] = useReducer(reducer, {
 		imgSrc: (currentUser?.profilePicture || DefaultPic),
-		imgUrl: (currentUser?.profilePicture || undefined),
 		name: (currentUser?.userName || "name"),
 		email: (currentUser?.email || "email"),
 	});
+
+	const [profilePic, setProfilePic] = React.useState('');
+	const [isLogged, setIsLogged] = React.useState(false);
 	
-	React.useEffect(() => {
-		console.log("tabAcount", currentUser);
-	  }, []);
+	const fetchData = async () => {
+		try {
+		  const user = await authService.getCurrentUser();
+			console.log(user);
+			if (user) {
+			  setIsLogged(true);
+			  if (user.profilePicture != pictureStarter)
+			  {
+				const photoProfile = await authService.getProfilePicture(user.profilePicture);
+				const teste = photoProfile instanceof HTMLImageElement ? photoProfile.src : '';
+				setProfilePic(teste);
+			  }
+			} else {
+			  setIsLogged(false);
+			  setProfilePic(DefaultPic);
+			}
+		  } catch (error) {
+			console.error("Error fetching user data:", error);
+		  }
+	  };
+	
+	  React.useEffect(() => {
+		fetchData();
+	  }, [users]);
+	  
+	const saveChangesAction = () => {
+		dispatch(addUser("logOut"));
+	}
 
 	return (
 		<CardContent>
@@ -196,7 +228,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
 				<Grid container spacing={7}>
 					<Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
 						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<ImgStyled src={state.imgSrc} alt='Profile Pic' />
+							<ImgStyled src={profilePic} alt='Profile Pic' />
 							<ProfilePicComponent
 								setImgSrc={setState}
 								setUrl={setState} />
@@ -213,7 +245,8 @@ const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
 					<Grid item xs={12}>
 						<Button
 						variant='contained'
-						onClick={() => userService.updateProfile(state.name, state.imgUrl, state.email)}
+						onClick={() => {userService.updateProfile(state.name, state.imgUrl, state.email);
+						saveChangesAction()}}
 						sx={{ marginRight: 3.5, backgroundColor: '#B700cc' }}>
 							Save Changes
 						</Button>
