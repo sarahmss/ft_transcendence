@@ -38,9 +38,9 @@ export class BanService {
 
   async findBan(room: Room, bannedUser: User) {
     return this.banRepository.findOne(
-      {where: {room: room,
+      {where: {roomId: room.roomId,
         ban_end: MoreThan(new Date()),
-        banned: bannedUser}}
+        bannedId: bannedUser.userId}}
     );
   }
 
@@ -48,14 +48,18 @@ export class BanService {
     return this.banRepository.findOne(
       {where: {
         roomId: roomId,
-        bannedId: bannedId
+        bannedId: bannedId,
+        ban_end: MoreThan(new Date()),
       }}
     );
   }
 
   async findBanRoomUser(room: Room) {
     return this.banRepository.find({
-      where: { room: room }
+      where: {
+        roomId: room.roomId,
+        ban_end: MoreThan(new Date()),
+      }
     });
     
   }

@@ -1,5 +1,5 @@
 
-import { Repository } from 'typeorm';
+import { MoreThan, Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
@@ -66,18 +66,15 @@ export class BlacklistService {
 	}
 
 	// Get the list of the blocked user by the user
-	async getBlockedUser(blocker: User, room: Room) {
+	async getBlockedUser(user: User, room: Room) {
 
 		const query = this.blackListRepository
 			.createQueryBuilder('block')
-			.where('block.status = true')
-			.andWhere('block.block_end > :timeNow', {timeNow: new Date()})
-			.andWhere('block.blocker = :id', {id: blocker.userId})
-			.orWhere('block.blocked_user = :id', {id: blocker.userId})
-			.andWhere('block.block_type = :type', {type: LOCAL_BLOCK})
-			.andWhere('block.room_id = :rid', {rid: room.roomId})
-			.orWhere('block.block_type = :type', {type: GLOBAL_BLOCK});
-
+			.where('block.status = true AND block.block_end > :timeNow', {timeNow: new Date()})
+			.andWhere('(block.blocker = :id OR block.blocked_user = :id)', {id: user.userId})
+			.andWhere('((block.block_type = :type AND block.room_id = :rid) OR block.block_type = :gtype)',
+				{type: LOCAL_BLOCK, rid: room.roomId, gtype: GLOBAL_BLOCK})
+		;
 		return query.getMany();
 	}
 	

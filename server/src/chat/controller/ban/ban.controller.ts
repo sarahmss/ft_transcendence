@@ -5,7 +5,9 @@ import {
   ConflictException,
   Controller,
   Delete,
+  Get,
   NotFoundException,
+  Param,
   Post,
   UnauthorizedException } from '@nestjs/common';
 
@@ -13,6 +15,7 @@ import { BanService } from 'src/chat/service/ban/ban.service';
 import { MembershipService } from 'src/chat/service/membership/membership.service';
 import { RoomService } from 'src/chat/service/room/room.service';
 import { Membership } from 'src/entity/membership.entity';
+import { Room } from 'src/entity/room.entity';
 import { UsersService } from 'src/users/users.service';
 
 @Controller('ban')
@@ -24,6 +27,13 @@ export class BanController {
     private readonly roomService: RoomService,
     private readonly membershipService: MembershipService,
   ) {}
+
+  @Get(':id')
+  async getValid(@Param('id') roomId: string) {
+    
+    const room: Room = <Room> {roomId: roomId};
+    return await this.banService.findBanRoomUser(room);
+  }
 
   @Post()
   async createBan(

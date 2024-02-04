@@ -47,16 +47,10 @@ export class HideMessageService {
     })
   }
 
-  // Get the entry by roomId
-  async getHideEntryByRoom (roomId: string) {
-    return this.hideMessageRepository.find(
-      { where: { room: { roomId: roomId } } });
-  }
-
   async getHideEntriesByRoomAndUser(room: Room, user: User) {
     return this.hideMessageRepository.find({where:
-      {room: room,
-      target: user}
+      {roomId: room.roomId,
+      targetId: user.userId}
     });
     
   }

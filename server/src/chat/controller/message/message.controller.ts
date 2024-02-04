@@ -41,9 +41,65 @@ export class MessageController {
 		private readonly banService: BanService,
 		private readonly emitter: EventEmitter2) {}
 
+	// Test endpoint
 	@Get('all')
 	async getAll() {
-		return await this.messageService.getAllMessage();
+		const messageSelection = await this.messageService.getAllMessage();
+		const sendMessages = messageSelection.map((msg: Message) => {
+			return {
+				message: msg.message,
+				messageId: msg.messageId,
+				messageTimestamp: msg.timestamp,
+				authorId: msg.user.userId,
+				author: msg.user.userName,
+			}
+		});
+		return sendMessages;
+	}
+
+	// Test endpoint
+	@Post('filter')
+	async getFilter(
+		@Body('roomId') roomId: string,
+		@Body('userId') userId: string,
+	) {
+		const room = await this.roomService.findRoom(roomId);
+		const user = await this.userService.findById(userId);
+		let messageSelection: Message[];
+
+		const messages = await this.messageService.findRoomMessage(room, 1000);
+		const hideMessages = await this.hideMessageService.getHideEntriesByRoomAndUser(room,
+																																										user);
+
+		switch (hideMessages.length > 0) {
+			case true:
+				const filteredMessages = messages.filter(
+					(message: Message) =>
+						!hideMessages.some((hide: HideMessage) =>
+							(message.messageId === hide.messageId))
+				);
+
+				messageSelection = filteredMessages;
+				break;
+
+			default:
+				messageSelection = messages;
+		}
+
+		const sendMessages = messageSelection.map((msg: Message) => {
+			return {
+				message: msg.message,
+				messageId: msg.messageId,
+				messageTimestamp: msg.timestamp,
+				authorId: msg.user.userId,
+				author: msg.user.userName,
+			}
+		});
+
+		console.log("number of messages VVV");
+		console.log(sendMessages.length);
+
+		return sendMessages;
 	}
 
 	@Post()
@@ -71,7 +127,6 @@ export class MessageController {
 																												.findParticipants(message.roomId, user.userId);
 
 			if (blackList.length > 0){
-
 				const hideMessageClients =
 					participantList.filter(
 						(participant) =>
@@ -89,6 +144,7 @@ export class MessageController {
 																room,
 																hideMessageClients);
 			}
+
 			this.emitter.emit('message.create',
 													messageInstance,
 													user.userName,
@@ -96,13 +152,14 @@ export class MessageController {
 													participantList,
 													banList
 			);
+
 		}
 		catch (error) {
 			throw error;
 		}
 	}
 
-	@Get()
+	@Post('get')
 	async getMessage(@Body() roomAndUser: GetMessage) {
 		const user = await this.userService.findById(roomAndUser.userId);
 		const room = await this.roomService.findRoom(roomAndUser.roomId);
@@ -116,23 +173,37 @@ export class MessageController {
 			roomAndUser.quant
 		);
 
-		// const messages = await this.messageService.findRoomMessage(
-		// 																						room,
-		// 																					  roomAndUser.quant);
+		let messageSelection: Message[];
 
-		const hideMessages = await this.hideMessageService.getHideEntriesByRoomAndUser(room, user);
+		const hideMessages = await this.hideMessageService.getHideEntriesByRoomAndUser(room,
+																																										user);
 
-		if (hideMessages.length > 0) {
-			const filteredMessages = messages.filter(
-				(message: Message) =>
-					!hideMessages.some((hide: HideMessage) =>
-						(message.messageId === hide.messageId))
-			);
+		switch (hideMessages.length > 0) {
+			case true:
+				const filteredMessages = messages.filter(
+					(message: Message) =>
+						!hideMessages.some((hide: HideMessage) =>
+							(message.messageId === hide.messageId))
+				);
 
-			return filteredMessages;
+				messageSelection = filteredMessages;
+				break;
+
+			default:
+				messageSelection = messages;
 		}
 
-		return messages;
+		const sendMessages = messageSelection.map((msg: Message) => {
+			return {
+				message: msg.message,
+				messageId: msg.messageId,
+				messageTimestamp: msg.timestamp,
+				authorId: msg.user.userId,
+				author: msg.user.userName,
+			}
+		});
+
+		return sendMessages;
 	}
 
 	@Patch()

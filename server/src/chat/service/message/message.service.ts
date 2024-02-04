@@ -38,11 +38,15 @@ export class MessageService {
 	async findRoomMessage(room: Room,
 					 quant: number = 25): Promise<Message[]> {
 
-		return this.messageRepository.find({ where:
-													{ room: room },
-													order:
-														{ timestamp: 'DESC' },
-													take: quant});
+		const query = this.messageRepository
+			.createQueryBuilder('msg')
+			.innerJoinAndSelect('msg.user', 'user')
+			.where('msg.room_id = :rid', {rid: room.roomId})
+			.take(quant)
+			.orderBy('msg.timestamp', 'DESC');
+
+
+		return query.getMany();
 	}
 
 	async findMessageWithPage(
@@ -53,12 +57,15 @@ export class MessageService {
 		if (isEmpty(page) || page < 0)
 			page = 0;
 
-		return this.messageRepository.find({ where:
-										   		 {room: room},
-													order:
-														{ timestamp: 'DESC' },
-													take: quant,
-													skip: page * quant});
+		const query = this.messageRepository
+			.createQueryBuilder('msg')
+			.innerJoinAndSelect('msg.user', 'user')
+			.where('msg.room_id = :rid', {rid: room.roomId})
+			.take(quant)
+			.skip(quant * page)
+			.orderBy('msg.timestamp', 'DESC');
+
+		return query.getMany();
 	}
 
 	async updateMessage(messageId: string,
@@ -75,8 +82,14 @@ export class MessageService {
 	}
 
 	async getAllMessage() {
-		return this.messageRepository
-			.find();
+
+		const query = this.messageRepository
+			.createQueryBuilder('msg')
+			.innerJoinAndSelect('msg.user', 'user')
+			.orderBy('msg.timestamp', 'DESC');
+
+		return query.getMany();
+
 	}
 
 	async deleteAllRoomMessage(roomId: string) {
