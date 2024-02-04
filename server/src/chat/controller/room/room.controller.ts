@@ -19,6 +19,8 @@ import { RoomService } from 'src/chat/service/room/room.service';
 
 import { DIRECT, GROUP } from 'src/constants/roomType.constant';
 import * as bcrypt from 'bcrypt';
+import { User } from 'src/entity/user.entity';
+import { UsersService } from 'src/users/users.service';
 
 
 @Controller('room')
@@ -27,6 +29,7 @@ export class RoomController {
 	constructor (
 		private readonly roomService: RoomService,
 		private readonly membershipService: MembershipService,
+		private readonly userService: UsersService,
 		private readonly emitter: EventEmitter2)
 	{}
 
@@ -51,6 +54,9 @@ export class RoomController {
 
 	@Delete('deleteRoom')
 	async deleteRoom(@Body('roomId') roomId: string) {
+		if (!roomId)
+			throw new BadRequestException("Required information not given");
+		
 		let room = await this.roomService.findRoom(roomId);
 		if (!room)
 			throw new NotFoundException("Room not found");
@@ -59,11 +65,16 @@ export class RoomController {
 	}
 
 	@Delete('leave')
-	async leaveRoom(@Body('roomId') roomId: string,
+	async leaveRoom(
+		@Body('roomId') roomId: string,
 		@Body('userId') userId: string){
+
+		if (!roomId || !userId)
+			throw new BadRequestException("Required information not given");
 		let room = await this.roomService.findRoom(roomId);
 		if (!room)
 			throw new NotFoundException("Room not found");
+
 		await this.membershipService.leaveRoom(userId, roomId);
 		this.emitter.emit('room.leave', room, "left");
 		
@@ -91,16 +102,18 @@ export class RoomController {
 	}
 
 	@Post('join')
-	async joinRoom(@Body() userJoin: RoomJoinData) {
-		const room: Room = await this.roomService.findRoom(userJoin.room.roomId);
-		let exception = await this.checkRoomJoinCondition(userJoin, room);
+	async joinRoom(@Body('userJoin') userJoin: RoomJoinData) {
+		const room: Room = await this.roomService.findRoom(userJoin.roomId);
+		const user: User = await this.userService.findById(userJoin.userId);
+		let exception = await this.checkRoomJoinCondition(userJoin, room, user);
 
 		if (exception)
 			throw exception;
 
 		try {
-			this.membershipService.joinSingleUser(userJoin.user, userJoin.room);
-			this.emitter.emit('room.join', userJoin.user.userId, room, "joined");
+			this.membershipService.joinSingleUser(user, room, false);
+			this.emitter.emit('room.join', userJoin.userId, room, "joined");
+			return "User Joined"
 		}
 		catch (error) {
 			throw error;
@@ -113,49 +126,73 @@ export class RoomController {
 		@Body('password') password: string,
 		@Body('roomId') roomId: string) {
 
-		const room = await this.roomService.findRoom(roomId);
+		if (!requestorId || !password || !roomId )
+			throw new BadRequestException('Required information not given');
 
-		let member = await this.membershipService.findMemberRoom(requestorId, roomId);
-		if (!member || !(member.admin || member.owner))
-			throw new UnauthorizedException("Requestor doesn't have enough rights or doesn't belong to the room");
-
-		if (!room)
-			throw new NotFoundException("Room not found.");
-
-		if (room.roomType == DIRECT)
-			throw new BadRequestException("Can't set passwords on direct rooms");
+		const exception = await this.permissionCheck(requestorId, roomId);
+		if (exception)
+			throw exception;
 
 		await this.roomService.setPassRoom(password, roomId);
 		return "Password set";
 	}
 
-	@Patch('remove')
+	@Patch('unset_pass')
 	async unsetPassword(
 		@Body('userId') requestorId: string,
 		@Body('roomId') roomId: string) {
 
+		if (!requestorId || !roomId)
+			throw new BadRequestException('Required information not given');
+
+		const exception = await this.permissionCheck(requestorId, roomId);
+		if (exception)
+			throw exception
+
+		await this.roomService.unsetPassRoom(roomId);
+		return "password removed";
+	}
+
+	@Patch('toggle_private')
+	async togglePrivate(
+		@Body('userId') requestorId: string,
+		@Body('roomId') roomId: string
+	) {
+
+		if (!requestorId || !roomId)
+			throw new BadRequestException('Required information not given');
+
+		const exception = await this.permissionCheck(requestorId, roomId);
+		if (exception)
+			throw exception
+
+		const status = await this.roomService.togglePrivate(roomId);
+		return `group chat visibily toggle: ${status ? "private": "public"}`;
+		
+	}
+
+	private async permissionCheck (requestorId: string, roomId: string) {
 		let member = await this.membershipService.findMemberRoom(requestorId, roomId);
 		if (!member || !(member.admin || member.owner))
-			throw new UnauthorizedException("Requestor doesn't have enough rights or doesn't belong to the room");
+			return new UnauthorizedException("Requestor doesn't have enough rights or doesn't belong to the room");
 
 		const room = await this.roomService.findRoom(roomId);
 
 		if (!room)
-			throw new NotFoundException("Room not found.");
+			return new NotFoundException("Room not found.");
 
 		if (room.roomType == DIRECT)
-			throw new BadRequestException("Can't set passwords on direct rooms");
-
-		await this.roomService.unsetPassRoom(roomId);
+			return new BadRequestException("This operation it's not available in direct chat room");
 		
 	}
 
-	private async checkRoomJoinCondition(userJoin: RoomJoinData, room: Room) {
+	private async checkRoomJoinCondition(userJoin: RoomJoinData, room: Room, user : User) {
 
-		if (!room)
+		if (!room || !user)
 			return new NotFoundException();
 
-		if (!this.membershipService.findMemberRoom(userJoin.user.userId, userJoin.room.roomId))
+		const member = await this.membershipService.findMemberRoom(userJoin.userId, userJoin.roomId)		
+		if (member)
 			return new ConflictException('The user it\'s already in the room');
 
 		switch (room.roomType) {
@@ -163,9 +200,12 @@ export class RoomController {
 				return new UnauthorizedException('Joining a direct it\'s not allowed');
 
 			case GROUP:
-				const gRoom: GroupRoom = await this.roomService.findGroup(userJoin.room.roomId);
+				const gRoom: GroupRoom = await this.roomService.findGroup(userJoin.roomId);
 				if (gRoom.isPrivate ||
-						gRoom.protected && !bcrypt.compareSync(userJoin.password, gRoom.password))
+						(gRoom.protected &&
+							!userJoin.password &&
+							!bcrypt.compareSync(userJoin.password, gRoom.password)
+				))
 					return new UnauthorizedException('The room is private or the wrong password is given');
 				break;
 

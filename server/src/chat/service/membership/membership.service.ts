@@ -22,21 +22,18 @@ export class MembershipService {
 			if (user[k].userId == owner)
 				owner_status = true;
 
-
-			let member = this.membershipRepository.create({
-				roomId: room.roomId,
-				userId: user[k].userId,
-				room: room,
-				user: user[k],
-				owner: owner_status
-			});
-
-			await this.membershipRepository.insert(member);
+			await this.joinSingleUser(user[k], room, owner_status);
 		}
 	}
 
-	async joinSingleUser (user: User, room: Room) {
-		let member = this.membershipRepository.create({user: user, room: room});
+	async joinSingleUser (user: User, room: Room, owner_status: boolean) {
+		let member = this.membershipRepository.create({
+			user: user,
+			userId: user.userId,
+			room: room,
+			roomId: room.roomId,
+			owner: owner_status
+		});
 		await this.membershipRepository.insert(member);
 	}
 

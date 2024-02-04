@@ -59,13 +59,8 @@ export class RoomService {
 		let room = this.roomRepository.create({roomType: roomCreationData.roomType,
 												roomName: roomCreationData.roomName});
 
-		if (room.roomType == DIRECT) {
-			// Filter the owner and get the other end user
-			// let participant = await this.userService.findById(roomCreationData.user.filter(
-			// 													user => user.userId != roomCreationData.owner.userId)[0].userId);
-			// room.roomName = participant.userName;
+		if (room.roomType == DIRECT)
 			room.roomName = null;
-		}
 		
 		await this.roomRepository.insert(room);
 
@@ -132,5 +127,19 @@ export class RoomService {
 			{password: null,
 				protected: false}
 		)
+	}
+
+	async togglePrivate(roomId: string) {
+		const privateStatus = await this.groupRepository.findOne({
+																						select: { isPrivate: true },
+																						where: { roomId: roomId }
+																					});
+
+		const status = !privateStatus.isPrivate;
+		this.groupRepository.update(
+			{roomId: roomId},
+			{isPrivate: status}
+		)
+		return status;
 	}
 }

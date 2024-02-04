@@ -26,10 +26,10 @@ export class RoomCreationData {
 
 export class RoomJoinData {
 	@IsNotEmpty()
-	room: Room;
+	roomId: string;
 
 	@IsNotEmpty()
-	user: User;
+	userId: string;
 
 	password?: string;
 }
