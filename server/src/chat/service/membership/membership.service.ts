@@ -54,7 +54,7 @@ export class MembershipService {
 	}
 
 	async leaveRoom(userId: string, roomId: string) {
-		await this.membershipRepository.delete({userId: userId, roomId: roomId});
+		return this.membershipRepository.delete({userId: userId, roomId: roomId});
 	}
 
 	async findMemberRooms(userId: string) {

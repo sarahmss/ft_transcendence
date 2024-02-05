@@ -64,6 +64,18 @@ export class BlacklistService {
 																				blockType);
 		});
 	}
+	
+	async getBlockedByTheUser (user: User, room: Room) {
+		const query = this.blackListRepository
+			.createQueryBuilder('block')
+			.where('block.status = true AND block.block_end > :timeNow', {timeNow: new Date()})
+			.andWhere('(block.blocker = :id)', {id: user.userId})
+			.andWhere('((block.block_type = :type AND block.room_id = :rid) OR block.block_type = :gtype)',
+				{type: LOCAL_BLOCK, rid: room.roomId, gtype: GLOBAL_BLOCK})
+		;
+		return query.getMany();
+		
+	}
 
 	// Get the list of the blocked user by the user
 	async getBlockedUser(user: User, room: Room) {

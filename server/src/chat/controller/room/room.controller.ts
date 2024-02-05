@@ -33,11 +33,13 @@ export class RoomController {
 		private readonly emitter: EventEmitter2)
 	{}
 
+	// Test endpoint
 	@Get('get_all')
 	async getAllRoom () {
 		return await this.roomService.getAll();
 	}
 
+	// Test endpoint
 	@Get('member_all')
 	async getAllMemberShip() {
 		return await this.membershipService.getAll();
@@ -71,13 +73,18 @@ export class RoomController {
 
 		if (!roomId || !userId)
 			throw new BadRequestException("Required information not given");
+		let user = await this.userService.findById(userId);
 		let room = await this.roomService.findRoom(roomId);
-		if (!room)
+		if (!room || !user)
 			throw new NotFoundException("Room not found");
+
+		const member = await this.membershipService.findMemberRoom(userId, roomId);
+		if (member)
+			throw new NotFoundException("The user was not found in this room");
 
 		await this.membershipService.leaveRoom(userId, roomId);
 		this.emitter.emit('room.leave', room, "left");
-		
+		return "user left";
 	}
 
 	@Post()

@@ -10,7 +10,6 @@ import { isEmpty } from 'class-validator';
 import { BlacklistService } from 'src/chat/service/blacklist/blacklist.service';
 import { RoomService } from 'src/chat/service/room/room.service';
 import { GLOBAL_BLOCK, LOCAL_BLOCK } from 'src/constants/blackListType.constant';
-import { BlackList } from 'src/entity/blacklist.entity';
 import { User } from 'src/entity/user.entity';
 import { UsersService } from 'src/users/users.service';
 
@@ -23,11 +22,13 @@ export class BlacklistController {
     private readonly userService: UsersService,
     private readonly roomService: RoomService) {}
 
+  //Test endpoint
   @Get("valid")
   async getValid() {
     return await this.blackListService.getValid();
   }
   
+  //Test endpoint
   @Get()
   async getAll() {
     return await this.blackListService.getAll();
@@ -35,48 +36,53 @@ export class BlacklistController {
 
   //Single blackList
   @Post("single")
-  async createBlackList(@Body('blockerId') blocker: string,
-    @Body('blockedId') blocked: string,
-    @Body('room') room: string,
+  async createBlackList(@Body('blockerId') blockerId: string,
+    @Body('blockedId') blockedId: string,
+    @Body('roomId') roomId: string,
     @Body('blockType') blockType: number,
     @Body('duration') duration: number) {
 
-    if (!(blocker && blocked && room))
+    blockType = this.setType(blockType);
+    if (!(blockType === GLOBAL_BLOCK || blockType === LOCAL_BLOCK))
+      throw new BadRequestException('Invalid block type.');
+
+    if (!(blockerId && blockedId))
       throw new BadRequestException("Incomplete information given.");
 
-    if (blocker === blocked)
+    if (blockerId === blockedId)
       throw new BadRequestException("The blocker and the blocked are the same");
 
-    blockType = this.setType(blockType);
+    const blockerUser = await this.userService.findById(blockerId);
+    const blockedUser = await this.userService.findById(blockedId);
+
+    if (!(blockedUser && blockerUser))
+      throw new NotFoundException('The user provided or doesn\'t exist.');
+
+    const roomTarget = await this.roomService.findRoom(roomId);
+    if (blockType === LOCAL_BLOCK && !roomTarget)
+      throw new BadRequestException("If the block it's local a room must be provided");
+
     const existingBlackList = await this.blackListService
-                                          .checkExistence(blocker,
-                                                            blocked,
-                                                            room,
+                                          .checkExistence(blockerId,
+                                                            blockedId,
+                                                            roomId,
                                                             blockType)
     // Renew if there is an existing entry
     if (existingBlackList) {
-
       await this.blackListService
                   .updateDuration(
                     existingBlackList.blackListId, duration);
+
       return "blackList entry updated"
     }
 
-    else {
-      const blockerUser = <User> await this.userService.findById(blocker);
-      const blockedUser = <User> await this.userService.findById(blocked);
-      const roomTarget = await this.roomService.findRoom(room);
-
-      if (!(blockedUser && blockerUser && roomTarget))
-        throw new NotFoundException('The user provided or room doesn\'t exist.');
-
-      if (!(blockType == GLOBAL_BLOCK || blockType == LOCAL_BLOCK))
-        throw new BadRequestException('Invalid block type.');
-    
-      await this.blackListService.createBlackListEntry(blockerUser, blockedUser, roomTarget, blockType);
-      return "blocked";
-      
-    }
+    await this.blackListService.createBlackListEntry(
+      blockerUser,
+      blockedUser,
+      roomTarget,
+      blockType
+    );
+    return "blocked";
   }
 
   // Bulk blacklisting
@@ -87,19 +93,26 @@ export class BlacklistController {
     @Body('blockType') blockType: number,
     @Body('duration') duration: number) {
 
-    if (!(blockedIds.length > 0 && blockerId && roomId ))
+    blockType = this.setType(blockType);
+    if (!(blockType === GLOBAL_BLOCK || blockType === LOCAL_BLOCK))
+      throw new BadRequestException('Invalid block type.');
+
+    const roomTarget = await this.roomService.findRoom(roomId);
+    if (blockType === LOCAL_BLOCK && !roomTarget)
+      throw new NotFoundException("Room Not found");
+
+    if (!(blockedIds && blockedIds.length > 0 && blockerId))
       throw new BadRequestException("Incomplete information given");
 
     if (blockedIds.some((id) => (id === blockerId)))
       throw new BadRequestException("The blockler cannot block itself");
    
-    const blocker = <User> await this.userService.findById(blockerId);
+    const blocker = await this.userService.findById(blockerId);
     if (!blocker)
       throw new NotFoundException('User not found')
 
-    blockType = this.setType(blockType);
-
     const userList = new Set<User>();
+
     blockedIds.forEach(async (userId: string) => {
       const user = await this.userService.findById(userId);
       if (!user)
@@ -107,31 +120,25 @@ export class BlacklistController {
       userList.add(user);
     });
 
-    const roomTarget = await this.roomService.findRoom(roomId);
-    
-    if (!(roomTarget))
-      throw new NotFoundException("Room Not found");
-
     const existingBlackList = await this.blackListService
-                                          .getBlockedUser(blocker, roomTarget);
+                                          .getBlockedByTheUser(blocker,roomTarget);
 
-    const renewUsers = existingBlackList.filter((existingBlock: BlackList) => {
-      [...userList].some((user: User) => (
-        user.userId === existingBlock.blockedId
-      ))
-    });
+    const renewUsers = this.filterUser(
+      existingBlackList,
+      [...userList],
+      true
+    );
 
-    const newEntryUsers = [...userList].filter((user: User) => {
-      !existingBlackList.some((blocked) => (
-        user.userId === blocked.blockedId
-      ))
-    });
+    const newEntryUsers = this.filterUser(
+      [...userList],
+      existingBlackList,
+      false
+    );
 
-    this.blackListService.updateDurationInBulk(renewUsers, duration);
+    await this.blackListService.updateDurationInBulk(renewUsers, duration);
+    await this.blackListService.createInBulk(blocker, newEntryUsers, roomTarget, blockType);
 
-    this.blackListService.createInBulk(blocker, newEntryUsers, roomTarget, blockType);
-
-    return "blocked in bulk";
+    return "Bulk blocking done";
    }
 
   @Patch('unblock')
@@ -148,10 +155,12 @@ export class BlacklistController {
 
     blockType = this.setType(blockType);
 
-    const entry = await this.blackListService.checkExistence(blockerId,
+    const entry = await this.blackListService.checkExistence(
+      blockerId,
       blockedId,
       roomId,
-      blockType);
+      blockType
+    );
 
     if (!entry)
       throw new NotFoundException("Black list entry doesn\'t not exist");
@@ -161,8 +170,18 @@ export class BlacklistController {
   }
 
   private setType(roomType: number) {
-    if (!roomType || !(roomType === LOCAL_BLOCK || roomType === GLOBAL_BLOCK))
+    if (isEmpty(roomType))
       return LOCAL_BLOCK;
     return roomType;
+  }
+
+  private filterUser(srcArray: any[], criteriaArray: any[], result: boolean) {
+
+    return srcArray.filter((existingBlock: any) => {
+       result === criteriaArray.some((user: any) => (
+        user.userId === existingBlock.blockedId
+      ))
+    });
+
   }
 }
