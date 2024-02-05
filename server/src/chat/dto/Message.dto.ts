@@ -1,7 +1,5 @@
 
 import { IsNotEmpty } from 'class-validator';
-import { Room } from 'src/entity/room.entity';
-import { User } from 'src/entity/user.entity';
 
 export class createMessage {
 	@IsNotEmpty()
