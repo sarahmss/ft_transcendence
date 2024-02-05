@@ -1,104 +1,152 @@
-import axios, { RawAxiosRequestHeaders }  from "axios";
+import axios, { RawAxiosRequestHeaders }	from "axios";
+// import {useSelector, useDispatch} from "react-redux";
+// import {addUser, userLog} from './reduceStore';
+
+
 import { BackLink, LocalSigninLink,
 		LocalSignupLink,
 		UserContentLink,
 		tokenData } from "../common/constants";
-import "core-js/stable/atob";
-import { jwtDecode } from "jwt-decode";
 
+		
+		import "core-js/stable/atob";
+		import { jwtDecode } from "jwt-decode";
+		
 class AuthService {
-	LocalLogin(userName: string, password: string) {
-		return axios
-			.post(LocalSigninLink, {
+			
+	async LocalLogin(userName: string, password: string) {
+		try {
+			console.log(LocalSigninLink, userName, password);
+
+			const response = await axios.post(LocalSigninLink, {
 				userName,
-				password
-			})
-			.then(response => {
-				if (response.data.accessToken)
-				{
-					localStorage.setItem("accessToken", response.data.accessToken);
-					localStorage.setItem("id", response.data.id);
-					localStorage.setItem("Logged","local");
-				}
-				return response.data;
+				password,
 			});
+			document.cookie = response.data.cookie;
+			sessionStorage.setItem("Logged", "ok");
+		} catch (error) {
+		console.error("Error during LocalLogin:", error);
+		throw error;
+		}
 	}
 
 	IntraLogin() {
-		localStorage.setItem("Logged","intra");
+		sessionStorage.setItem("Logged", "ok");
 	}
 
-	logout() {
-		const authToken = this.getAuthToken();
-		localStorage.removeItem("LoggedUser");
-		return axios.get(BackLink + "/auth/logout", { headers: authToken })
+	async logout() {
+		try {
+			const authToken = this.getAuthToken();
+			sessionStorage.clear();
+			await axios.get(BackLink + "/auth/logout", { headers: authToken });
+		} catch (error) {
+			console.error("Error during logout:", error);
+			throw error;
+		}
 	}
 
-	getIsLogged()
-	{
-		const isLogged = localStorage.getItem("Logged");
-		if (isLogged)
-			return isLogged;
-
-		return null;
+	getIsLogged() {
+		const isLogged = sessionStorage.getItem("Logged");
+		return isLogged || null;
 	}
 
-	register(userName: string, email: string, password: string, passwordConfirm: string) {
-		return axios.post(LocalSignupLink, {
+	async register(userName: string, email: string, password: string, passwordConfirm: string) {
+		try {
+			const response = await axios.post(LocalSignupLink, {
 			userName,
 			email,
 			password,
-		passwordConfirm: passwordConfirm
-		});
-	}
-
-	getCurrentUser() {
-		if (this.getIsLogged() != null)
-		{
-			this.RequestCurrentUser();
-			const userStr = localStorage.getItem("LoggedUser");
-			if (userStr)
-				return JSON.parse(userStr);
+			passwordConfirm: passwordConfirm,
+			});
+			console.log(response)
+			return response;
+		} catch (error) {
+			console.error("Error during register:", error);
+			throw error;
 		}
-		return null;
 	}
 
-	RequestCurrentUser() {
-		const userId = this.getIdFromToken();
-		const authToken = this.getAuthToken();
-		axios.get(UserContentLink + userId, { headers: authToken }).then((response) => {
-			localStorage.setItem("LoggedUser", JSON.stringify(response.data))
+	async RequestCurrentUser() {
+		try {
+			console.log("Entrou aqui");
+			const userId = this.getIdFromToken();
+			const authToken = this.getAuthToken();
+			const response = await axios.get(UserContentLink + userId, { headers: authToken });
+
+			sessionStorage.setItem("LoggedUser", JSON.stringify(response.data));
+
 			return response.data;
-		})
+		} catch (error) {
+			console.error("Error during RequestCurrentUser:", error);
+			throw error;
+		}
+		}
+
+	async getCurrentUser() {
+
+		try {
+			if (this.getIsLogged() != null)
+			{
+				console.log("Entrou no getCurrent user - 7")
+				await this.RequestCurrentUser();
+				const userStr = sessionStorage.getItem("LoggedUser");
+				if (userStr)
+					return JSON.parse(userStr);
+				return null;
+			}
+		} catch (error) {
+			console.error("Error during getCurrentUser:", error);
+      		throw error;
+		}
 	}
 
-	getCurrentUserId() {
-		const user = this.getCurrentUser();
-		if (user && user.userId)
-			return user.userId;
-		return "";
+	getCurrentUserPlay() {
+		try {
+			if (this.getIsLogged() != null)
+			{
+				this.RequestCurrentUser();
+				const userStr = sessionStorage.getItem("LoggedUser");
+				if (userStr)
+					return JSON.parse(userStr);
+				return null;
+			}
+		} catch (error) {
+			console.error("Error during getCurrentUser:", error);
+      		throw error;
+		}
 	}
 
 	getAuthToken() {
-		if (this.getIsLogged() == "local") {
-			const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + localStorage.getItem("accessToken")};
-			return authToken;
-		} else if (this.getIsLogged() == "intra") {
-			const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
-			return authToken;
-		}
+		const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
+		return authToken;
 	}
 
 	getIdFromToken() {
-		if (this.getIsLogged() == "local") {
-			return localStorage.getItem("id");
-		} else if (this.getIsLogged() == "intra")
-		{
-			const cookie = document.cookie
-			const tokenData: tokenData = jwtDecode(cookie);
-			return tokenData.id;
-		}
+		const cookie = document.cookie
+		const tokenData: tokenData = jwtDecode(cookie);
+		return tokenData.id;
 	}
-}
 
-export default new AuthService();
+	async getProfilePicture(localQr: string) {
+		const authTokenQr = this.getAuthToken();
+		localQr = BackLink + localQr;
+		console.log(localQr);
+		const response = await axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' });
+		if (response.data) {
+			const imageBase64 = btoa(
+				new Uint8Array(response.data)
+				.reduce((data, byte) => data + String.fromCharCode(byte), '')
+			)
+			const imgElement = document.createElement('img');
+			imgElement.src = `data:image/png;base64,${imageBase64}`;
+			console.log(imgElement);
+			return imgElement;
+		}
+		return "";
+	}
+
+
+}
+const authService = new AuthService();
+
+export default authService;

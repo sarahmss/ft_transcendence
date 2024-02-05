@@ -1,0 +1,13 @@
+/*
+
+    O jogador entrou na sala de selecao
+    Se nao houver mais jogadores abre uma caixa de mensagem dando a opcao de continuar esperando ou sair da sala de selecao
+    
+    Se tiver pelo menos putro jogador faz o match e vai jogar
+
+    Solo
+    Dupla
+    Grupal
+
+
+*/

@@ -9,8 +9,6 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - '5432:5432'
-    volumes:
-      - pgdata:/var/lib/postgresql/data
     networks:
       - transcendence
 
@@ -45,6 +43,7 @@ services:
     env_file: .env
     environment:
       - REACT_APP_BACK_HOST=${BACK_URL}
+      - REACT_APP_FRONT_HOST=${FRONT_URL}
     ports:
       - "${FRONT_PORT}:${FRONT_PORT}"
     depends_on:
@@ -55,6 +54,3 @@ services:
 networks:
     transcendence:
         driver: bridge
-
-volumes:
-  pgdata: {}

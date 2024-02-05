@@ -7,10 +7,10 @@ db:
 	@docker compose up -d db
 
 front:
-		cd client ; npm start
+	cd client ; npm start
 
 back:
-		cd server ; npm run start:dev
+	cd server ; npm run start:dev
 
 local: db front back
 	@echo "Running Local..."
@@ -24,18 +24,12 @@ re:
 list:
 	@docker ps -a
 
-list-volumes:
-	@docker volume ls
-
 list-networks:
 	@docker network ls
 
 clean-db:
 	@echo "Cleaning database..."
 	@docker-compose -f ./docker-compose.yml down -v
-
-prepare: clean-db re
-	@echo "Relaunched to test !"
 
 clean: down
 	@-docker rmi -f `docker images -qa`

@@ -1,0 +1,12 @@
+.wrapper {
+	display: flex;
+	flex-direction: row;
+  }
+
+  .image-container {
+	flex: 70%;
+
+  }
+  .container {
+	flex: 30%;
+  }

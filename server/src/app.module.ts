@@ -8,8 +8,10 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
 import { PassportModule } from '@nestjs/passport';
+import { UploadsModule } from './uploads/upload.module';
 import { ChatModule } from './chat/chat.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { GameModule } from './game/game.module';
 
 @Module({
 	imports: [
@@ -17,7 +19,10 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 		ConfigModule.forRoot(),
 		PassportModule.register({ session: true }),
 		UsersModule,
+		UploadsModule,
 		AuthModule,
+		ChatModule,
+		GameModule,
 		TypeOrmModule.forRoot({
 			type: process.env.DB_TYPE as any,
 			host: process.env.PG_HOST,
@@ -28,8 +33,8 @@ import { EventEmitterModule } from '@nestjs/event-emitter';
 			entities: [__dirname + '/**/*.entity{.ts,.js}'],
 			synchronize: true,
 		}),
-		ChatModule,
 	],
+	
 })
 export class AppModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {

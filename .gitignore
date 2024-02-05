@@ -2,3 +2,10 @@
 ./Backend/dist
 node_modules
 *.sh
+./server/node_modules
+./server/dist
+./client/node_modules
+./client/dist
+./node_modules
+./dist
+.env

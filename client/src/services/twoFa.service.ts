@@ -1,99 +1,78 @@
-import axios, {RawAxiosRequestHeaders} from 'axios';
+import axios from 'axios';
 import AuthService from './auth.service';
-import { ChangeEvent } from 'react';
-import { TwoFaLink, TwoFaEnableLink } from '../common/constants';
-import authService from './auth.service';
+import { DefaultPic,
+		TwoFaLink,
+		TwoFaDisableLink,
+		TwoFaEnableLink,
+		TwoFaGenerateLink,
+		TwoFaLoginLink } from '../common/constants';
+
+import fetchData from '../components/navBar/NavBar';
 
 class TwoFaService {
 
-	handleAuthentication(userId: string, code: string) {
-		axios
-			.post(
-				`${TwoFaLink} ${userId}`,
-				{ code: code })
-			.then((response) => {
-				document.cookie = response.data.cookie;
-			}).catch(() => {
-			});
-	}
+	async handleAuthentication(userId: string, code: string) {
+		try {
+			const response = await axios.post(
+			`${TwoFaLink} ${userId}`,
+			{ code: code }
+			);
 
-	// redirectToEnable2FA = (code: string) => {
-	// 	return axios.post(
-	// 		TwoFaEnableLink,
-	// 		{ code: code },
-	// 		{ headers: authHeader() }
-	// 	)
-	// }
-
-	// if(authService.getIsLogged())
-	// 	return localStorage.getItem("qrcode");
-	getQrCode(){
-		const authTokenQr = AuthService.getAuthToken();
-		const localQr = localStorage.getItem("qrcode");
-
-		console.log(localQr);
-		console.log(authTokenQr);
-		if(localQr)
-		{
-			axios.get(localQr, 
-			{headers : authTokenQr})
-			.then((response) => {
-				console.log("Deu certo");
-			})
-			.catch(error => {
-				console.log("Deu errado!");
-			  });
-
-		} else {
-			console.log("teste");
+			document.cookie = response.data.cookie;
+		} catch (error) {
+			console.error(error);
 		}
 	}
 
-	generateQrCode() {
-        const authToken = AuthService.getAuthToken()
-        axios.get( "http://localhost:5000/2fa-auth/generate",
-            { headers: authToken })
-            .then((response) => {
-				console.log("Response data: ", response.data)
-                localStorage.setItem("qrcode", response.data.url)
-				console.log("foi");
-            });
-    }
-    
+	async generateQrCode(): Promise<string> {
+		try {
+			const authToken = AuthService.getAuthToken();
+			const response = await axios.get(TwoFaGenerateLink, { headers: authToken });
 
-	redirectToEnable2FA (code:string) {
-		const userID = AuthService.getAuthToken();
-		console.log(code);
-        axios.post( "http://localhost:5000/2fa-auth/enable",
-			{ code: code },
-            { headers: userID })
-            .then((response) => {
-                localStorage.setItem("qrcode", response.data.url)
-            });
-	};
+			sessionStorage.setItem("qrcode", response.data.url);
+			return response.data.url;
+		} catch (error) {
+			console.error(error);
+			throw new Error("Error generating QrCode");
+		}
+	}
 
-	redirectToDisable2FA (userId:string, code:string) {
-		const authToken = AuthService.getAuthToken()
-        axios.post( "http://localhost:5000/2fa-auth/disable",
-			{ code: code },
-            { headers: authToken })
-            .then((response) => {
-                localStorage.setItem("qrcode", response.data.url)
-            });
-	};
 
-	reditectToDisable2Fa = () => {
-	// history.push('/disable2fa');
-	};
+	async redirectToEnable2FA(code: string) {
+		try {
+			const authToken = AuthService.getAuthToken();
+			await axios.post(TwoFaEnableLink, { code: code }, { headers: authToken });
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
-	applyChanges = async () => {
-	// Restante do código para aplicar as alterações...
-	};
+	async redirectToDisable2FA(code: string) {
+		try {
+			const authToken = AuthService.getAuthToken();
+			await axios.post(TwoFaDisableLink, { code: code }, { headers: authToken });
+		} catch (error) {
+			console.error(error);
+		}
+	}
 
-	onAvatarChange = async (event: ChangeEvent<HTMLInputElement>) => {
-	// Restante do código para lidar com a mudança do avatar...
-	};
-
+	async login2Fa(code: string, userId: string): Promise<boolean> {
+		try {
+			const response = await axios.post(`${TwoFaLoginLink}?user=${userId}`,
+			{ code: code })
+			.then((response) => {
+				document.cookie = response.data.cookie;
+				sessionStorage.setItem("Logged", "ok");
+			});
+			
+			return true;
+		} catch (error) {
+			console.error(error);
+			return false;
+		}
+	}
 }
 
-export default new TwoFaService();
+const twoFaService = new TwoFaService();
+
+export default twoFaService;

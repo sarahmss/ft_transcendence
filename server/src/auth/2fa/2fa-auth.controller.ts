@@ -25,22 +25,23 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 
 		/********************************* GET ******************************/
 		@Get('generate')
-		async generate(@Req() request: UserRequest) {
+		async generate(@Res() response: Response, @Req() request: UserRequest) {
 			const userId = request.user;
-			return this._2faService.createQrCode(`${userId}`);
+			this._2faService.createQrCode(userId);
+			return(response.status(200).send({ url: process.env.BACK_URL + `/uploads/${userId}/qrcode.png`}));
 		}
 
 		/********************************* POST ******************************/
 		@Post('enable')
 		async enable(@Req() request: UserRequest, @Body() body: TwoFaAuthDto) {
 			const userId = request.user;
-			return this._2faService.SetTwoFactorAuthOn(`${userId}`, body.code);
+			return this._2faService.SetTwoFactorAuthOn(userId, body.code);
 		}
 
 		@Post('disable')
 		async disable(@Req() request: UserRequest, @Body() body: TwoFaAuthDto) {
 			const userId = request.user;
-			return this._2faService.SetTwoFactorAuthOff(`${userId}`, body.code);
+			return this._2faService.SetTwoFactorAuthOff(userId, body.code);
 		}
 
 		@Post('login')
@@ -49,14 +50,15 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 			@Body() body: TwoFaAuthDto,
 			@Res() response: Response,)
 			{
-				const isValid = await this._2faService.checkQrCode(`${userId}`,
+				const isValid = await this._2faService.checkQrCode(userId,
 																body.code);
 				if (isValid == false) {
 				throw new BadRequestException(MessagesHelper.INVALID_QR_CODE);
 				}
+				const token = this._jwtService.sign({ id: userId });
 				response.cookie('accessToken',
-								this._jwtService.sign({ id: userId }),
-								{sameSite: 'lax', });
+									token,
+									{sameSite: 'lax', });
 				return response.status(200).json({
 					cookie: response.getHeader('set-cookie'),
 				});

@@ -1,0 +1,43 @@
+.col-md-12 {
+    padding: 0px;
+    background-color: #B700cc;
+    height: 40%;
+    width: 80%;
+    margin: 90px  auto;
+    border-radius: 5px;
+    min-width: 420px;
+    max-width: 800px;
+    min-height: 420px;
+    max-height: 800px;
+    overflow:hidden;
+    columns: 2;
+}
+
+.card-container {
+    background-color: white;
+    max-width: 350px;
+    padding: 15px;
+    margin: 30px 30px 30px 30px;
+    border-radius: 5px;
+}
+
+.button_login{
+    background-color: white;
+    border: 1px solid gray;
+    color:black;
+    width: 37%;
+    height: 35px;
+}
+
+.span_login{
+    color:black;
+    font-size:10px;
+    text-align: left;
+}
+
+.lorem{
+    break-before: column;
+    margin-top: 140px;
+    color:white;
+}
+

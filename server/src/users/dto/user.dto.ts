@@ -41,6 +41,5 @@ export class UpdateUserDto {
 	email: string;
 
 	@IsOptional()
-	@IsUrl({ require_tld: false })
 	profilePicture: string;
 }

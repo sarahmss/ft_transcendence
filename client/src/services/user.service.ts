@@ -1,16 +1,50 @@
 import axios from 'axios';
-import { BackLink, PublicContentLink } from '../common/constants';
+import { BackLink, UserContentLink } from '../common/constants';
 import AuthService from './auth.service';
 
 class UserService {
-	getPublicContent() {
-		return axios.get(PublicContentLink);
+	
+	
+	async uploadProfilePic(imgName: string, img: FormData): Promise<string | undefined> {
+		const userId = AuthService.getIdFromToken();
+
+		try {
+			const response = await axios.post(
+			`${BackLink}/uploads/${userId}/profilePictures/${imgName}`,
+			img,
+			{ headers: AuthService.getAuthToken() }
+			);
+
+			if (response.data.url) {
+			return response.data.url;
+			}
+
+			return undefined;
+		} catch (error) {
+			console.error('Error during uploadProfilePic:', error);
+			throw error;
+		}
 	}
 
-	getUserBoard() {
-		const userId = AuthService.getCurrentUserId();
-		return axios.get(`${BackLink}/${userId}/profile`, { headers: AuthService.getAuthToken() });
+	async updateProfile(userName: string, profilePicture: string, email: string): Promise<void> {
+		const userId = AuthService.getIdFromToken();
+
+		try {
+			await axios.patch((UserContentLink + userId),
+				{
+					userName: userName,
+					profilePicture: profilePicture,
+					email: email
+				},
+				{ headers: AuthService.getAuthToken() }
+			);
+		} catch (error) {
+			console.error('Error while updating profile:', error);
+			throw error;
+		}
 	}
 }
 
-export default new UserService();
+const userService = new UserService();
+
+export default userService;

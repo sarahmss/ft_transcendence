@@ -1,6 +1,4 @@
-import { HttpException,
-	HttpStatus,
-	Injectable,
+import { Injectable,
 	NotFoundException,
 	UnprocessableEntityException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -10,7 +8,6 @@ import { UpdateUserDto, CreateUserDto } from "./dto/user.dto";
 import { status } from "../helpers/types.helper"
 import { IntraUserData, UserHelper } from '../helpers/types.helper';
 import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
 
 @Injectable()
 export class UsersService {
@@ -79,10 +76,10 @@ export class UsersService {
 		return user.status;
 	}
 
-	async getUserSecret(userId: string): Promise<string>
+	async get2FaSecret(userId: string): Promise<string>
 	{
 		const user = await this.checkUser(userId);
-		return user.password;
+		return user.secret2Fa;
 	}
 
 	/********************************* SET ******************************/
@@ -105,9 +102,9 @@ export class UsersService {
 		return this.setStatus(userId, status.PLAYING);
 	}
 
-	async setUserSecret(userId: string, password: string): Promise<User> {
+	async set2FaSecret(userId: string, secret: string): Promise<User> {
 		const user = await this.checkUser(userId);
-		user.password = password;
+		user.secret2Fa = secret;
 		return this.usersRepository.save(user);
 	}
 
@@ -153,11 +150,12 @@ export class UsersService {
 	}
 
 
-	async NameisNotUnique(userName: string) {
-		if (!userName) {
+	async NameisNotUnique(newUserName: string, oldUserName:string) {
+
+		if (!newUserName || newUserName == oldUserName) {
 			return false;
 		}
-		const user = await this.findByUserName(userName)
+		const user = await this.findByUserName(newUserName)
 		if (user) {
 			return true;
 		}
@@ -176,7 +174,8 @@ export class UsersService {
 		const newUser = this.usersRepository.create({
 													userName: userName,
 													password: hashedPassword,
-													email: email
+													email: email,
+													profilePicture: UserHelper.TEMP_PROFILE_PICTURE
 												});
 		response.send({ message: "User was registered successfully!" });
 		return this.usersRepository.save(newUser);
@@ -198,7 +197,7 @@ export class UsersService {
 
 		async update(userId: string, userDto: UpdateUserDto): Promise<User> {
 			const user = await this.checkUser(userId);
-			const invalidUpdate = await this.NameisNotUnique(userDto.userName);
+			const invalidUpdate = await this.NameisNotUnique(userDto.userName, user.userName);
 			if (invalidUpdate){
 				throw new UnprocessableEntityException();
 			}

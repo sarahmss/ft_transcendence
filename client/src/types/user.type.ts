@@ -3,7 +3,8 @@ export default interface IUser {
 	userName?: string | null,
 	email?: string,
 	password?: string,
-	profilePicture?: string
+	profilePicture?: string,
+	hasTwoFactorAuth?: boolean
 }
 
 export default interface ITwoFac {

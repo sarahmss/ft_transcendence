@@ -1,10 +1,13 @@
-import { Component } from "react";
+import { Component, useReducer } from "react";
 import { Navigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-// import axios from "axios";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { Link, Card, CardContent, Box, Button, Divider} from '@mui/material';
+import { reducer } from "../../common/helper";
+import { IntraloginLink } from "../../common/constants";
+import './css/login.component.css'
 import AuthService from "../../services/auth.service";
 import * as Yup from "yup";
-import { IntraLoginButton } from "./intraLogin.component";
 
 type Props = {};
 
@@ -15,6 +18,55 @@ type State = {
 	loading: boolean,
 	message: string
 };
+
+
+const IntraLoginButton = () => {
+	const [state, setState] = useReducer(reducer, {
+		loading: false,
+		loginError: false,
+		loginMsg: "Something went wrong",
+	});
+
+	const theme = createTheme({
+		palette: {
+		  primary: {
+			main: '#ffffff',
+		  },
+		  secondary: {
+			main: '#ffffff',
+		  },
+		},
+	});
+
+	const handleLoading = () => {
+		setState({ loading: true });
+		setTimeout(() => {
+			setState({ loading: false });
+			setState({ loginError: true });
+		}, 7000 )
+		AuthService.IntraLogin();
+	}
+
+	return (
+		<>
+		<div className="form-group ">
+			<ThemeProvider theme={theme}>
+				<Button
+					variant="contained"
+					disabled={state.loading}
+					onClick={handleLoading}
+					size="large"
+					style={{minWidth:100}}
+					>
+					<Link href={IntraloginLink}>
+						<span className="span_login">Login with 42</span>
+					</Link>
+				</Button>
+			</ThemeProvider>
+		</div>
+		</>
+	)
+}
 
 export default class Login extends Component<Props, State> {
 	constructor(props: Props) {
@@ -30,11 +82,11 @@ export default class Login extends Component<Props, State> {
 		};
 	}
 
-	componentDidMount() {
-		const currentUser = AuthService.getCurrentUser();
+	async componentDidMount() {
+		const currentUser = await AuthService.getCurrentUser();
 
 		if (currentUser) {
-			this.setState({ redirect: "/profile" });
+			this.setState({ redirect: "/" });
 		};
 	}
 
@@ -57,10 +109,10 @@ export default class Login extends Component<Props, State> {
 			loading: true
 		});
 
-		AuthService.LocalLogin(userName, password).then(
+		await AuthService.LocalLogin(userName, password).then(
 			() => {
 				this.setState({
-				redirect: "/profile"
+				redirect: "/"
 				});
 			},
 			error => {
@@ -92,22 +144,20 @@ export default class Login extends Component<Props, State> {
 		};
 
 		return (
-			<div className="col-md-12">
-				<div className="card card-container">
+			<Card className="col-md-12" sx={{backgroundColor:'#B700cc'}}>
+				<Card className="card-container">
 					<img
 						src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
 						alt="profile-img"
 						className="profile-img-card"
 					/>
-
 					<Formik
 						initialValues={initialValues}
 						onSubmit={this.handleLogin}
 					>
 						<Form>
 							<div className="form-group">
-								<label htmlFor="userName">user name</label>
-								<Field name="userName" type="text" className="form-control" />
+								<Field name="userName" type="text" className="form-control" placeholder="User" />
 								<ErrorMessage
 									name="userName"
 									component="div"
@@ -116,8 +166,7 @@ export default class Login extends Component<Props, State> {
 							</div>
 
 							<div className="form-group">
-								<label htmlFor="password">Password</label>
-								<Field name="password" type="password" className="form-control" />
+								<Field name="password" type="password" className="form-control" placeholder="Password" />
 								<ErrorMessage
 									name="password"
 									component="div"
@@ -125,16 +174,30 @@ export default class Login extends Component<Props, State> {
 								/>
 							</div>
 
-							<div className="form-group">
-								<button type="submit" className="btn btn-primary btn-block" disabled={loading}>
+							<Box className="form-group"
+								sx={{margin:'10px',
+								display: 'flex',
+								justifyContent:'center'}}>
+
+								<Button
+									type="submit"
+									className="btn btn-primary btn-block"
+									disabled={loading}
+									sx={{backgroundColor:'#B700cc', color:'white'}}>
+									Login
 									{loading && (
 										<span className="spinner-border spinner-border-sm"></span>
 									)}
-									<span>Login</span>
-								</button>
-							</div>
+								</Button>
 
-							<IntraLoginButton/>
+							</Box>
+							<Box className="form-group"
+								sx={{margin:'15px',
+								display: 'flex',
+								justifyContent:'center'}}>
+
+								<IntraLoginButton/>
+							</Box>
 
 							{message && (
 								<div className="form-group">
@@ -143,10 +206,14 @@ export default class Login extends Component<Props, State> {
 									</div>
 								</div>
 							)}
+
 						</Form>
 					</Formik>
-				</div>
-			</div>
+				</Card>
+				<CardContent style={{ paddingLeft: 35, paddingTop: 25 }}>
+					<p className="lorem">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi laborum ad commodi quos voluptate perspiciatis consectetur a, sapiente nam ab necessitatibus, ipsa quidem? Id aliquam, eligendi quidem dolor perferendis error.</p>
+				</CardContent>
+			</Card>
 		);
 	}
 }
