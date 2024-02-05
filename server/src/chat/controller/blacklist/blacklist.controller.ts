@@ -13,8 +13,6 @@ import { GLOBAL_BLOCK, LOCAL_BLOCK } from 'src/constants/blackListType.constant'
 import { User } from 'src/entity/user.entity';
 import { UsersService } from 'src/users/users.service';
 
-//If blockType it's not given the blackList will default to room level block
-
 @Controller('blacklist')
 export class BlacklistController {
 
@@ -42,7 +40,6 @@ export class BlacklistController {
     @Body('blockType') blockType: number,
     @Body('duration') duration: number) {
 
-    blockType = this.setType(blockType);
     if (!(blockType === GLOBAL_BLOCK || blockType === LOCAL_BLOCK))
       throw new BadRequestException('Invalid block type.');
 
@@ -93,7 +90,6 @@ export class BlacklistController {
     @Body('blockType') blockType: number,
     @Body('duration') duration: number) {
 
-    blockType = this.setType(blockType);
     if (!(blockType === GLOBAL_BLOCK || blockType === LOCAL_BLOCK))
       throw new BadRequestException('Invalid block type.');
 
@@ -147,13 +143,14 @@ export class BlacklistController {
     @Body('roomId') roomId: string,
     @Body('blockType') blockType: number) {
 
+    if (!(blockType === GLOBAL_BLOCK || blockType === LOCAL_BLOCK))
+      throw new BadRequestException('Invalid block type.');
+
     if (!(blockedId && blockerId))
       throw new BadRequestException("Incomplete information given");
 
     if (blockType === LOCAL_BLOCK && isEmpty(roomId))
       throw new BadRequestException("Room level unblocking requires the roomId");
-
-    blockType = this.setType(blockType);
 
     const entry = await this.blackListService.checkExistence(
       blockerId,
@@ -167,12 +164,6 @@ export class BlacklistController {
 
     this.blackListService.unblockById(entry.blackListId);
     return "unblocked";
-  }
-
-  private setType(roomType: number) {
-    if (isEmpty(roomType))
-      return LOCAL_BLOCK;
-    return roomType;
   }
 
   private filterUser(srcArray: any[], criteriaArray: any[], result: boolean) {

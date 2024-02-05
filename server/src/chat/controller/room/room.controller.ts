@@ -45,8 +45,8 @@ export class RoomController {
 		return await this.membershipService.getAll();
 	}
 
-	@Get('list_room/:userId')
-	async getListRoom(@Param('userId') userId: string) {
+	@Post('list_room')
+	async getListRoom(@Body('userId') userId: string) {
 		if (!userId)
 			throw new BadRequestException("User id not given");
 		let membershipList = await this.membershipService.findMemberRooms(userId);
