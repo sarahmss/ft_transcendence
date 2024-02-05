@@ -22,10 +22,10 @@ export class RoomService {
 		@Inject(MessageService) private readonly messageService: MessageService,
 	) {}
 
-	async checkUser(userList: User[]): Promise<boolean> {
+	async checkUser(userList: string[]): Promise<boolean> {
 		for (let k = 0; k < userList.length; k++) {
 
-			let userInstance = await this.userService.findById(userList[k].userId);
+			let userInstance = await this.userService.findById(userList[k]);
 
 			if (!userInstance)
 				return false;
@@ -56,18 +56,29 @@ export class RoomService {
 	}
 
 	async createRoom(roomCreationData: RoomCreationData) {
-		let room = this.roomRepository.create({roomType: roomCreationData.roomType,
-												roomName: roomCreationData.roomName});
+		let room = this.roomRepository.create(
+			{
+				roomType: roomCreationData.roomType,
+				roomName: roomCreationData.roomName
+			});
 
 		if (room.roomType == DIRECT)
 			room.roomName = null;
 		
 		await this.roomRepository.insert(room);
 
-		if (room.roomType == GROUP)
-			this.createGroupRoom(room, roomCreationData.isPrivate, roomCreationData.password);
-		else if (room.roomType == DIRECT)
-			this.createDirectRoom(room);
+		switch (room.roomType) {
+			
+			case GROUP:
+			this.createGroupRoom(room,
+														roomCreationData.isPrivate,
+														roomCreationData.password);
+				break;
+
+			case DIRECT:
+				this.createDirectRoom(room);
+				break;
+		}
 		return room;
 	}
 

@@ -1,6 +1,4 @@
 import { IsNotEmpty, IsPositive, Max, Min } from "class-validator";
-import { Room } from "src/entity/room.entity";
-import { User } from "src/entity/user.entity";
 
 export class RoomCreationData {
 
@@ -10,17 +8,15 @@ export class RoomCreationData {
 	@Max(2)
 	roomType: number;
 	
-	@IsNotEmpty()
-	isPrivate: boolean;
 
 	@IsNotEmpty()
-	user: User[];
+	userId: string[];
 
 	@IsNotEmpty()
-	owner: User;
+	ownerId: string;
 
-	roomName: string;
-
+	roomName?: string;
+	isPrivate?: boolean;
 	password?: string;
 }
 

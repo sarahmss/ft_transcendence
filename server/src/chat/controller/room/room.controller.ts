@@ -47,6 +47,8 @@ export class RoomController {
 
 	@Get('list_room/:userId')
 	async getListRoom(@Param('userId') userId: string) {
+		if (!userId)
+			throw new BadRequestException("User id not given");
 		let membershipList = await this.membershipService.findMemberRooms(userId);
 		let roomList = [];
 		for (let k = 0; k < membershipList.length; k++)
@@ -54,7 +56,7 @@ export class RoomController {
 		return roomList;
 	}
 
-	@Delete('deleteRoom')
+	@Delete()
 	async deleteRoom(@Body('roomId') roomId: string) {
 		if (!roomId)
 			throw new BadRequestException("Required information not given");
@@ -95,12 +97,23 @@ export class RoomController {
 		
 		try {
 			let room = await this.roomService.createRoom(roomCreationData);
-			this.membershipService.joinRoom(roomCreationData.user,
+			const userList = [];
+
+			roomCreationData.userId.forEach(async (userId: string) => {
+				let user = await this.userService.findById(userId);
+
+				if (user)
+					userList.push(user);
+
+				else
+					throw new NotFoundException('User not found');
+			});
+			await this.membershipService.joinRoom(userList,
 				room,
-				roomCreationData.owner.userId
+				roomCreationData.ownerId
 			);
 
-			this.emitter.emit('room.create', roomCreationData.user, room, "joined");
+			this.emitter.emit('room.create', roomCreationData.userId, room, "joined");
 			return room;
 		}
 		catch ( error ) {
@@ -223,18 +236,18 @@ export class RoomController {
 
 	private async checkRoomCreationCondition(roomCreationData: RoomCreationData) {
 
-		if (!(await this.roomService.checkUser(roomCreationData.user)))
+		if (!(await this.roomService.checkUser(roomCreationData.userId)))
 			return new NotFoundException("Users not found");
 		
-		if (!roomCreationData.user.length)
+		if (!roomCreationData.userId.length)
 			return new BadRequestException("The user list must have at least 1 user");
 
-		let uniqueId = Array.from(new Set(roomCreationData.user.map(user => user["userId"])));
+		let uniqueId = Array.from(new Set(roomCreationData.userId));
 
-		if (!uniqueId.find((id) => id === roomCreationData.owner.userId))
+		if (!uniqueId.find((id) => id === roomCreationData.ownerId))
 			return new BadRequestException("The owner must be a member");
 
-		if (uniqueId.length !== roomCreationData.user.length)
+		if (uniqueId.length !== roomCreationData.userId.length)
 			return new ConflictException("A user cannot enter in the same room multiple times");
 
 		switch (roomCreationData.roomType) {
@@ -250,12 +263,12 @@ export class RoomController {
 	}
 
 	async validateDirectRoom (roomCreationData: RoomCreationData) {
-		if (roomCreationData.user.length != 2)
+		if (roomCreationData.userId.length != 2)
 			return new BadRequestException("Direct messaging should have only 2 participants")
 
 		if (await this.membershipService.checkDirectRoomMembership(
-					roomCreationData.user[0],
-					roomCreationData.user[1]
+					<User> {userId: roomCreationData.userId[0]},
+					<User> {userId: roomCreationData.userId[1]}
 				))
 			return new ConflictException("This room already exists");
 	}

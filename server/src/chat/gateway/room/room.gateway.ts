@@ -27,7 +27,6 @@ import { RoomService } from 'src/chat/service/room/room.service';
 import { Message } from 'src/entity/message.entity';
 import { BlackList } from 'src/entity/blacklist.entity';
 import { Ban } from 'src/entity/ban.entity';
-import { Blob } from 'buffer';
 
 // Handling blacklist will happen
 // in two fashions:
@@ -118,8 +117,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		const conn = this.connectedUserService
 			.getConnection(userId);
-		if (conn)
-			conn.emit(emission_event, room);
+		if (conn) {
+			const data = {userId: userId, roomId: room.roomId}
+			conn.emit(emission_event, data);
+		}
 	}
 
 	// Create => event name: joined
@@ -130,8 +131,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		users.forEach((user: any) => {
 			const conn = this.connectedUserService.getConnection(user.userId);
-			if (conn)
-				conn.emit(emission_event, room);
+			if (conn) {
+				const data = {userId: user.userId, roomId: room.roomId}
+				conn.emit(emission_event, data);
+			}
 		});
 	}
 
