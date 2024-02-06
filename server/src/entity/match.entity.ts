@@ -9,7 +9,7 @@ import {
 import { User } from './user.entity';
 
 @Entity()
-export class Match {
+export class MatchHistory {
 
     @PrimaryGeneratedColumn("uuid")
     gameId: string;
