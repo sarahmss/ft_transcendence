@@ -133,9 +133,6 @@ const AccountSettings = () => {
         <TabPanel sx={{ p: 0 }} value='security'>
 			{currentUser && <TabSecurity currentUser={currentUser} />}
 		</TabPanel>
-        <TabPanel sx={{ p: 0 }} value='info'>
-          { currentUser && <TabInfo currentUser={currentUser}/>}
-        </TabPanel>
         <TabPanel sx={{ p: 0 }} value='status'>
             {currentUser && <TabStatus currentUser={currentUser}/>}
         </TabPanel>

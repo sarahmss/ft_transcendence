@@ -4,7 +4,7 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { Link, Card, CardContent, Box, Button} from '@mui/material';
 import { reducer } from "../../common/helper";
-import { Front2Fa, IntraloginLink } from "../../common/constants";
+import { IntraloginLink } from "../../common/constants";
 import './css/login.component.css'
 import AuthService from "../../services/auth.service";
 import * as Yup from "yup";
