@@ -3,13 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { RoomCreationData } from 'src/chat/dto/room.dto';
 import { DIRECT, GROUP } from 'src/constants/roomType.constant';
 import { DirectRoom, GroupRoom, Room } from 'src/entity/room.entity';
-import { User } from 'src/entity/user.entity';
 import { UsersService } from 'src/users/users.service';
 import { In, Repository } from 'typeorm';
 import { MembershipService } from '../membership/membership.service';
 import * as bcrypt from 'bcrypt';
 import { MessageService } from '../message/message.service';
-import { HideMessageService } from '../hide-message/hide-message.service';
 
 @Injectable()
 export class RoomService {
@@ -18,10 +16,7 @@ export class RoomService {
 		@InjectRepository(Room) private readonly roomRepository: Repository<Room>,
 		@InjectRepository(GroupRoom) private readonly groupRepository: Repository<GroupRoom>,
 		@InjectRepository(DirectRoom) private readonly directRepository: Repository<DirectRoom>,
-		@Inject(HideMessageService) private readonly hideMessageService: HideMessageService,
 		@Inject(UsersService) private readonly userService: UsersService,
-		@Inject(MembershipService) private readonly membershipService: MembershipService,
-		@Inject(MessageService) private readonly messageService: MessageService,
 	) {}
 
 	async checkUser(userList: string[]): Promise<boolean> {
@@ -105,25 +100,6 @@ export class RoomService {
 	}
 
 	async deleteRoom(room: Room) {
-
-		switch (room.roomType) {
-
-			case GROUP:
-				await this.groupRepository.delete(
-					{roomId: room.roomId});
-				break;
-
-			case DIRECT:
-				await this.directRepository.delete(
-						{roomId: room.roomId});
-				break;
-		}
-
-		await this.membershipService.deleteMembershipByRoom(
-			room.roomId);
-
-		await this.messageService.deleteAllRoomMessage(room.roomId);
-
 		await this.roomRepository.delete({roomId: room.roomId});
 	}
 

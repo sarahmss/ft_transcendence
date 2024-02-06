@@ -39,7 +39,7 @@ export class GroupRoom {
 	@Column({name: 'room_id'})
 	roomId: string;
 
-	@OneToOne(() => Room, (entity: Room) => entity.roomId)
+	@OneToOne(() => Room, (entity: Room) => entity.roomId, {onDelete: "CASCADE"})
 	@JoinColumn( {name: 'room_id'})
 	room: Room;
 
@@ -64,7 +64,7 @@ export class DirectRoom {
 	roomId: string;
 
 	@OneToOne( () => Room,
-			  (entity: Room) => entity.roomId )
+			  (entity: Room) => entity.roomId, {onDelete: "CASCADE"} )
 	@JoinColumn( { name: 'room_id'} )
 	room: Room;
 }

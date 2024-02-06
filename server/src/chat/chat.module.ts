@@ -24,6 +24,7 @@ import { Ban } from 'src/entity/ban.entity';
 import { InviteService } from './service/invite/invite.service';
 import { InviteController } from './controller/invite/invite.controller';
 import { Invite } from 'src/entity/invite.entity';
+import { AdminController } from './controller/admin/admin.controller';
 
 @Module({
 	imports: [ 
@@ -47,7 +48,8 @@ import { Invite } from 'src/entity/invite.entity';
 		MessageController,
 		BlacklistController,
 		BanController,
-		InviteController
+		InviteController,
+		AdminController
 	],
 
 	providers: [

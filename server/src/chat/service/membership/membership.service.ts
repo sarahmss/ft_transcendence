@@ -15,6 +15,7 @@ export class MembershipService {
 	async joinRoom(user: User[],
 				   room: Room,
 				   owner: string) {
+
 		for (let k = 0; k < user.length ; k++) {
 
 			let owner_status: boolean = false;
@@ -22,7 +23,7 @@ export class MembershipService {
 			if (user[k].userId == owner)
 				owner_status = true;
 
-			await this.joinSingleUser(user[k], room, owner_status);
+			this.joinSingleUser(user[k], room, owner_status);
 		}
 	}
 
@@ -32,7 +33,8 @@ export class MembershipService {
 			userId: user.userId,
 			room: room,
 			roomId: room.roomId,
-			owner: owner_status
+			owner: owner_status,
+			admin: owner_status 
 		});
 		await this.membershipRepository.insert(member);
 	}
@@ -41,16 +43,10 @@ export class MembershipService {
 		return this.membershipRepository.find();
 	}
 
-	async giveAdmin(user: User, room: Room) {
-		await this.membershipRepository.update(
-			{userId: user.userId, roomId: room.roomId},
-			{ admin: true });
-	}
-
-	async removeAdmin(user: User, room: Room) {
-		await this.membershipRepository.update(
-			{userId: user.userId, roomId: room.roomId},
-			{ admin: false });
+	async toggleAdmin(member: Membership, roomId: string) {
+		this.membershipRepository.update(
+			{userId: member.userId, roomId: roomId},
+			{ admin: !member.admin });
 	}
 
 	async leaveRoom(userId: string, roomId: string) {
@@ -72,6 +68,22 @@ export class MembershipService {
 		});
 	}
 
+	async findParticipantsWithUserLeftJoin(roomId: string, userId: string) {
+		return this.membershipRepository.find({
+			relations: ['user'],
+			where: {
+				roomId: roomId, userId: Not(Equal(userId))
+			}
+		});
+	}
+	
+	async findParticipantsNotExclusive(roomId: string) {
+		return this.membershipRepository.find({
+			where: {
+				roomId: roomId
+			}
+		});
+	}
 
 	async checkDirectRoomMembership(user1: User, user2: User): Promise<boolean> {
 		let result = await this.membershipRepository

@@ -12,7 +12,7 @@ export class Ban {
   @PrimaryGeneratedColumn('uuid', {name: "ban_id"})
   banId: string;
 
-  @ManyToOne(() => User, (entity: User) => entity.userId)
+  @ManyToOne(() => User, (entity: User) => entity.userId, {onDelete: "CASCADE"})
   @JoinColumn({name: 'banned_id'})
   banned: User;
 
@@ -25,7 +25,7 @@ export class Ban {
   @Column({type: 'timestamptz'})
   ban_end: Date;
 
-  @ManyToOne(() => Room, (entity: Room) => entity.roomId)
+  @ManyToOne(() => Room, (entity: Room) => entity.roomId, {onDelete: "CASCADE"})
   @JoinColumn({name: 'room_id'})
   room: Room;
 }

@@ -52,12 +52,11 @@ export class InviteController {
     if (!invitation)
       throw new NotFoundException('Invitation not found');
 
-    if (userId !== invitation.inviteId)
-      throw new UnauthorizedException('Invation not meant for this user');
-
-    await this.inviteService.useInvitation(inviteId);
+    if (userId !== invitation.userId)
+      throw new UnauthorizedException('Invition not meant for this user');
 
     await this.memberService.joinSingleUser(invitation.user, invitation.room, false);
+    await this.inviteService.useInvitation(inviteId);
     return "invitation used";
   }
 }

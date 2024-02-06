@@ -29,7 +29,7 @@ export class RoomController {
 		private readonly roomService: RoomService,
 		private readonly membershipService: MembershipService,
 		private readonly userService: UsersService,
-		private readonly emitter: EventEmitter2)
+		private readonly eventEmitter: EventEmitter2)
 	{}
 
 	// Test endpoint
@@ -48,10 +48,18 @@ export class RoomController {
 	async getListRoom(@Body('userId') userId: string) {
 		if (!userId)
 			throw new BadRequestException("User id not given");
+
 		let membershipList = await this.membershipService.findMemberRooms(userId);
 		let roomList = [];
-		for (let k = 0; k < membershipList.length; k++)
-			roomList.push(await this.roomService.findRoom(membershipList[k].roomId));
+
+		for (let k = 0; k < membershipList.length; k++) {
+			const room = await this.roomService.findRoom(membershipList[k].roomId);
+			if (room.roomType == DIRECT) {
+				const otherUser = (await this.membershipService.findParticipantsWithUserLeftJoin(room.roomId, userId))[0];
+				room.roomName = otherUser.user.userName;
+			}
+			roomList.push(room);
+		}
 		return roomList;
 	}
 
@@ -63,8 +71,9 @@ export class RoomController {
 		let room = await this.roomService.findRoom(roomId);
 		if (!room)
 			throw new NotFoundException("Room not found");
+		const members = await this.membershipService.findParticipantsNotExclusive(roomId); 
 		await this.roomService.deleteRoom(room);
-		this.emitter.emit('room.delete', room, "left");
+		this.eventEmitter.emit('room.delete', members, room, "delete", (__: any, _:any) => {return {}});
 	}
 
 	@Delete('leave')
@@ -84,7 +93,18 @@ export class RoomController {
 			throw new NotFoundException("The user was not found in this room");
 
 		await this.membershipService.leaveRoom(userId, roomId);
-		this.emitter.emit('room.leave', room, "left");
+		const memberList = await this.membershipService.findParticipantsNotExclusive(roomId);
+		this.eventEmitter.emit('room.leave', memberList, room, "left",
+			(_: any, room : Room, user_leave: User = user) => {
+				return {
+					message: `User ${user_leave.userName} left`,
+					userName: user_leave.userName,
+					userId: user_leave.userId,
+					room: room,
+					roomId: room.roomId
+				}
+			}
+		);
 		return "user left";
 	}
 
@@ -95,24 +115,33 @@ export class RoomController {
 			throw exception;
 		
 		try {
-			let room = await this.roomService.createRoom(roomCreationData);
 			const userList = [];
 
-			roomCreationData.userId.forEach(async (userId: string) => {
-				let user = await this.userService.findById(userId);
+			for (let i: number = 0; i < roomCreationData.userId.length; i++) {
+				let user = await this.userService.findById(roomCreationData.userId[i]);
+				console.log(user);
 
 				if (user)
 					userList.push(user);
 
 				else
 					throw new NotFoundException('User not found');
-			});
-			await this.membershipService.joinRoom(userList,
+			}
+			let room = await this.roomService.createRoom(roomCreationData);
+			await this.membershipService.joinRoom(
+				userList,
 				room,
 				roomCreationData.ownerId
 			);
 
-			this.emitter.emit('room.create', roomCreationData.userId, room, "joined");
+			this.eventEmitter.emit('room.create', roomCreationData.userId, room, "joined",
+				(userId: string, room: Room ) => {
+					return {
+						userId: userId,
+						roomId: room.roomId,
+					}
+				}
+			);
 			return room;
 		}
 		catch ( error ) {
@@ -131,7 +160,17 @@ export class RoomController {
 
 		try {
 			this.membershipService.joinSingleUser(user, room, false);
-			this.emitter.emit('room.join', userJoin.userId, room, "joined");
+			const  memberList = await this.membershipService.findParticipantsNotExclusive(room.roomId);
+			this.eventEmitter.emit('room.join', memberList, userJoin.userId, room, "joined",
+				(_: any, __: any, member: User = user) => {
+					return {
+						userName: member.userName,
+						userId: member.userId,
+						message: `User: ${member.userName}, joined`,
+						room: room
+					};
+				}
+			);
 			return "User Joined"
 		}
 		catch (error) {

@@ -72,18 +72,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const user = await this.checkUser(<string> client.handshake.headers.jwt);
 
 			client.data.userId = user.userId;
-
-			let roomList = [];
-			this.connectedUserService.addConnection(user.userId, client);
-
-			const membershipRoom: Membership[] = await this.membershipService
-																												.findMemberRooms(user.userId);
-
-			membershipRoom.forEach((room) => {
-				roomList.push(room.roomId);
-			});
-
-			client.emit("room-list", await this.roomService.findRoomWithArray(roomList));
 		}
 		catch {
 			console.log("Connection has gone wrong!");
@@ -109,31 +97,21 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.emit("message-response", payload);
 	}
 
-	// Emit the joined room to the client to append on room list of the client
 	// Join => event name: joined
 	// Leave => event name: left
-	@OnEvent('room.join')
-	@OnEvent('room.leave')
-	emitRoomToSingleMember(userId: string, room: Room, emission_event: string) {
-
-		const conn = this.connectedUserService
-			.getConnection(userId);
-		if (conn) {
-			const data = {userId: userId, roomId: room.roomId}
-			conn.emit(emission_event, data);
-		}
-	}
-
 	// Create => event name: joined
 	// Delete => event name: left
+	@OnEvent('room.join')
+	@OnEvent('room.leave')
+	@OnEvent('room.admin')
 	@OnEvent('room.create')
 	@OnEvent('room.delete')
-	emitRoomToAllMembers(users: any, room: Room, emission_event: string) {
+	emitRoomToAllMembers(users: any[], room: any, emission_event: string, cb: any) {
 
 		users.forEach((user: any) => {
 			const conn = this.connectedUserService.getConnection(user.userId);
 			if (conn) {
-				const data = {userId: user.userId, roomId: room.roomId}
+				const data = cb(users, room);
 				conn.emit(emission_event, data);
 			}
 		});

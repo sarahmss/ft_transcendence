@@ -14,6 +14,7 @@ export class InviteService {
 
   async findValid(inviteId: string) {
     return this.inviteRepository.findOne({
+      relations: ['room', 'user'],
       where: {
         inviteId: inviteId,
         timeLimit: MoreThan(new Date()),
@@ -23,7 +24,8 @@ export class InviteService {
   }
 
   async createInvitation(room: Room, user: User) {
-    const instance = this.inviteRepository.create({
+
+    let instance = this.inviteRepository.create({
       user: user,
       userId: user.userId,
       room: room,

@@ -21,11 +21,11 @@ export class Message {
 	@Column({name: 'user_id'})
 	userId: string;
 
-	@ManyToOne(() => Room, (entity: Room) => entity.roomId)
+	@ManyToOne(() => Room, (entity: Room) => entity.roomId, {onDelete: "CASCADE"})
 	@JoinColumn({ name: 'room_id' })
 	room: Room;
 
-	@ManyToOne(() => User, (entity: User) => entity.userId)
+	@ManyToOne(() => User, (entity: User) => entity.userId, {onDelete: "SET NULL"})
 	@JoinColumn({ name: 'user_id' })
 	user: User;
 

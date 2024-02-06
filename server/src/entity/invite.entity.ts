@@ -15,12 +15,13 @@ export class Invite {
   roomId: string;
 
   @ManyToOne(() => User, (entity: User) => entity.userId, {onDelete: 'CASCADE'})
+  @JoinColumn({name: 'user_id'})
+  user: User
+
+  @ManyToOne(() => Room, (entity: Room) => entity.roomId, {onDelete: 'CASCADE'})
   @JoinColumn({name: 'room_id'})
   room: Room;
 
-  @ManyToOne(() => Room, (entity: Room) => entity.roomId, {onDelete: 'CASCADE'})
-  @JoinColumn({name: 'user_id'})
-  user: User
 
   @Column({default: true})
   valid: boolean;
