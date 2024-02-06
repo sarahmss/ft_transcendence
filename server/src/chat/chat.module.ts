@@ -23,10 +23,12 @@ import { BanController } from './controller/ban/ban.controller';
 import { Ban } from 'src/entity/ban.entity';
 import { InviteService } from './service/invite/invite.service';
 import { InviteController } from './controller/invite/invite.controller';
+import { Invite } from 'src/entity/invite.entity';
 
 @Module({
 	imports: [ 
 		TypeOrmModule.forFeature([
+										Invite,
 										Message,
 										Room,
 										DirectRoom,

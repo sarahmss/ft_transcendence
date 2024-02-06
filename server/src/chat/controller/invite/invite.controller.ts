@@ -37,7 +37,9 @@ export class InviteController {
 
     const rawInvitation = await this.inviteService.createInvitation(room, user);
 
-    return {inviteId: rawInvitation.inviteId};
+    return {
+      inviteId: rawInvitation.inviteId
+    };
   }
 
   @Patch()
