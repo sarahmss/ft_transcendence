@@ -1,4 +1,5 @@
 import { Body, ConflictException, Controller, NotFoundException, Patch, Post, UnauthorizedException } from '@nestjs/common';
+import { BanService } from 'src/chat/service/ban/ban.service';
 import { InviteService } from 'src/chat/service/invite/invite.service';
 import { MembershipService } from 'src/chat/service/membership/membership.service';
 import { RoomService } from 'src/chat/service/room/room.service';
@@ -12,6 +13,7 @@ export class InviteController {
     private readonly roomService: RoomService,
     private readonly userService: UsersService,
     private readonly memberService: MembershipService,
+    private readonly banService: BanService,
   ) {}
 
   @Post()
@@ -20,6 +22,9 @@ export class InviteController {
     @Body('roomId') roomId: string,
     @Body('userId') userId: string,
   ) {
+
+    if (await this.banService.checkBan(requestorId, roomId))
+      throw new UnauthorizedException("The user is banned");
 
     const requestorMembership = await this.memberService.findMemberRoom(requestorId, roomId);
     if (!requestorMembership)

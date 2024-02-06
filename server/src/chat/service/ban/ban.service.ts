@@ -69,4 +69,14 @@ export class BanService {
 			return new UnauthorizedException("The current user is banned");
 	}
 
+  async checkBan(userId: string, roomId: string) {
+    return !!(await this.banRepository.findOne({
+                  where: {
+                    ban_end: MoreThan(new Date()),
+                    bannedId: userId,
+                    roomId: roomId
+                  }
+              }));
+  }
+
 }
