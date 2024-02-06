@@ -1,7 +1,6 @@
 import { BadRequestException, Body, Controller, NotFoundException, Patch, UnauthorizedException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { MembershipService } from 'src/chat/service/membership/membership.service';
-import { Membership } from 'src/entity/membership.entity';
 
 @Controller('admin')
 export class AdminController {
