@@ -21,6 +21,8 @@ import { BlacklistController } from './controller/blacklist/blacklist.controller
 import { BanService } from './service/ban/ban.service';
 import { BanController } from './controller/ban/ban.controller';
 import { Ban } from 'src/entity/ban.entity';
+import { InviteService } from './service/invite/invite.service';
+import { InviteController } from './controller/invite/invite.controller';
 
 @Module({
 	imports: [ 
@@ -42,7 +44,8 @@ import { Ban } from 'src/entity/ban.entity';
 		RoomController,
 		MessageController,
 		BlacklistController,
-		BanController
+		BanController,
+		InviteController
 	],
 
 	providers: [
@@ -55,6 +58,7 @@ import { Ban } from 'src/entity/ban.entity';
 		HideMessageService,
 		ConnectedUserService,
 		BanService,
+		InviteService,
 	],
 
 })
