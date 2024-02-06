@@ -91,6 +91,10 @@ export class RoomService {
 		return this.groupRepository.findOne({where: {roomId: roomId}});
 	}
 
+	async findGroupJoin() {
+		
+	}
+
 	async findRoomWithArray(roomIds: string[]) {
 		return this.roomRepository.find({where: {roomId: In(roomIds)}});
 	}
@@ -117,6 +121,7 @@ export class RoomService {
 				protected: false}
 		)
 	}
+
 
 	async togglePrivate(roomId: string) {
 		const privateStatus = await this.groupRepository.findOne({
