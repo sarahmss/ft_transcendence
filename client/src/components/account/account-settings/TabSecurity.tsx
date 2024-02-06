@@ -128,6 +128,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 		return new Promise<void>(async (resolve, reject) => {
 			if (localQr) {
 			try {
+				console.log("Qrcode: ",localQr);
 				const response = await axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' });
 
 				if (response.data) {

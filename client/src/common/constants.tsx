@@ -13,6 +13,8 @@ export const TwoFaEnableLink = TwoFaLink + "/enable"
 export const TwoFaGenerateLink = TwoFaLink + "/generate"
 export const TwoFaLoginLink = TwoFaLink + "/login"
 
+export const pictureStarter = "https://freedesignfile.com/upload/2017/08/astronaut-icon-vector.png";
+
 
 export const FrontLogin = FrontLink + "/login";
 export const FrontGame = FrontLink + "/game";

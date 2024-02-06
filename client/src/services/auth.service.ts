@@ -1,5 +1,6 @@
 import axios, { RawAxiosRequestHeaders }	from "axios";
 
+
 import { BackLink, Front2Fa, LocalSigninLink,
 		LocalSignupLink,
 		UserContentLink,
@@ -120,6 +121,26 @@ class AuthService {
 		const tokenData: tokenData = jwtDecode(cookie);
 		return tokenData.id;
 	}
+
+	async getProfilePicture(localQr: string) {
+		const authTokenQr = this.getAuthToken();
+		localQr = BackLink + localQr;
+		console.log(localQr);
+		const response = await axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' });
+		if (response.data) {
+			const imageBase64 = btoa(
+				new Uint8Array(response.data)
+				.reduce((data, byte) => data + String.fromCharCode(byte), '')
+			)
+			const imgElement = document.createElement('img');
+			imgElement.src = `data:image/png;base64,${imageBase64}`;
+			console.log(imgElement);
+			return imgElement;
+		}
+		return "";
+	}
+
+
 }
 const authService = new AuthService();
 
