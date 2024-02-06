@@ -325,13 +325,34 @@ export class GameService {
 		}
 	}
 
-	// TO DO:
-	// 1. console.log no match pra ver o que aparece em player1 e player2 (se o id deles em relação ao array players está gravado em match)
-	// 2. Se o id deles estiver gravado, é só usar o proprio objeto match
-	//		-> não está, logo, vamos ter que gravar no objeto match tambem (e, numa reconexão, atualizar esse id no objeto match)
-	// na hora de criar um matchHistory pra resgatar o id desses users no banco de dados
-	// no player especifico dentro do array players (vai ter que gravar isso)
-	// daí resgata cada um no banco de dados e grava no matchHistory...
+	async storeMatchHistory(match: MatchModel, roomId: string) {
+		const user1 = await this.usersService.findById(this.game.players[match.player1SocketID].userIdDataBase);
+		const user2 = await this.usersService.findById(this.game.players[match.player2SocketID].userIdDataBase);
+		const matchHist = new MatchHistory();
+		const timeEndMatch = new Date();
+		const durationInSeconds = Math.floor((timeEndMatch.getTime() - match.timeStartMatch.getTime()) / 1000);
+		matchHist.gameTime = durationInSeconds;
+		if (match.score1 > match.score2) {
+			matchHist.winner = user1;
+			matchHist.loser = user2;
+			matchHist.loserScore = match.score2;
+			matchHist.winnerScore = match.score1;
+			user1.winningGames.push(matchHist);
+			user2.losingGames.push(matchHist);
+		}
+		else if (match.score2 > match.score1) {
+			matchHist.winner = user2;
+			matchHist.loser = user1;
+			matchHist.loserScore = match.score1;
+			matchHist.winnerScore = match.score2;
+			user2.winningGames.push(matchHist);
+			user1.losingGames.push(matchHist);
+		}
+		// await this.matchRepository.save(matchHist);
+		await this.usersRepository.save(user1);
+		await this.usersRepository.save(user2);
+		delete this.game.match[roomId];
+	}
 
 	isCurrentUserTheWinner(match: MatchModel, playerNumbers: string): boolean {
 		if ((playerNumbers === 'player1' && match.score1 > match.score2)
@@ -341,7 +362,7 @@ export class GameService {
 			return false;
 	}
 
-	async storeMatchHistory(client: Socket, match: MatchModel, playerNumbers: string) {
+	async updateWinnerScoresInDB(client: Socket, match: MatchModel, playerNumbers: string) {
 		const player = this.game.players[client.id];
 		const user = await this.usersService.findById(player.userIdDataBase);
 		
@@ -367,7 +388,6 @@ export class GameService {
 	}
 
 	async leaveRoomInit(client: Socket, server: Server) {
-
 		const clientId = client.id;
 		const roomId = this.game.players[client.id].room;
 		const room = this.game.rooms[roomId];
@@ -377,63 +397,17 @@ export class GameService {
 			if (this.game.players[client.id].state !== 'watching')
 			{
 				const playerNumbers = 'player' + (client.id === room.player1 ? 1 : 2);
-				room[playerNumbers] = undefined; // 
-				// aqui é um dos jogadores saindo, daí já atualiza informações de 
-				// gamesWon e level (talvez) no banco de dados
+				room[playerNumbers] = undefined;
 				if (match) {
 					match[playerNumbers] = undefined;
 					if (match.status !== 'END') {
-						// ou seja, alguem pressionou o botao ANTES de chegar ao fim da pontuacao da partida
-						// ou seja, esse alguem desistiu. Ninguem ganha?
-						// no Match History ficaria como? dá desistencia apenas?
 						match.status = 'END';
 						match.message = `Player ${
 						  this.game.players[client.id].name
 						} left the match.`;
 					}
 					else {
-						await this.storeMatchHistory(client, match, playerNumbers);
-
-						// ou seja, cai aqui quando o status de match já está como 'END'
-						// ou seja: jogo terminou porque atingiu o limite da pontuacao -> alguem VENCEU
-						// resta saber quem...
-
-						//cria o matchHistory por aqui e grava no user apropriado do banco de dados...
-
-						// o resto desse else virou storeMatchHistory()
-						// if (playerNumbers === 'player1' && match.score1 > match.score2) {
-						// 	client.data.user.gamesWonToLevelUp += 1;
-						// 	client.data.user.totalGamesWon += 1;
-						// } else if (playerNumbers === 'player2' && match.score2 > match.score1) {
-						// 	client.data.user.totalGamesWon += 1;
-						// 	client.data.user.gamesWonToLevelUp += 1;
-						// }
-						// verifica se tem partidas ganhas o suficiente pra
-						// subir de level
-						// if (client.data.user.gamesWonToLevelUp >= this.matchesToLevelUp(client.data.user.level)) {
-						// 	client.data.user.level += 1;
-						// 	client.data.user.gamesWonToLevelUp = 0;
-						// }
-						//mudar isso para uma função própria e só chamar com o client que venceu a partida...
-						// fazer esse resgate do user do banco antes de alterar
-						// variaveis dele, e só fazer essas alterações se findById tiver
-						// conseguido encontrar o user no banco...
-						// acho que só precisaria gravar o userId no objeto do array players
-						// porque daí é só "trocar" isso na reconexão e fazer essa chamada
-						// na hora de gravar como já tá fazendo
-						// console.log('Games Won desse client de nome ', JSON.stringify(client.data.user.totalGamesWon));
-						// const user = await this.usersService.findById(client.data.user.userId);
-						// if (user) {
-						// 	user.gamesWonToLevelUp = client.data.user.gamesWonToLevelUp;
-						// 	user.totalGamesWon = client.data.user.totalGamesWon;
-						// 	user.level = client.data.user.level;
-							//const userRepository = getRepository(User);
-							//await userRepository.save(client.data.user); //será que ele travou ao voltar por conta desse await?
-						// 	await this.usersRepository.save(client.data.user);
-						// 	console.log('CONSEGUIMOS SALVAR O USUARIO NO BANCO DEPOIS DA PARTIDA');
-						// }
-						// else
-						// 	console.log('NÃO ENCONTRAMOS ESSE USER NO BANCO');
+						await this.updateWinnerScoresInDB(client, match, playerNumbers);
 					}
 				}
             }
@@ -442,51 +416,12 @@ export class GameService {
 				delete room.spectators[client.id];
 				server.to(client.id).emit('RemoveMatch');
 			}
+
 			this.game.players[client.id].room = '';
 			this.game.players[client.id].state = '';
-
 			if (!room.player1 && !room.player2 && Object.keys(room.spectators).length === 0) {
 				if (match) {
-					// é aqui que precisa gravar as informações da
-					// partida antes de fazer o delete
-					// isso inclui: nomes dos jogadores (player1Name e player2Name armazenado em this.game.rooms[roomId])
-					// score1, score2, timeStartMatch armazenado em match (timeStartMatch pra ser usado pra calcular o tempo que a partida levou)
-					// vai ter que criar um match,
-					// resgatar o user do banco e alterar/adicionar
-					// esse match à ele (dependendendo se for o usuario perdedor ou vencedor (acho que))
-					// e pelo jeito vai ter que criar e gravar esse match nos respectivos users do banco
-					// ANTES DAQUI, porque nesse contexto aqui já estaríamos na perspectiva
-					// do jogador que resta na sala pra sair, entao o outro nao passa por aqui, e pode
-					// ser tanto o perdedor quanto o vencedor...
-					const user1 = await this.usersService.findById(this.game.players[match.player1SocketID].userIdDataBase);
-					const user2 = await this.usersService.findById(this.game.players[match.player2SocketID].userIdDataBase);
-					const matchHist = new MatchHistory();
-					const timeEndMatch = new Date();
-    				const durationInSeconds = Math.floor((timeEndMatch.getTime() - match.timeStartMatch.getTime()) / 1000);
-					matchHist.gameTime = durationInSeconds;
-					// falta salvar a duracao da partida (novo Date() pro tempo atual e tirar o calculo da duracao e armazenar)
-					if (match.score1 > match.score2) {
-						matchHist.winner = user1;
-						matchHist.loser = user2;
-						matchHist.loserScore = match.score2;
-						matchHist.winnerScore = match.score1;
-						// tambem é necessário atualizar o vetor MatchHistory em user
-						user1.winningGames.push(matchHist);
-						user2.losingGames.push(matchHist);
-					}
-					else if (match.score2 > match.score1) {
-						matchHist.winner = user2;
-						matchHist.loser = user1;
-						matchHist.loserScore = match.score1;
-						matchHist.winnerScore = match.score2;
-						// tambem é necessário atualizar o vetor MatchHistory em user
-						user2.winningGames.push(matchHist);
-						user1.losingGames.push(matchHist);
-					}
-					// await this.matchRepository.save(matchHist);
-					await this.usersRepository.save(user1);
-					await this.usersRepository.save(user2);
-					delete this.game.match[roomId];
+					await this.storeMatchHistory(match, roomId);
                 }
 				delete this.game.rooms[roomId];
             }
@@ -526,7 +461,6 @@ export class GameService {
     }
 
     moveBall({ball}) {
-
         const xpos = ball.x + ball.xspeed * ball.xdirection;
         const ypos = ball.y + ball.yspeed * ball.ydirection;
         ball.x = xpos;
@@ -534,7 +468,6 @@ export class GameService {
     }
 
     movePaddle(match) {
-
         [1, 2].forEach((i) => {
         const player = match[`player${i}`];
         switch (player.direction) {
@@ -557,7 +490,6 @@ export class GameService {
     }
 
     restartMatch(match, roomId) {
-
       const { ball, gameConfig } = match;
 
       ball.xdirection *= -1;
@@ -573,7 +505,6 @@ export class GameService {
     }
 
     checkCollision(match, roomId) {
-
         const { ball, gameConfig } = match;
         if (ball.y > gameConfig.height - ball.width || ball.y < ball.width) {
             ball.ydirection *= -1;
