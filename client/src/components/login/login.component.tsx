@@ -2,12 +2,13 @@ import { Component, useReducer } from "react";
 import { Navigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link, Card, CardContent, Box, Button, Divider} from '@mui/material';
+import { Link, Card, CardContent, Box, Button} from '@mui/material';
 import { reducer } from "../../common/helper";
-import { IntraloginLink } from "../../common/constants";
+import { Front2Fa, IntraloginLink } from "../../common/constants";
 import './css/login.component.css'
 import AuthService from "../../services/auth.service";
 import * as Yup from "yup";
+import LoginBack from '../assets/login.jpeg';
 
 type Props = {};
 
@@ -109,27 +110,36 @@ export default class Login extends Component<Props, State> {
 			loading: true
 		});
 
-		await AuthService.LocalLogin(userName, password).then(
-			() => {
-				this.setState({
-				redirect: "/"
-				});
+		await AuthService.LocalLogin(
+			userName,
+			password
+			).then(
+			response => {
+				this.setState({ redirect: "/" });
+				document.cookie = response.data.cookie;
+				sessionStorage.setItem("Logged", "ok");
 			},
 			error => {
-				const resMessage =
-					(error.response &&
-					error.response.data &&
-					error.response.data.message) ||
-					error.message ||
-					error.toString();
+				if (error.response.status === 307)
+				{
+					const userId = error.response.data.userId;
+					console.log(userId);
+					this.setState({ redirect: `/2fa?user=${userId}` });
+				} else {
+					const resMessage =
+						(error.response &&
+						error.response.data &&
+						error.response.data.message) ||
+						error.message ||
+						error.toString();
 
-				this.setState({
-					loading: false,
-					message: resMessage
-				});
+					this.setState({
+						loading: false,
+						message: resMessage });
+					}
 				}
 			);
-			}
+		}
 
 	render() {
 		if (this.state.redirect) {

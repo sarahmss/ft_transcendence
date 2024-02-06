@@ -16,6 +16,7 @@ export const TwoFaLoginLink = TwoFaLink + "/login"
 
 export const FrontLogin = FrontLink + "/login";
 export const FrontGame = FrontLink + "/game";
+export const Front2Fa = FrontLink + "/2fa";
 export const DefaultPic = "https://ssl.gstatic.com/accounts/ui/avatar_2x.png";
 export const DEFAULT_ERROR_MSG = "ooops, something went wrong";
 

@@ -15,8 +15,8 @@ export class AuthService {
 		try{
 			const user: User = await this.usersService.validateLocalUser(data);
 			if (user.has2FaAuth) {
-				return response.redirect(process.env.FRONT_URL + `/2fa?user=${user.userId}`);
-			}
+				return response.status(307).json({ userId: user.userId });
+			};
 			const token = this.jwtService.sign({ id: user.userId });
 			response.cookie('accessToken',
 								token,

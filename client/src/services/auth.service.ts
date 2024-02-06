@@ -1,32 +1,28 @@
 import axios, { RawAxiosRequestHeaders }	from "axios";
-// import {useSelector, useDispatch} from "react-redux";
-// import {addUser, userLog} from './reduceStore';
 
-import { BackLink, LocalSigninLink,
+import { BackLink, Front2Fa, LocalSigninLink,
 		LocalSignupLink,
 		UserContentLink,
 		tokenData } from "../common/constants";
 
-		
-		import "core-js/stable/atob";
-		import { jwtDecode } from "jwt-decode";
-		
+
+import "core-js/stable/atob";
+import { jwtDecode } from "jwt-decode";
+
 class AuthService {
-			
+
 	async LocalLogin(userName: string, password: string) {
 		try {
-			console.log(LocalSigninLink, userName, password);
-
 			const response = await axios.post(LocalSigninLink, {
 				userName,
 				password,
 			});
-			document.cookie = response.data.cookie;
-			sessionStorage.setItem("Logged", "ok");
+			return (response);
 		} catch (error) {
 		console.error("Error during LocalLogin:", error);
 		throw error;
 		}
+
 	}
 
 	IntraLogin() {
@@ -57,7 +53,6 @@ class AuthService {
 			password,
 			passwordConfirm: passwordConfirm,
 			});
-			console.log(response)
 			return response;
 		} catch (error) {
 			console.error("Error during register:", error);
