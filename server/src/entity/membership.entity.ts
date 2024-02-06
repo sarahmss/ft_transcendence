@@ -17,12 +17,12 @@ export class Membership {
 	userId: string;
 
 	@ManyToOne(() => Room,
-			   (entity: Room) => entity.roomId )
+			   (entity: Room) => entity.roomId, {onDelete: "CASCADE"} )
 	@JoinColumn({ name: 'room_id' })
 	room: Room;
 
 	@ManyToOne(() => User,
-			   (entity: User) => entity.userId)
+			   (entity: User) => entity.userId, {onDelete: "CASCADE"} )
 	@JoinColumn({ name: 'user_id' })
 	user: User;
 

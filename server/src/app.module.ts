@@ -10,10 +10,12 @@ import { AuthMiddleware } from './auth/midlleware/auth.midlleware';
 import { PassportModule } from '@nestjs/passport';
 import { UploadsModule } from './uploads/upload.module';
 import { ChatModule } from './chat/chat.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GameModule } from './game/game.module';
 
 @Module({
 	imports: [
+		EventEmitterModule.forRoot(),
 		ConfigModule.forRoot(),
 		PassportModule.register({ session: true }),
 		UsersModule,
@@ -46,6 +48,7 @@ export class AppModule implements NestModule {
 			{ path: '/auth/signup', method: RequestMethod.POST },
 			{ path: '/auth/signin', method: RequestMethod.POST },
 			{ path: '/2fa-auth/login', method: RequestMethod.POST },
+			{ path: '/images/:userId/:path', method: RequestMethod.GET },
 		)
 		.forRoutes('');
 	}

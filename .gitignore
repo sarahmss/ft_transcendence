@@ -1,3 +1,7 @@
+./Backend/node_modules
+./Backend/dist
+node_modules
+*.sh
 ./server/node_modules
 ./server/dist
 ./client/node_modules
