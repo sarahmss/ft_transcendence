@@ -7,7 +7,6 @@ import { Column,
 	OneToOne,
 	PrimaryGeneratedColumn } from 'typeorm';
 
-import { User } from './user.entity';
 import { Membership } from './membership.entity';
 
 
@@ -17,7 +16,7 @@ export class Room {
 	@PrimaryGeneratedColumn('uuid')
 	roomId: string;
 
-	@Column({ default: 'Default name'} )
+	@Column({nullable: true})
 	roomName: string;
 
 	@Column()
@@ -37,12 +36,21 @@ export class GroupRoom {
 	@PrimaryGeneratedColumn('uuid', { name: 'group_chat_id' })
 	roomGId: string;
 
-	@OneToOne(() => User, (entity: User) => entity.userId)
+	@Column({name: 'room_id'})
+	roomId: string;
+
+	@OneToOne(() => Room, (entity: Room) => entity.roomId, {onDelete: "CASCADE"})
 	@JoinColumn( {name: 'room_id'})
-	roomId: Room;
+	room: Room;
 
 	@Column( {default: true, name: "is_private" } )
 	isPrivate: boolean;
+
+	@Column( { default: false } )
+	protected: boolean;
+
+	@Column( { default: null, nullable: true } )
+	password: string;
 }
 
 @Entity()
@@ -52,9 +60,11 @@ export class DirectRoom {
 							{ name: 'direct_chat_id' })
 	roomDId: string;
 
-	@OneToOne( () => Room,
-			  (entity: Room) => entity.roomId )
-	@JoinColumn( { name: 'room_id'} )
-	roomId: Room;
+	@Column({name: 'room_id'})
+	roomId: string;
 
+	@OneToOne( () => Room,
+			  (entity: Room) => entity.roomId, {onDelete: "CASCADE"} )
+	@JoinColumn( { name: 'room_id'} )
+	room: Room;
 }

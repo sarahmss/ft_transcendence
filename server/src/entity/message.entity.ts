@@ -15,17 +15,23 @@ export class Message {
 	@PrimaryGeneratedColumn("uuid", {name: 'message_id'})
 	messageId: string;
 
-	@ManyToOne(() => Room, (entity: Room) => entity.roomId)
+	@Column({name: 'room_id'})
+	roomId: string;
+
+	@Column({name: 'user_id'})
+	userId: string;
+
+	@ManyToOne(() => Room, (entity: Room) => entity.roomId, {onDelete: "CASCADE"})
 	@JoinColumn({ name: 'room_id' })
-	roomId: Room;
+	room: Room;
 
-	@Column()
-	message: string;
-
-	@OneToMany(() => User, (entity: User) => entity.userId)
+	@ManyToOne(() => User, (entity: User) => entity.userId, {onDelete: "SET NULL"})
 	@JoinColumn({ name: 'user_id' })
-	userId: User;
+	user: User;
 
 	@UpdateDateColumn({ type: 'timestamptz' })
 	timestamp: Date;
+
+	@Column()
+	message: string;
 }

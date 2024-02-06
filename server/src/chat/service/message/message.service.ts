@@ -4,6 +4,8 @@ import { Message } from 'src/entity/message.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/entity/user.entity';
 import { Room } from 'src/entity/room.entity';
+import { isEmpty } from 'class-validator';
+import * as xssFilters from 'xss-filters';
 
 @Injectable()
 export class MessageService {
@@ -14,13 +16,18 @@ export class MessageService {
 						room: Room,
 						user: User): Promise<Message> {
 
-		let messageInstance = this.messageRepository.create()
+		const sanitizedMessage = xssFilters.inHTMLData(message);
 
-		messageInstance.message = message;
-		messageInstance.roomId = room;
-		messageInstance.userId = user;
+		let messageInstance: Message = this.messageRepository.create({
+				message: sanitizedMessage,
+				room: room,
+				user: user,
+				roomId: room.roomId,
+				userId: user.userId,
+			});
 
 		await this.messageRepository.insert(messageInstance);
+
 		return messageInstance;
 	}
 
@@ -28,40 +35,64 @@ export class MessageService {
 		return await this.messageRepository.findOne({where: {messageId: messageId}});
 	}
 
-	async findMessage(user: User,
-					 room: Room,
+	async findRoomMessage(room: Room,
 					 quant: number = 25): Promise<Message[]> {
 
-		return await this.messageRepository.find({ where:
-													{userId: user, roomId: room},
-													order:
-														{ timestamp: 'DESC' },
-													take: quant});
+		const query = this.messageRepository
+			.createQueryBuilder('msg')
+			.innerJoinAndSelect('msg.user', 'user')
+			.where('msg.room_id = :rid', {rid: room.roomId})
+			.take(quant)
+			.orderBy('msg.timestamp', 'DESC');
+
+
+		return query.getMany();
 	}
 
-	async findMessageWithPage(user: User,
+	async findMessageWithPage(
 							  room: Room,
 							  page: number,
 							  quant: number = 25): Promise<Message[]> {
 
-		if (page < 0)
+		if (isEmpty(page) || page < 0)
 			page = 0;
 
-		return await this.messageRepository.find({ where:
-										   		 {userId: user, roomId: room},
-													order:
-														{ timestamp: 'DESC' },
-													take: quant,
-													skip: page * quant});
+		const query = this.messageRepository
+			.createQueryBuilder('msg')
+			.innerJoinAndSelect('msg.user', 'user')
+			.where('msg.room_id = :rid', {rid: room.roomId})
+			.take(quant)
+			.skip(quant * page)
+			.orderBy('msg.timestamp', 'DESC');
+
+		return query.getMany();
 	}
 
 	async updateMessage(messageId: string,
 					   newMessage: string) {
-		return await this.messageRepository.update({messageId: messageId},
-												   {message: newMessage});
+
+		const sanitizedMessage = xssFilters.inHTMLData(newMessage);
+		return this.messageRepository.update(
+																	{messageId: messageId},
+																   {message: sanitizedMessage});
 	}
 
 	async deleteMessage(messageId: string) {
 		await this.messageRepository.delete({messageId: messageId});
+	}
+
+	async getAllMessage() {
+
+		const query = this.messageRepository
+			.createQueryBuilder('msg')
+			.innerJoinAndSelect('msg.user', 'user')
+			.orderBy('msg.timestamp', 'DESC');
+
+		return query.getMany();
+
+	}
+
+	async deleteAllRoomMessage(roomId: string) {
+		await this.messageRepository.delete({roomId: roomId});
 	}
 }

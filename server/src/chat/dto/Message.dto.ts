@@ -1,29 +1,27 @@
 
 import { IsNotEmpty } from 'class-validator';
-import { Message } from 'src/entity/message.entity';
-import { Room } from 'src/entity/room.entity';
-import { User } from 'src/entity/user.entity';
-
 
 export class createMessage {
 	@IsNotEmpty()
-	user: User;
+	userId: string;
 
 	@IsNotEmpty()
-	room: Room;
+	roomId: string;
 
 	@IsNotEmpty()
 	message: string;
 }
 
-
 export class GetMessage {
 
 	@IsNotEmpty()
-	user: User;
+	userId: string;
 
 	@IsNotEmpty()
-	room: Room;
+	roomId: string;
+
+	@IsNotEmpty()
+	page: number;
 
 	quant: number;
 }
@@ -31,7 +29,7 @@ export class GetMessage {
 export class UpdateMessage {
 
 	@IsNotEmpty()
-	message: Message;
+	messageId: string;
 
 	@IsNotEmpty()
 	newMessage: string;
@@ -39,5 +37,5 @@ export class UpdateMessage {
 
 export class DeleteMessage {
 	@IsNotEmpty()
-	message: Message;
+	messageId: string;
 }
