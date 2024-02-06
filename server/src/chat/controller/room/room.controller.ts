@@ -6,7 +6,6 @@ import { BadRequestException,
 	Delete,
 	Get,
 	NotFoundException,
-	Param,
 	Patch,
 	Post,
 	UnauthorizedException } from '@nestjs/common';

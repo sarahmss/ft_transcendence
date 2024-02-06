@@ -9,6 +9,7 @@ import { In, Repository } from 'typeorm';
 import { MembershipService } from '../membership/membership.service';
 import * as bcrypt from 'bcrypt';
 import { MessageService } from '../message/message.service';
+import { HideMessageService } from '../hide-message/hide-message.service';
 
 @Injectable()
 export class RoomService {
@@ -17,6 +18,7 @@ export class RoomService {
 		@InjectRepository(Room) private readonly roomRepository: Repository<Room>,
 		@InjectRepository(GroupRoom) private readonly groupRepository: Repository<GroupRoom>,
 		@InjectRepository(DirectRoom) private readonly directRepository: Repository<DirectRoom>,
+		@Inject(HideMessageService) private readonly hideMessageService: HideMessageService,
 		@Inject(UsersService) private readonly userService: UsersService,
 		@Inject(MembershipService) private readonly membershipService: MembershipService,
 		@Inject(MessageService) private readonly messageService: MessageService,

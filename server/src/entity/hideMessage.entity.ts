@@ -19,15 +19,15 @@ export class HideMessage {
   @Column({name: "room_id"})
   roomId: string;
 
-  @ManyToOne(() => Message, (entity: Message) => entity.messageId )
+  @ManyToOne(() => Message, (entity: Message) => entity.messageId, {onDelete: "CASCADE"} )
   @JoinColumn({name: 'message_id'})
   message: Message;
 
-  @ManyToOne(() => User, (entity: User) => entity.userId)
+  @ManyToOne(() => User, (entity: User) => entity.userId, {onDelete: "CASCADE"})
   @JoinColumn({name: "target_id"})
   target: User;
 
-  @ManyToOne(() => Room, (entity: Room) => entity.roomId)
+  @ManyToOne(() => Room, (entity: Room) => entity.roomId, {onDelete: "CASCADE"})
   @JoinColumn({name: "room_id"})
   room: Room;
 }

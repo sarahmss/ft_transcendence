@@ -65,7 +65,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		return user;
 	}
 
-	async handleConnection(client: Socket, ...args: any[]) {
+	async handleConnection(client: Socket) {
 
 		// Authentication via jwt token sent by the client
 		try {
@@ -97,6 +97,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			.removeConnection(client.data.userId);
 
 		client.disconnect();
+		console.log("User disconnected");
 	}
 
 	// Test listener

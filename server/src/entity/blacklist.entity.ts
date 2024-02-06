@@ -26,15 +26,15 @@ export class BlackList {
 	@Column({name: 'room_id'})
 	roomId: string;
 
-	@ManyToOne(() => User, (entity: User) => entity.userId)
+	@ManyToOne(() => User, (entity: User) => entity.userId, {onDelete: "CASCADE"})
 	@JoinColumn({name: 'blocker'})
 	blocker: User;
 
-	@ManyToOne(() => User, (entity: User) => entity.userId)
+	@ManyToOne(() => User, (entity: User) => entity.userId, {onDelete: "CASCADE"})
 	@JoinColumn({name: 'blocked_user'})
 	blocked_user: User;
 
-	@ManyToOne(() => Room, (entity: Room) => entity.roomId)
+	@ManyToOne(() => Room, (entity: Room) => entity.roomId, {onDelete: "CASCADE"})
 	@JoinColumn({name: 'room_id'})
 	room: Room;
 
