@@ -48,15 +48,22 @@ export class RoomController {
 	async getListRoom(@Body('userId') userId: string) {
 		if (!userId)
 			throw new BadRequestException("User id not given");
-
-		let membershipList = await this.membershipService.findMemberRooms(userId);
+		
+		let membershipList = await this.membershipService.findMemberRoomsWithJoinRoom(userId);
 		let roomList = [];
 
 		for (let k = 0; k < membershipList.length; k++) {
-			const room = await this.roomService.findRoom(membershipList[k].roomId);
-			if (room.roomType == DIRECT) {
-				const otherUser = (await this.membershipService.findParticipantsWithUserLeftJoin(room.roomId, userId))[0];
-				room.roomName = otherUser.user.userName;
+			let room: any = membershipList[k].room;
+
+			switch (room.roomType) {
+				case DIRECT:
+					const otherUser = (await this.membershipService.findParticipantsWithUserLeftJoin(room.roomId, userId))[0];
+					room.roomName = otherUser.user.userName;
+					break;
+				case GROUP:
+					const groupRoom = (await this.roomService.findGroup(room.roomId));
+					room.isProtected = groupRoom.protected;
+					break;
 			}
 			roomList.push(room);
 		}

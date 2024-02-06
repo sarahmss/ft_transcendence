@@ -57,9 +57,20 @@ export class MembershipService {
 		return this.membershipRepository.find({where: {userId: userId}});
 	}
 
+	async findMemberRoomsWithJoinRoom(userId: string) {
+		return this.membershipRepository.find({
+			relations: ['room'],
+			where: {userId: userId}
+		});
+	}
+
 	async findMemberRoom(userId: string, roomId: string) {
-		return this.membershipRepository.findOne({where: {userId: userId,
-													roomId: roomId}});
+		return this.membershipRepository.findOne({
+			where: {
+				userId: userId,
+				roomId: roomId
+			}
+		});
 	}
 
 	async findParticipants(roomId: string, userId: string) {

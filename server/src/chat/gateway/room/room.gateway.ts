@@ -47,9 +47,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	constructor(
 		private readonly authService: AuthService,
 		private readonly userService: UsersService,
-		private readonly membershipService: MembershipService,
 		private readonly connectedUserService: ConnectedUserService,
-		private readonly roomService: RoomService,
 	) {}
 
 	@WebSocketServer() server: Server;
@@ -72,9 +70,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const user = await this.checkUser(<string> client.handshake.headers.jwt);
 
 			client.data.userId = user.userId;
+			this.connectedUserService.addConnection(user.userId, client);
 		}
 		catch {
-			console.log("Connection has gone wrong!");
+			console.log("User auth failure");
 			this.handleDisconnect(client);
 		}
 	}
