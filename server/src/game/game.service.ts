@@ -1,5 +1,10 @@
 import { Injectable, Logger } from "@nestjs/common";
 import { Server, Socket } from 'socket.io';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from '../entity/user.entity';
+import { UsersService } from '../users/users.service';
+import { MatchHistory } from '../entity/match.entity';
 
 class GameModel {
 	players: Record<string, PlayerModel>;
@@ -19,6 +24,7 @@ export class PlayerModel {
 	name: string;
 	room: string;
 	id: string;
+	userIdDataBase: any;
 	state: string;
 	customizations: any
 	disconnected : any;
@@ -28,6 +34,7 @@ export class PlayerModel {
 		this.name = data.name;
 		this.id = data.id;
 		this.room = data.room || '';
+		this.userIdDataBase = '';
 		this.state = '';
 		this.disconnected = undefined;
 		this.timerId = undefined;
@@ -56,6 +63,8 @@ class RoomModel {
 class MatchModel {
 	score1: number;
 	score2: number;
+	player1SocketID: string;
+	player2SocketID: string;
 	gameConfig: any;
 	player1: any;
 	player2: any;
@@ -65,12 +74,14 @@ class MatchModel {
 	message: string;
 	accelerated: boolean;
 
-	constructor(gameConfig: any) {
+	constructor(gameConfig: any, player1SocketID: string, player2SocketID: string) {
 		this.score1 = 0;
 		this.score2 = 0;
 		this.gameConfig = gameConfig;
 		this.player1 = { ready: false, x: 10, y: this.gameConfig.height / 2, height: 80, width: 10, speed: 5};
 		this.player2 = { ready: false, x: this.gameConfig.width - 10, y: this.gameConfig.height / 2, height: 80, width: 10, speed: 5 };
+		this.player1SocketID = player1SocketID;
+		this.player2SocketID = player2SocketID;
 		this.status = 'CUSTOM';
 		this.timeStartMatch = '';
 		this.ball = '';
@@ -82,10 +93,18 @@ class MatchModel {
 @Injectable()
 export class GameService {
 
+	constructor(
+		@InjectRepository(User)
+		private readonly usersRepository: Repository<User>,
+		private readonly usersService: UsersService,
+		@InjectRepository(MatchHistory)
+		private readonly matchRepository: Repository<MatchHistory>,
+		) {}
+
     public logger: Logger = new Logger('AppGateway');
     public gameConfig = {
-        width: 580,
-        height: 320,
+        width: 640,
+        height: 420,
     };
 
 	public game: GameModel = new GameModel();
@@ -121,17 +140,20 @@ export class GameService {
         this.refreshMatch(server, roomId);
     }
 
-	rejoinRoom(client: Socket, oldClientId: string): void {
+	rejoinRoom(client: Socket, oldClientId: string, server: Server): void {
 		const currentCliendId = client.id;
 		const player = this.game.players[currentCliendId];
-
 		if (!player || !player.room) {
 			return;
 		}
 
 		const roomId = player.room;
 		const room = this.game.rooms[roomId];
-
+		const match = this.game.match[roomId];
+		if (match.player1SocketID === oldClientId)
+			match.player1SocketID = currentCliendId;
+		else if (match.player2SocketID === oldClientId)
+			match.player2SocketID = oldClientId;
 		if (player.state === 'watching')
 		{
 			if (room)
@@ -159,6 +181,7 @@ export class GameService {
 
 		client.join(roomId);
 		console.log(`${player.name} rejoined room`);
+		this.refreshMatch(server, roomId); //essa ordem pode afetar? será melhor deixar no gateway em handleRecconect?
 	}
 
     joinRoom(client: Socket, roomId: string, server : Server) {
@@ -171,7 +194,7 @@ export class GameService {
 		this.game.players[client.id].state = 'in_room';
         const room = this.game.rooms[roomId];
         if (room.player1 && room.player2) {
-			this.game.match[roomId] = new MatchModel(this.gameConfig);
+			this.game.match[roomId] = new MatchModel(this.gameConfig, room.player1, room.player2);
           this.gameInProgress(roomId, server);
         }
         this.refreshPlayers(server);
@@ -220,6 +243,7 @@ export class GameService {
                 x: this.gameConfig.width / 2,
                 y: this.gameConfig.height / 2,
             };
+			console.log('GAME LOADED, OBJETO MATCH: ', JSON.stringify(match));
         }
     }
 
@@ -290,8 +314,80 @@ export class GameService {
 		match[playerNumbers] = { ...match[playerNumbers], direction };
 	}
 
-	leaveRoomInit(client: Socket, server: Server): void {
+	matchesToLevelUp(currentLevel: number): number {
+		if(currentLevel < 5) {
+			return 5;
+		} else {
 
+			const baseGame = 5;// quantidade inicial de partidas necessárias
+			const increment = 2;// incremento a cada 3 níveis
+			return baseGame + increment * Math.floor((currentLevel - 5) / 3);
+		}
+	}
+
+	async storeMatchHistory(match: MatchModel, roomId: string) {
+		const user1 = await this.usersService.findById(this.game.players[match.player1SocketID].userIdDataBase);
+		const user2 = await this.usersService.findById(this.game.players[match.player2SocketID].userIdDataBase);
+		const matchHist = new MatchHistory();
+		const timeEndMatch = new Date();
+		const durationInSeconds = Math.floor((timeEndMatch.getTime() - match.timeStartMatch.getTime()) / 1000);
+		matchHist.gameTime = durationInSeconds;
+		if (match.score1 > match.score2) {
+			matchHist.winner = user1;
+			matchHist.loser = user2;
+			matchHist.loserScore = match.score2;
+			matchHist.winnerScore = match.score1;
+			user1.winningGames.push(matchHist);
+			user2.losingGames.push(matchHist);
+		}
+		else if (match.score2 > match.score1) {
+			matchHist.winner = user2;
+			matchHist.loser = user1;
+			matchHist.loserScore = match.score1;
+			matchHist.winnerScore = match.score2;
+			user2.winningGames.push(matchHist);
+			user1.losingGames.push(matchHist);
+		}
+		// await this.matchRepository.save(matchHist);
+		await this.usersRepository.save(user1);
+		await this.usersRepository.save(user2);
+		delete this.game.match[roomId];
+	}
+
+	isCurrentUserTheWinner(match: MatchModel, playerNumbers: string): boolean {
+		if ((playerNumbers === 'player1' && match.score1 > match.score2)
+			|| (playerNumbers === 'player2' && match.score2 > match.score1))
+			return true;
+		else
+			return false;
+	}
+
+	async updateWinnerScoresInDB(client: Socket, match: MatchModel, playerNumbers: string) {
+		const player = this.game.players[client.id];
+		const user = await this.usersService.findById(player.userIdDataBase);
+		
+		if (user) {
+			if (this.isCurrentUserTheWinner(match, playerNumbers)) {
+				user.gamesWonToLevelUp += 1;
+				user.totalGamesWon += 1;
+				const gamesWonToLevelUp = user.gamesWonToLevelUp;
+				if (gamesWonToLevelUp >= this.matchesToLevelUp(user.level)) {
+					user.level += 1;
+					user.gamesWonToLevelUp = 0;
+				}
+				await this.usersRepository.save(user);
+				console.log('CONSEGUIMOS SALVAR O USUARIO VENCEDOR NO BANCO DEPOIS DA PARTIDA');
+			}
+			else {
+				console.log('Esse user não é o vencedor: ', user.userName);
+			}
+		}
+		else {
+			console.log('NÃO ENCONTRAMOS ESSE USER NO BANCO');
+		}
+	}
+
+	async leaveRoomInit(client: Socket, server: Server) {
 		const clientId = client.id;
 		const roomId = this.game.players[client.id].room;
 		const room = this.game.rooms[roomId];
@@ -310,6 +406,9 @@ export class GameService {
 						  this.game.players[client.id].name
 						} left the match.`;
 					}
+					else {
+						await this.updateWinnerScoresInDB(client, match, playerNumbers);
+					}
 				}
             }
 			else
@@ -317,17 +416,12 @@ export class GameService {
 				delete room.spectators[client.id];
 				server.to(client.id).emit('RemoveMatch');
 			}
+
 			this.game.players[client.id].room = '';
 			this.game.players[client.id].state = '';
-
 			if (!room.player1 && !room.player2 && Object.keys(room.spectators).length === 0) {
 				if (match) {
-					// é aqui que precisa gravar as informações da
-					// partida antes de fazer o delete
-					// isso inclui: nomes dos jogadores (player1Name e player2Name armazenado em this.game.rooms[roomId])
-					// score1, score2, timeStartMatch armazenado em match (timeStartMatch pra ser usado pra calcular o tempo que a partida levou)
-					
-					delete this.game.match[roomId];
+					await this.storeMatchHistory(match, roomId);
                 }
 				delete this.game.rooms[roomId];
             }
@@ -367,7 +461,6 @@ export class GameService {
     }
 
     moveBall({ball}) {
-
         const xpos = ball.x + ball.xspeed * ball.xdirection;
         const ypos = ball.y + ball.yspeed * ball.ydirection;
         ball.x = xpos;
@@ -375,7 +468,6 @@ export class GameService {
     }
 
     movePaddle(match) {
-
         [1, 2].forEach((i) => {
         const player = match[`player${i}`];
         switch (player.direction) {
@@ -398,15 +490,14 @@ export class GameService {
     }
 
     restartMatch(match, roomId) {
-
       const { ball, gameConfig } = match;
 
       ball.xdirection *= -1;
       ball.x = gameConfig.width / 2;
       ball.y = gameConfig.height / 2;
 
-	  if (match.score1 === 10 || match.score2 === 10) {
-		const playerNumber = match.score1 === 10 ? 1 : 2;
+	  if (match.score1 === 5 || match.score2 === 5) {
+		const playerNumber = match.score1 === 5 ? 1 : 2;
 		const playerSocketId = this.game.rooms[roomId][`player${playerNumber}`];
 		match.status = 'END';
 		match.message = `The player ${this.game.players[playerSocketId].name} won.`;
@@ -414,7 +505,6 @@ export class GameService {
     }
 
     checkCollision(match, roomId) {
-
         const { ball, gameConfig } = match;
         if (ball.y > gameConfig.height - ball.width || ball.y < ball.width) {
             ball.ydirection *= -1;
