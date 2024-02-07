@@ -26,8 +26,6 @@ const messages = [
 	{ id: 1, text: "Hi there!", sender: "bot" },
 	{ id: 2, text: "Hello!", sender: "user" },
 	{ id: 3, text: "How can I assist you today?", sender: "bot" },
-	{ id: 4, text: "How can I assist you today?", sender: "bot" },
-	{ id: 5, text: "Hello!", sender: "user" },
 ];
 
 const chatSocket = socketClient(ChatLink, {
@@ -43,12 +41,13 @@ const ChatComponent = () => {
 		if (input.trim() !== "") {
 			try {
 
-				console.log(messagesByRoom);
-				if (!messagesByRoom["something"])
-					messagesByRoom["something"] = [];
-				else
-					messagesByRoom["something"].push("woah");
-				console.log(messagesByRoom);
+				// console.log(messagesByRoom);
+				// if (!messagesByRoom["something"])
+				// 	messagesByRoom["something"] = [];
+				// else
+				// 	messagesByRoom["something"].push("woah");
+				// console.log(messagesByRoom);
+				console.log(AuthService.getIdFromToken());
 				// const data = {
 
 				//     message: {

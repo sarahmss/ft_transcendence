@@ -75,15 +75,19 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				const decodedToken = this.authService.IsValidJwt(token);
 				user = await this.authService.IsValidUser(decodedToken.userId);
 			}
-			else
+			else {
 				user = await this.checkUser(<string> client.handshake.headers.jwt); 
+
+			}
 
 			client.data.user = user;
 			this.connectedUserService.addConnection(user.userId, client);
 		}
-		catch {
+		catch (error) {
+			console.log(error);
 			console.log("User auth failure");
-			this.handleDisconnect(client);
+			if (client.data.user)
+				this.handleDisconnect(client);
 		}
 	}
 
