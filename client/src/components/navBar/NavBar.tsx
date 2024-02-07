@@ -10,6 +10,8 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import authService from '../../services/auth.service';
+import Menu from '@mui/material/Menu';
+import MenuIcon from '@mui/icons-material/Menu';
 import { Link} from 'react-router-dom';
 
 
@@ -22,6 +24,7 @@ const pagesLogged = [
 	{ label: 'Profile', link: '/profile' },
 	{ label: 'Settings', link: '/settings' },
 	{ label: 'Logout', link: '/logout' },
+  { label: 'Game', link: '/game' },
 ];
 
 const pagesUnlogged = [
@@ -34,6 +37,24 @@ const NavBar: React.FC = () => {
   const [profilePic, setProfilePic] = React.useState('');
   let users = useSelector(userLog);
 
+
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+
+  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElNav(event.currentTarget);
+  };
+  const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseNavMenu = () => {
+    setAnchorElNav(null);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
 
   const fetchData = async () => {
     try {
@@ -100,15 +121,55 @@ const NavBar: React.FC = () => {
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-            <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              color="inherit"
-              >
-            </IconButton>
-          </Box>
+          <IconButton
+            size="large"
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            onClick={handleOpenNavMenu}
+            color="inherit"
+          >
+            <MenuIcon />
+          </IconButton>
+          <Menu
+            id="menu-appbar"
+            anchorEl={anchorElNav}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+            open={Boolean(anchorElNav)}
+            onClose={handleCloseNavMenu}
+            sx={{
+              display: { xs: 'block', md: 'none' },
+            }}
+          >
+            {isLogged ? (
+              pagesLogged.map((page) => (
+                <MenuItem key={page.label} onClick={handleCloseNavMenu}>
+                  <Link to={page.link} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Typography textAlign="center">{page.label}</Typography>
+                  </Link>
+                </MenuItem>
+              ))
+            ) : (
+              pagesUnlogged.map((page) => (
+                <MenuItem key={page.label} onClick={handleCloseNavMenu}>
+                  <Link to={page.link} style={{ textDecoration: 'none', color: 'inherit' }}>
+                    <Typography textAlign="center">{page.label}</Typography>
+                  </Link>
+                </MenuItem>
+              ))
+            )}
+          </Menu>
+        </Box>
+
+
           <SelfImprovementIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
