@@ -108,15 +108,6 @@ const AccountSettings = () => {
             }
           />
           <Tab
-            value='info'
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <InformationOutline />
-                <TabName>Info</TabName>
-              </Box>
-            }
-          />
-          <Tab
             value='status'
             label={
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -130,12 +121,17 @@ const AccountSettings = () => {
         <TabPanel sx={{ p: 0 }} value='account'>
           {currentUser && <TabAccount currentUser={currentUser}/>}
         </TabPanel>
+
         <TabPanel sx={{ p: 0 }} value='security'>
-			{currentUser && <TabSecurity currentUser={currentUser} />}
-		</TabPanel>
+			    {currentUser && <TabSecurity currentUser={currentUser} />}
+		    </TabPanel>
+
         <TabPanel sx={{ p: 0 }} value='status'>
-            {currentUser && <TabStatus currentUser={currentUser}/>}
+          {currentUser && <TabStatus currentUser={currentUser}/>}
+          {/* {<TabStatus currentUser={currentUser}/>} */}
+
         </TabPanel>
+        
       </TabContext>
     </Card>
 	</div>
