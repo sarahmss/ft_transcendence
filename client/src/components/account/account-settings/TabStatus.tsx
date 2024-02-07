@@ -17,12 +17,11 @@ interface TabStatusProps {
 
 const TabStatus: React.FC<TabStatusProps> = ({ currentUser }) => {
 
-
 	return (
         <CardContent>
          <Grid container spacing={6}>
               <Grid item xs={12} md={4}>
-                <Trophy />
+                <Trophy currentUser={currentUser} />
               </Grid>
               <Grid item xs={12} md={8}>
                 <StatisticsCard />

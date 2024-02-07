@@ -13,45 +13,36 @@ import CardContent from '@mui/material/CardContent'
 
 // ** Icons Imports
 import TrendingUp from 'mdi-material-ui/TrendingUp'
-import CurrencyUsd from 'mdi-material-ui/CurrencyUsd'
-import DotsVertical from 'mdi-material-ui/DotsVertical'
-import CellphoneLink from 'mdi-material-ui/CellphoneLink'
-import AccountOutline from 'mdi-material-ui/AccountOutline'
+import TrendingDown from 'mdi-material-ui/TrendingDown'
+import TimelineIcon from '@mui/icons-material/Timeline';
 
-// ** Types
-type ThemeColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
+import DotsVertical from 'mdi-material-ui/DotsVertical'
 
 interface DataType {
   stats: string
   title: string
-  color: ThemeColor
+  color: string
   icon: ReactElement
 }
 
 const salesData: DataType[] = [
   {
-    stats: '245k',
-    title: 'Sales',
-    color: 'primary',
+    stats: '245',
+    title: 'Wins',
+    color: '#B700cc',
     icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />
   },
   {
-    stats: '12.5k',
-    title: 'Customers',
-    color: 'success',
-    icon: <AccountOutline sx={{ fontSize: '1.75rem' }} />
+    stats: '12',
+    title: 'Losses',
+    color: '#B700cc',
+    icon: <TrendingDown sx={{ fontSize: '1.75rem' }} />
   },
   {
-    stats: '1.54k',
-    color: 'warning',
-    title: 'Products',
-    icon: <CellphoneLink sx={{ fontSize: '1.75rem' }} />
-  },
-  {
-    stats: '$88k',
-    color: 'info',
-    title: 'Revenue',
-    icon: <CurrencyUsd sx={{ fontSize: '1.75rem' }} />
+    stats: '88',
+    color: '#B700cc',
+    title: 'Matches',
+    icon: <TimelineIcon sx={{ fontSize: '1.75rem' }} />
   }
 ]
 
@@ -67,7 +58,7 @@ const renderStats = () => {
             height: 44,
             boxShadow: 3,
             color: 'common.white',
-            backgroundColor: `${item.color}.main`
+            backgroundColor: `${item.color}`
           }}
         >
           {item.icon}
@@ -94,7 +85,7 @@ const StatisticsCard = () => {
         subheader={
           <Typography variant='body2'>
             <Box component='span' sx={{ fontWeight: 600, color: 'text.primary' }}>
-              Total 48.5% growth
+              You played 245 matches
             </Box>{' '}
             😎 this month
           </Typography>

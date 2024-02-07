@@ -14,13 +14,12 @@ import TableContainer from '@mui/material/TableContainer'
 type ThemeColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
 
 interface RowType {
-  age: number
+  matches: number
   name: string
-  date: string
+  victories: string
   email: string
-  salary: string
+  defeats: string
   status: string
-  designation: string
 }
 
 interface StatusObj {
@@ -31,85 +30,35 @@ interface StatusObj {
 
 const rows: RowType[] = [
   {
-    age: 27,
-    status: 'current',
-    date: '09/27/2018',
+    matches: 27,
+    status: 'Online',
+    victories: '09/27/2018',
     name: 'Sally Quinn',
-    salary: '$19586.23',
+    defeats: '$19586.23',
     email: 'eebsworth2m@sbwire.com',
-    designation: 'Human Resources Assistant'
   },
   {
-    age: 61,
-    date: '09/23/2016',
-    salary: '$23896.35',
-    status: 'professional',
-    name: 'Margaret Bowers',
-    email: 'kocrevy0@thetimes.co.uk',
-    designation: 'Nuclear Power Engineer'
-  },
-  {
-    age: 59,
-    date: '10/15/2017',
-    name: 'Minnie Roy',
-    status: 'rejected',
-    salary: '$18991.67',
-    email: 'ediehn6@163.com',
-    designation: 'Environmental Specialist'
-  },
-  {
-    age: 30,
-    date: '06/12/2018',
-    status: 'resigned',
-    salary: '$19252.12',
-    name: 'Ralph Leonard',
-    email: 'dfalloona@ifeng.com',
-    designation: 'Sales Representative'
-  },
-  {
-    age: 66,
-    status: 'applied',
-    date: '03/24/2018',
-    salary: '$13076.28',
+    matches: 66,
+    status: 'Offline',
+    victories: '03/24/2018',
+    defeats: '$13076.28',
     name: 'Annie Martin',
-    designation: 'Operator',
     email: 'sganderton2@tuttocitta.it'
   },
   {
-    age: 33,
-    date: '08/25/2017',
-    salary: '$10909.52',
-    name: 'Adeline Day',
-    status: 'professional',
-    email: 'hnisius4@gnu.org',
-    designation: 'Senior Cost Accountant'
-  },
-  {
-    age: 61,
-    status: 'current',
-    date: '06/01/2017',
-    salary: '$17803.80',
-    name: 'Lora Jackson',
-    designation: 'Geologist',
-    email: 'ghoneywood5@narod.ru'
-  },
-  {
-    age: 22,
-    date: '12/03/2017',
-    salary: '$12336.17',
+    matches: 22,
+    victories: '12/03/2017',
+    defeats: '$12336.17',
     name: 'Rodney Sharp',
-    status: 'professional',
-    designation: 'Cost Accountant',
+    status: 'Playing',
     email: 'dcrossman3@google.co.jp'
   }
 ]
 
 const statusObj: StatusObj = {
-  applied: { color: 'info' },
-  rejected: { color: 'error' },
-  current: { color: 'primary' },
-  resigned: { color: 'warning' },
-  professional: { color: 'success' }
+  Online: { color: 'success' },
+  Offline: { color: 'error' },
+  Playing: { color: 'info' },
 }
 
 const DashboardTable = () => {
@@ -121,9 +70,9 @@ const DashboardTable = () => {
             <TableRow>
               <TableCell>Name</TableCell>
               <TableCell>Email</TableCell>
-              <TableCell>Date</TableCell>
-              <TableCell>Salary</TableCell>
-              <TableCell>Age</TableCell>
+              <TableCell>Matches</TableCell>
+              <TableCell>Victories</TableCell>
+              <TableCell>Defeats</TableCell>
               <TableCell>Status</TableCell>
             </TableRow>
           </TableHead>
@@ -133,13 +82,12 @@ const DashboardTable = () => {
                 <TableCell sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
                   <Box sx={{ display: 'flex', flexDirection: 'column' }}>
                     <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{row.name}</Typography>
-                    <Typography variant='caption'>{row.designation}</Typography>
                   </Box>
                 </TableCell>
                 <TableCell>{row.email}</TableCell>
-                <TableCell>{row.date}</TableCell>
-                <TableCell>{row.salary}</TableCell>
-                <TableCell>{row.age}</TableCell>
+                <TableCell>{row.matches}</TableCell>
+                <TableCell>{row.victories}</TableCell>
+                <TableCell>{row.defeats}</TableCell>
                 <TableCell>
                   <Chip
                     label={row.status}

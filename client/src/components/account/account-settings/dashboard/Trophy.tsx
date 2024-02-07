@@ -6,7 +6,7 @@ import CardContent from '@mui/material/CardContent'
 import { styled, useTheme } from '@mui/material/styles'
 import TrophySrc from '../../../../assets/trophy.png';
 import TriangleSrc from '../../../../assets/triangle-light.png';
-
+import IUser from '../../../../types/user.type'
 // Styled component for the triangle shaped background image
 const TriangleImg = styled('img')({
   right: 0,
@@ -23,21 +23,22 @@ const TrophyImg = styled('img')({
   position: 'absolute'
 })
 
-const Trophy = () => {
+interface TrophyProps {
+	currentUser: IUser | null
+}
+
+const Trophy: React.FC<TrophyProps> = ({ currentUser }) => {
 
   return (
     <Card sx={{ position: 'relative' }}>
       <CardContent>
-        <Typography variant='h6'>Congratulations John! 🥳</Typography>
+        <Typography variant='h6'>Welcome {currentUser?.userName}! 🥳</Typography>
         <Typography variant='body2' sx={{ letterSpacing: '0.25px' }}>
-          Best seller of the month
+          You have won matches
         </Typography>
-        <Typography variant='h5' sx={{ my: 4, color: 'primary.main' }}>
-          $42.8k
+        <Typography variant='h5' sx={{ my: 4, color: '#B700cc' }}>
+          42
         </Typography>
-        <Button size='small' variant='contained'>
-          View Sales
-        </Button>
         <TriangleImg alt='triangle background' src={TriangleSrc} />
         <TrophyImg alt='trophy' src={TrophySrc} />
       </CardContent>
