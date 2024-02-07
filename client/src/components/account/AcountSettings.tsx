@@ -58,7 +58,7 @@ const AccountSettings = () => {
         if (user) {
           setCurrentUser(user);
         } else {
-          setRedirect('.home');
+          setRedirect('home');
         }
       } catch (error) {
         console.error("Error fetching user data:", error);
@@ -127,9 +127,7 @@ const AccountSettings = () => {
 		    </TabPanel>
 
         <TabPanel sx={{ p: 0 }} value='status'>
-          {/* {currentUser && <TabStatus currentUser={currentUser}/>} */}
-          {<TabStatus currentUser={currentUser}/>}
-
+          {currentUser && <TabStatus currentUser={currentUser}/>}
         </TabPanel>
         
       </TabContext>
