@@ -34,7 +34,7 @@ const Trophy: React.FC<TrophyProps> = ({ currentUser }) => {
       <CardContent>
         <Typography variant='h6'>Welcome {currentUser?.userName}! 🥳</Typography>
         <Typography variant='body2' sx={{ letterSpacing: '0.25px' }}>
-          You have won matches
+          Level
         </Typography>
         <Typography variant='h5' sx={{ my: 4, color: '#B700cc' }}>
           42

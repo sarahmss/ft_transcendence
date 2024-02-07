@@ -18,10 +18,13 @@ import TimelineIcon from '@mui/icons-material/Timeline';
 
 import DotsVertical from 'mdi-material-ui/DotsVertical'
 
+
+type ThemeColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
+
 interface DataType {
   stats: string
   title: string
-  color: string
+  color: ThemeColor
   icon: ReactElement
 }
 
@@ -29,18 +32,18 @@ const salesData: DataType[] = [
   {
     stats: '245',
     title: 'Wins',
-    color: '#B700cc',
+    color: 'success',
     icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />
   },
   {
     stats: '12',
     title: 'Losses',
-    color: '#B700cc',
+    color: 'error',
     icon: <TrendingDown sx={{ fontSize: '1.75rem' }} />
   },
   {
     stats: '88',
-    color: '#B700cc',
+    color: 'info',
     title: 'Matches',
     icon: <TimelineIcon sx={{ fontSize: '1.75rem' }} />
   }
@@ -58,7 +61,7 @@ const renderStats = () => {
             height: 44,
             boxShadow: 3,
             color: 'common.white',
-            backgroundColor: `${item.color}`
+            backgroundColor: `${item.color}.main`
           }}
         >
           {item.icon}

@@ -1,0 +1,55 @@
+import React from 'react';
+import Astronauta from '../assets/Astronauta.png';
+import Raquete from '../assets/Raquete.png'
+// ** React Imports
+import { Fragment, ReactNode } from 'react'
+
+// ** MUI Components
+import useMediaQuery from '@mui/material/useMediaQuery'
+import { styled, useTheme } from '@mui/material/styles'
+
+interface FooterIllustrationsProp {
+  image1?: ReactNode
+  image2?: ReactNode
+}
+
+
+const Img1 = styled('img')(({ theme }) => ({
+  left: '0rem',
+  bottom: '0rem',
+  position: 'absolute',
+  [theme.breakpoints.down('lg')]: {
+    left: 0,
+    bottom: 0
+  }
+}))
+
+
+const Img2 = styled('img')(() => ({
+  right: 0,
+  top: '5%',
+  position: 'absolute',
+}))
+
+const FooterIllustration = (props: FooterIllustrationsProp) => {
+  const { image1, image2 } = props
+
+  const theme = useTheme()
+
+  const hidden = useMediaQuery(theme.breakpoints.down('md'))
+
+  if (!hidden) {
+    return (
+      <Fragment>
+        {image1 || <Img1 alt='Astronauta' src={Astronauta} />}
+        {image2 || <Img2 alt='Pong' src={Raquete} />}
+      </Fragment>
+    )
+  } else {
+    return null
+  }
+}
+
+export default FooterIllustration
+
+
