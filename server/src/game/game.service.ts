@@ -375,12 +375,13 @@ export class GameService {
 					user.level += 1;
 					user.gamesWonToLevelUp = 0;
 				}
-				await this.usersRepository.save(user);
-				console.log('CONSEGUIMOS SALVAR O USUARIO VENCEDOR NO BANCO DEPOIS DA PARTIDA');
 			}
 			else {
 				console.log('Esse user não é o vencedor: ', user.userName);
+				user.totalGamesLost += 1;
 			}
+			await this.usersRepository.save(user);
+			console.log('CONSEGUIMOS SALVAR O USUARIO VENCEDOR NO BANCO DEPOIS DA PARTIDA');
 		}
 		else {
 			console.log('NÃO ENCONTRAMOS ESSE USER NO BANCO');
@@ -435,12 +436,10 @@ export class GameService {
 
 	removePlayer(playerId: string, client: Socket, server: Server):void {
 		console.log(`${this.game.players[playerId]} disconnected`);
-
 		this.leaveRoomInit(client, server);
 		delete this.game.players[client.id];
 		this.refreshPlayers(server);
 		this.refreshRooms(server);
-
 	}
 
     gameInProgress(roomId: string, server: Server): void {
