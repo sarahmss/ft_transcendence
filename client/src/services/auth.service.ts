@@ -125,7 +125,6 @@ class AuthService {
 	async getProfilePicture(localQr: string) {
 		const authTokenQr = this.getAuthToken();
 		localQr = BackLink + localQr;
-		console.log(localQr);
 		const response = await axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' });
 		if (response.data) {
 			const imageBase64 = btoa(
@@ -134,9 +133,10 @@ class AuthService {
 			)
 			const imgElement = document.createElement('img');
 			imgElement.src = `data:image/png;base64,${imageBase64}`;
-			console.log(imgElement);
 			return imgElement;
 		}
+		else
+			console.log("Deu muito ruim")
 		return "";
 	}
 

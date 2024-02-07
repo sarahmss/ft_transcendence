@@ -24,19 +24,33 @@ import AuthService from '../../../services/auth.service';
 import axios from 'axios';
 import IUser from '../../../types/user.type';
 import { reducer } from '../../../common/helper';
+import { red } from '@mui/material/colors';
 
 interface SendButtonProps {
 	code: string;
 	TwoFaEnabled: boolean;
 	setTwoFaEnabled: React.Dispatch<React.SetStateAction<{ TwoFaEnabled: boolean }>>;
+	errorCode: boolean;
+	setErrorCode: React.Dispatch<React.SetStateAction<{ errorCode: boolean }>>;
 }
+
 const SendButton: React.FC<SendButtonProps> =({ code,
 	TwoFaEnabled,
-	setTwoFaEnabled }) => {
+	setTwoFaEnabled, errorCode, setErrorCode }) => {
 
-	const handleRedirectToEnable2Fa = () => {
-		TwoFaService.redirectToEnable2FA(code);
-		setTwoFaEnabled({TwoFaEnabled: true});
+	const handleRedirectToEnable2Fa = async () => {
+		const redirect = await TwoFaService.redirectToEnable2FA(code);
+		if (redirect)
+		{
+			setTwoFaEnabled({TwoFaEnabled: true});
+			
+		}
+		else
+		{
+			setErrorCode({errorCode:true});
+			setTwoFaEnabled({TwoFaEnabled: false});
+		}
+		console.log(errorCode);
 	};
 
 	const handleRedirectToDisable2Fa = () => {
@@ -64,9 +78,11 @@ interface InsertCodeProps {
 	TwoFaEnabled: boolean;
 	setTwoFaEnabled: React.Dispatch<React.SetStateAction<{ TwoFaEnabled: boolean }>>;
 	setCode: React.Dispatch<React.SetStateAction<{ code: string }>>;
+	errorCode: boolean;
+	setErrorCode: React.Dispatch<React.SetStateAction<{ errorCode: boolean }>>;
 }
 
-const InsertCode: React.FC<InsertCodeProps> = ({ code, TwoFaEnabled, setTwoFaEnabled, setCode }) => {
+const InsertCode: React.FC<InsertCodeProps> = ({ code, TwoFaEnabled, setTwoFaEnabled, setCode, errorCode, setErrorCode }) => {
 	const handle2FaChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setCode({ code: event.target.value });
 	};
@@ -87,7 +103,7 @@ const InsertCode: React.FC<InsertCodeProps> = ({ code, TwoFaEnabled, setTwoFaEna
 			</InputAdornment>
 			}
 		/>
-		<SendButton code={code} TwoFaEnabled={TwoFaEnabled} setTwoFaEnabled={setTwoFaEnabled} />
+		<SendButton code={code} TwoFaEnabled={TwoFaEnabled} setTwoFaEnabled={setTwoFaEnabled} errorCode={errorCode} setErrorCode={setErrorCode} />
 		</FormControl>
 	);
 	};
@@ -103,6 +119,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 		TwoFaDisable: false,
 		QrCodeImg: null,
 		Code: '',
+		errorCode: false,
 		});
 
 	const handleEnable2FAClick = async () => {
@@ -110,6 +127,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 		if (state.QrCodeGenerated === false) {
 			await TwoFaService.generateQrCode();
 			setState({ ...state, QrCodeGenerated: true });
+			console.log("ErrorCode: ",state.errorCode);
 		}
 		await getQrCode();
 		} catch (error) {
@@ -193,6 +211,8 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 												TwoFaEnabled={state.TwoFaEnabled}
 												setTwoFaEnabled={setState}
 												setCode={setState}
+												errorCode={false}
+												setErrorCode={setState}
 											/>
 										</Grid>
 									</div>
@@ -213,11 +233,15 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 										<div>{'Error Loading QR code...'}</div>
 									)}
 									<Grid item xs={12} sx={{ marginTop: 6 }}>
+										{state.errorCode ? (<label style={{backgroundColor:'red'}}>Error! Try again.</label>): (<label></label>)}
 										<InsertCode
 											code={state.code}
 											TwoFaEnabled={state.TwoFaEnabled}
 											setTwoFaEnabled={setState}
 											setCode={setState}
+											errorCode={false}
+											setErrorCode={setState}
+											
 										/>
 									</Grid>
 								</div>

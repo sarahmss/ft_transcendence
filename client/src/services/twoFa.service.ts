@@ -39,8 +39,10 @@ class TwoFaService {
 		try {
 			const authToken = AuthService.getAuthToken();
 			await axios.post(TwoFaEnableLink, { code: code }, { headers: authToken });
+			return true;
 		} catch (error) {
 			console.error(error);
+			return false;
 		}
 	}
 
