@@ -67,9 +67,18 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		// Authentication via jwt token sent by the client
 		try {
-			const user = await this.checkUser(<string> client.handshake.headers.jwt);
 
-			client.data.userId = user.userId;
+			let user: any;
+
+			if (client.handshake.headers.cookie) {
+				const token = client.handshake.headers.cookie.split('=')[1];
+				const decodedToken = this.authService.IsValidJwt(token);
+				user = await this.authService.IsValidUser(decodedToken.userId);
+			}
+			else
+				user = await this.checkUser(<string> client.handshake.headers.jwt); 
+
+			client.data.user = user;
 			this.connectedUserService.addConnection(user.userId, client);
 		}
 		catch {
@@ -81,7 +90,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	handleDisconnect(client: Socket) {
 
 		this.connectedUserService
-			.removeConnection(client.data.userId);
+			.removeConnection(client.data.user.userId);
 
 		client.disconnect();
 		console.log("User disconnected");

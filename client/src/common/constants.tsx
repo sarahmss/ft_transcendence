@@ -7,6 +7,8 @@ export const LocalSigninLink = BackLink + "/auth/signin"
 export const UserContentLink = BackLink + "/users/"
 export const TwoFaLink = BackLink + "/2fa-auth"
 export const GameLink = BackLink + "/game"
+export const ChatLink = BackLink + "/room"
+export const MessagePostLink = BackLink + "/message"
 
 export const TwoFaDisableLink = TwoFaLink + "/disable"
 export const TwoFaEnableLink = TwoFaLink + "/enable"
@@ -14,7 +16,6 @@ export const TwoFaGenerateLink = TwoFaLink + "/generate"
 export const TwoFaLoginLink = TwoFaLink + "/login"
 
 export const pictureStarter = "https://freedesignfile.com/upload/2017/08/astronaut-icon-vector.png";
-
 
 export const FrontLogin = FrontLink + "/login";
 export const FrontGame = FrontLink + "/game";

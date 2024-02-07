@@ -1,4 +1,6 @@
 import * as React from "react";
+import axios from 'axios';
+
 import {
 	Box,
 	TextField,
@@ -7,22 +9,66 @@ import {
 	Avatar,
 	Grid,
 	Paper,
+	Select,
 	Card
 } from "@mui/material";
+
 import SendIcon from "@mui/icons-material/Send";
+
+import { ChatLink, MessagePostLink } from "../../common/constants";
+
+import socketClient from 'socket.io-client';
+import AuthService from "../../services/auth.service";
+
+const messagesByRoom: any = {};
 
 const messages = [
 	{ id: 1, text: "Hi there!", sender: "bot" },
 	{ id: 2, text: "Hello!", sender: "user" },
 	{ id: 3, text: "How can I assist you today?", sender: "bot" },
+	{ id: 4, text: "How can I assist you today?", sender: "bot" },
+	{ id: 5, text: "Hello!", sender: "user" },
 ];
+
+const chatSocket = socketClient(ChatLink, {
+  autoConnect: true,
+  transports: ['websocket'],
+  withCredentials: true,
+});
 
 const ChatComponent = () => {
 	const [input, setInput] = React.useState("");
 
-	const handleSend = () => {
+	const handleSend = async () => {
 		if (input.trim() !== "") {
-			console.log(input);
+			try {
+
+				console.log(messagesByRoom);
+				if (!messagesByRoom["something"])
+					messagesByRoom["something"] = [];
+				else
+					messagesByRoom["something"].push("woah");
+				console.log(messagesByRoom);
+				// const data = {
+
+				//     message: {
+				// 			userId: "51fb1552-79bb-447e-9eed-1c8bdca2a9f9",
+    //           roomId: "38e32c2f-f266-45b4-8a58-8cb799d7ce3c" ,
+    //           message: "something!"
+				// 		}
+				// }
+
+				// const res = await axios.post(
+				// 	MessagePostLink,
+				// 	data,
+				// 	{ headers: AuthService.getAuthToken()}
+				// );
+				// console.log(res);
+			}
+
+			catch (error) {
+				console.log(error);
+			}
 			setInput("");
 		}
 	};
@@ -32,7 +78,9 @@ const ChatComponent = () => {
 	};
 
 	return (
+
 		<Card sx={{margin:'10px',}}>
+
 			<Box
 				sx={{
 					height: "125vh",
@@ -46,6 +94,7 @@ const ChatComponent = () => {
 						<Message key={message.id} message={message} />
 					))}
 				</Box>
+
 				<Box sx={{ p: 2, backgroundColor: "background.default" }}>
 					<Grid container spacing={2}>
 						<Grid item xs={10}>
@@ -58,7 +107,9 @@ const ChatComponent = () => {
 								onChange={handleInputChange}
 							/>
 						</Grid>
+
 						<Grid item xs={1}>
+
 							<Button
 								fullWidth
 								variant="contained"
@@ -69,9 +120,11 @@ const ChatComponent = () => {
 								Send
 							</Button>
 						</Grid>
+
 					</Grid>
 				</Box>
 			</Box>
+
 		</Card>
 	);
 };
