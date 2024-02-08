@@ -69,6 +69,21 @@ export class UsersService {
 			status: user.status,
 		};
 	}
+	
+
+	async getUserStats(userId: string)
+	{
+		const user = await this.checkUser(userId);
+		return {
+			userName: user.userName,
+			email: user.email,
+			level: user.level,
+			gamesWonToLevelUp: user.gamesWonToLevelUp,
+			totalGamesWon: user.totalGamesWon,
+			victories: user.winningGames,
+			defeats: user.losingGames,
+		};
+	}
 
 	async getUserStatus(userId: string): Promise<status>
 	{

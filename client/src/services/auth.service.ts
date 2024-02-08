@@ -20,10 +20,9 @@ class AuthService {
 			});
 			return (response);
 		} catch (error) {
-		console.error("Error during LocalLogin:", error);
-		throw error;
+			console.error("Error during LocalLogin:", error);
+			throw error;
 		}
-
 	}
 
 	IntraLogin() {
@@ -48,11 +47,11 @@ class AuthService {
 
 	async register(userName: string, email: string, password: string, passwordConfirm: string) {
 		try {
-			const response = await axios.post(LocalSignupLink, {
-			userName,
-			email,
-			password,
-			passwordConfirm: passwordConfirm,
+				const response = await axios.post(LocalSignupLink, {
+				userName,
+				email,
+				password,
+				passwordConfirm: passwordConfirm,
 			});
 			return response;
 		} catch (error) {
@@ -63,7 +62,6 @@ class AuthService {
 
 	async RequestCurrentUser() {
 		try {
-			console.log("Entrou aqui");
 			const userId = this.getIdFromToken();
 			const authToken = this.getAuthToken();
 			const response = await axios.get(UserContentLink + userId, { headers: authToken });
@@ -82,7 +80,6 @@ class AuthService {
 		try {
 			if (this.getIsLogged() != null)
 			{
-				console.log("Entrou no getCurrent user - 7")
 				await this.RequestCurrentUser();
 				const userStr = sessionStorage.getItem("LoggedUser");
 				if (userStr)

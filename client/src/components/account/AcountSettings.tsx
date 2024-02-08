@@ -13,7 +13,6 @@ import MuiTab, { TabProps } from '@mui/material/Tab'
 // ** Icons Imports
 import AccountOutline from 'mdi-material-ui/AccountOutline'
 import LockOpenOutline from 'mdi-material-ui/LockOpenOutline'
-import InformationOutline from 'mdi-material-ui/InformationOutline'
 import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 
 // ** Demo Tabs Imports
@@ -53,8 +52,6 @@ const AccountSettings = () => {
     const fetchData = async () => {
       try {
         const user = await authService.getCurrentUser();
-        console.log("user AcountSettings: ", user);
-
         if (user) {
           setCurrentUser(user);
         } else {
@@ -72,7 +69,7 @@ const AccountSettings = () => {
     setValue(newValue)
   }
 
-  if (redirect === 'home') {
+  if (redirect === '.home') {
     return <Navigate to={'/'} />;
   }
 
@@ -127,7 +124,9 @@ const AccountSettings = () => {
 		    </TabPanel>
 
         <TabPanel sx={{ p: 0 }} value='status'>
-          {currentUser && <TabStatus currentUser={currentUser}/>}
+          {/* {currentUser && <TabStatus currentUser={currentUser}/>} */}
+          {<TabStatus currentUser={currentUser}/>}
+
         </TabPanel>
         
       </TabContext>
