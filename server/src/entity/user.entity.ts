@@ -39,13 +39,20 @@ export class User {
 	@Column({ nullable: false, default: 0 })
     totalGamesWon: number;
 
+	@Column({ nullable: false, default: 0 })
+    totalGamesLost: number;
+
     @Column({ nullable: false, default: 1 }) 
     level: number;
 
-	@OneToMany(() => MatchHistory, matchHistory => matchHistory.winner)
+	@OneToMany(() => MatchHistory, matchHistory => matchHistory.winner, {
+		cascade: true,
+	})
     winningGames: MatchHistory[];
 
-    @OneToMany(() => MatchHistory, matchHistory => matchHistory.loser)
+    @OneToMany(() => MatchHistory, matchHistory => matchHistory.loser, {
+		cascade: true,
+	})
     losingGames: MatchHistory[];
 }
 
