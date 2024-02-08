@@ -1,5 +1,4 @@
 import * as React from "react";
-import axios from 'axios';
 
 import {
 	Box,
@@ -15,67 +14,25 @@ import {
 
 import SendIcon from "@mui/icons-material/Send";
 
-import { ChatLink, MessagePostLink } from "../../common/constants";
-
-import socketClient from 'socket.io-client';
 import authService from "../../services/auth.service";
 import roomService from "../../services/chat/room.service";
-
-const messagesByRoom: any = {};
-
-const messages = [
-	{ id: 1, text: "Hi there!", sender: "bot" },
-	{ id: 2, text: "Hello!", sender: "user" },
-	{ id: 3, text: "How can I assist you today?", sender: "bot" },
-];
-
-const chatSocket = socketClient(ChatLink, {
-  autoConnect: true,
-  transports: ['websocket'],
-  withCredentials: true,
-});
+import messageService from "../../services/chat/message.service";
+import { messages } from '../../contexts/ChatContext'
+import { useSignals } from "@preact/signals-react/runtime";
 
 const ChatComponent = () => {
+	useSignals();
 	const [input, setInput] = React.useState("");
-
 
 	const handleSend = async () => {
 		if (input.trim() !== "") {
 			try {
 
-				chatSocket.emit('message', "something is off");
-
-				chatSocket.on('client-response', (response) => {
-				  console.log('Received client-response:', response);
-				});
-
-				chatSocket.on('message-response', (response) => {
-				  console.log('Received message-response:', response);
-				});
-				console.log(roomService.getRoom(authService.getIdFromToken()));
-	
-				// console.log(messagesByRoom);
-				// if (!messagesByRoom["something"])
-				// 	messagesByRoom["something"] = [];
-				// else
-				// 	messagesByRoom["something"].push("woah");
-				// console.log(messagesByRoom);
-
-				// const data = {
-
-				//     message: {
-				// 			userId: "51fb1552-79bb-447e-9eed-1c8bdca2a9f9",
-    //           roomId: "38e32c2f-f266-45b4-8a58-8cb799d7ce3c" ,
-    //           message: "something!"
-				// 		}
-				// }
-
-				// const res = await axios.post(
-				// 	MessagePostLink,
-				// 	data,
-				// 	{ headers: AuthService.getAuthToken()}
-				// );
-				// console.log(res);
+				messageService.sendMessage(
+					input,
+					authService.getIdFromToken(),
+					"d17283d5-ffbc-4ac7-8d15-4c6d7ba02692"
+				);
 			}
 
 			catch (error) {
@@ -102,7 +59,7 @@ const ChatComponent = () => {
 				}}
 			>
 				<Box sx={{ flexGrow: 1, overflow: "auto", p: 2, minWidth: 300, maxWidth: 600 }}>
-					{messages.map((message) => (
+					{messages.value.map((message: any) => (
 						<Message key={message.id} message={message} />
 					))}
 				</Box>

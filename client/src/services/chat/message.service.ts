@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { BackLink } from '../../common/constants';
+import authService from '../auth.service';
 
 
 class ChatMessageService {
@@ -29,7 +30,7 @@ class ChatMessageService {
     try {
 
       const packaged = this.formatMessage(message, userId, roomId);
-      await axios.post(BackLink + '/message', packaged);
+      await axios.post(BackLink + '/message', packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
 
@@ -51,7 +52,7 @@ class ChatMessageService {
         userId: userId
       }
       
-      const resp = await axios.patch(BackLink + "/message", packaged);
+      const resp = await axios.patch(BackLink + "/message", packaged, {headers: authService.getAuthToken()});
       console.log(resp);
     } catch (error) {
 
