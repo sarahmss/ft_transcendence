@@ -36,11 +36,11 @@ const statusObj: StatusObj = {
 };
 
 interface DashboardTableProps {
-  AllUserStats: IUserStats[] ;
+  AllUserStats: IUserStats[] | null;
 }
 
 const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats }) => {
-  const rows: RowType[] = AllUserStats.map((userStats: IUserStats) => {
+  const rows: RowType[] | undefined = AllUserStats?.map((userStats: IUserStats) => {
     const row: RowType = {
       matches: userStats?.matches || '0',
       status: userStats?.status || 'Offline',
@@ -48,7 +48,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats }) => {
       defeats: userStats?.totalGamesLost || '0',
       name: userStats?.userName || 'user',
       email: userStats?.email || 'user@email',
-    };
+    } ;
 
     return row;
   });

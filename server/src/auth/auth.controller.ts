@@ -4,7 +4,9 @@ import { Controller,
 			Req,
 			Res,
 			UseGuards,
-			Body } from '@nestjs/common';
+			Body,
+			ParseUUIDPipe,
+			Param } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { FortyTwoGuard } from './guards/FortyTwo.guard';
 import { Response } from 'express';
@@ -60,10 +62,10 @@ export class AuthController {
 		this.authService.IntraLogin(response, request.user);
 	}
 
-	@Get('logout')
-	async logoutUser(@Res() response: Response) {
+	@Get(':userId/logout')
+	async logoutUser(@Param('userId', ParseUUIDPipe) userId: string, @Res() response: Response) {
 		this.logger.log( 'GET: auth/logout');
-		await this.authService.logout(response).then(() => response.redirect(
+		await this.authService.logout(response, userId).then(() => response.redirect(
 													process.env.FRONT_URL));
 	}
 }
