@@ -80,8 +80,10 @@ export class UsersService {
 			level: user.level,
 			gamesWonToLevelUp: user.gamesWonToLevelUp,
 			totalGamesWon: user.totalGamesWon,
+			totalGamesLost: user.totalGamesLost,
 			victories: user.winningGames,
 			defeats: user.losingGames,
+			matches: user.totalGamesWon + user.totalGamesLost
 		};
 	}
 

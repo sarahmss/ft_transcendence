@@ -3,13 +3,13 @@ import React, { useEffect, useState } from 'react'
 
 // ** MUI Imports
 import Grid from '@mui/material/Grid'
-import IUserStats from '../../../types/user.type'
+import IUserStats from '../../../types/userStats.type'
 import IUser from '../../../types/user.type'
 
 import Trophy from './dashboard/Trophy'
 import StatisticsCard from './dashboard/StatisticsCard'
 import DashboardTable from './dashboard/Table'
-// import MatchHistory from './dashboard/MatchHistory'
+import MatchHistory from './dashboard/MatchHistory'
 
 import { CardContent } from '@mui/material';
 import userService from '../../../services/user.service';

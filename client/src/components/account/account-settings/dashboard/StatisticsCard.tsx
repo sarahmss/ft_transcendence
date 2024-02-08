@@ -11,7 +11,7 @@ import TrendingUp from 'mdi-material-ui/TrendingUp'
 import TrendingDown from 'mdi-material-ui/TrendingDown'
 import TimelineIcon from '@mui/icons-material/Timeline';
 import DotsVertical from 'mdi-material-ui/DotsVertical'
-import IUserStats from '../../../../types/user.type'
+import IUserStats from '../../../../types/userStats.type'
 
 type ThemeColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
 
@@ -35,13 +35,13 @@ const buildStatsData = (userStats: IUserStats | null): DataType[] => {
       icon: <TimelineIcon sx={{ fontSize: '1.75rem' }} />
     },
     {
-      stats: userStats?.victories || '0',
+      stats: userStats?.totalGamesWon || '0',
       title: 'Victories',
       color: 'success',
       icon: <TrendingUp sx={{ fontSize: '1.75rem' }} />
     },
     {
-      stats: userStats?.defeats || '0',
+      stats: userStats?.totalGamesLost || '0',
       title: 'Defeats',
       color: 'error',
       icon: <TrendingDown sx={{ fontSize: '1.75rem' }} />
