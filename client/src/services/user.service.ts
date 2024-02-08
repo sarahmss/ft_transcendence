@@ -50,7 +50,7 @@ class UserService {
 		try {
 			if (AuthService.getIsLogged() != null)
 			{
-				const response = await axios.get((UserContentLink + userId + '/profile'),
+				const response = await axios.get((UserContentLink + userId + '/stats'),
 					{ headers: AuthService.getAuthToken() });
 				return (response.data);
 			}

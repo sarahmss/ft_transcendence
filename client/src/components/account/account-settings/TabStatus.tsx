@@ -9,7 +9,7 @@ import IUser from '../../../types/user.type'
 import Trophy from './dashboard/Trophy'
 import StatisticsCard from './dashboard/StatisticsCard'
 import DashboardTable from './dashboard/Table'
-import MatchHistory from './dashboard/MatchHistory'
+// import MatchHistory from './dashboard/MatchHistory'
 
 import { CardContent } from '@mui/material';
 import userService from '../../../services/user.service';
