@@ -21,15 +21,19 @@ interface TabStatusProps {
 
 const TabStatus: React.FC<TabStatusProps> = ({ currentUser }) => {
 
-
   const [userStats, setUserStats] = useState<IUserStats | null>(null);
+  const [AllUserStats, setAllUserStats] = useState<IUserStats[] | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const userStats = await userService.RequestUserStats()
+        const AllUserStats = await userService.RequestAllUserStats()
+
         if (userStats) {
           setUserStats(userStats);
+        } if (userStats) {
+          setAllUserStats(AllUserStats);
         }
       } catch (error) {
         console.error("Error fetching user stats:", error);
@@ -49,11 +53,11 @@ const TabStatus: React.FC<TabStatusProps> = ({ currentUser }) => {
                 <StatisticsCard userStats={userStats} />
               </Grid>
             </Grid>
-            {/* <Grid item xs={12}>
+            <Grid item xs={15}>
               <MatchHistory />
-            </Grid> */}
+            </Grid>
             <Grid item xs={12}>
-              <DashboardTable />
+              <DashboardTable AllUserStats={AllUserStats}/>
             </Grid>
         </CardContent>
           

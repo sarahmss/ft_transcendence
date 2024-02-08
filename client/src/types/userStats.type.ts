@@ -9,5 +9,6 @@ export default interface IUserStats {
 	totalGamesLost?: string,
 	victories?: MatchHistory[],
 	defeats?: MatchHistory[],
-	matches?: string
+	matches?: string,
+	status?: string
 }

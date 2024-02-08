@@ -59,6 +59,23 @@ class UserService {
 			throw error;
 		}
 	}
+
+	
+	async RequestAllUserStats(){
+		const userId = AuthService.getIdFromToken();
+
+		try {
+			if (AuthService.getIsLogged() != null)
+			{
+				const response = await axios.get((UserContentLink + 'AllStats'),
+					{ headers: AuthService.getAuthToken() });
+				return (response.data);
+			}
+		} catch (error) {
+			console.error('Error while requesting stats:', error);
+			throw error;
+		}
+	}
 }
 const userService = new UserService();
 

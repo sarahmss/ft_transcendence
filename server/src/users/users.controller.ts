@@ -24,6 +24,16 @@ export class UsersController {
 		return this.usersService.findAll();
 	}
 
+	@Get('/AllStats')
+	async getAllUserStats(): Promise<User[]> {
+		return this.usersService.getAllUserStats();
+	}
+
+	@Get(':userId/stats')
+	async getUserStats( @Param('userId', ParseUUIDPipe) userId: string ) {
+		return this.usersService.getUserStats(userId);
+	}
+
 	@Get(':userId')
 	async findById( @Param('userId', ParseUUIDPipe) userId: string ) {
 		return this.usersService.getUser(userId);
@@ -34,10 +44,7 @@ export class UsersController {
 		return this.usersService.getUserProfile(userId);
 	}
 
-	@Get(':userId/stats')
-	async getUserStats( @Param('userId', ParseUUIDPipe) userId: string ) {
-		return this.usersService.getUserStats(userId);
-	}
+
 
 	/********************************* PATCH ******************************/
 
