@@ -5,9 +5,9 @@ export default interface IUserStats {
 	email?: string,
 	level?: string,
 	gamesWonToLevelUp?: string,
-	totalGamesWon?: number,
-	totalGamesLost?: number,
+	totalGamesWon?: string,
+	totalGamesLost?: string,
 	victories?: MatchHistory[],
 	defeats?: MatchHistory[],
-	matches?: number
+	matches?: string
 }
