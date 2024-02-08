@@ -30,8 +30,8 @@ interface SendButtonProps {
 	code: string;
 	TwoFaEnabled: boolean;
 	setTwoFaEnabled: React.Dispatch<React.SetStateAction<{ TwoFaEnabled: boolean }>>;
-	errorCode: boolean;
-	setErrorCode: React.Dispatch<React.SetStateAction<{ errorCode: boolean }>>;
+	errorCode: string;
+	setErrorCode: React.Dispatch<React.SetStateAction<{ errorCode: string }>>;
 }
 
 const SendButton: React.FC<SendButtonProps> =({ code,
@@ -40,14 +40,11 @@ const SendButton: React.FC<SendButtonProps> =({ code,
 
 	const handleRedirectToEnable2Fa = async () => {
 		const redirect = await TwoFaService.redirectToEnable2FA(code);
-		if (redirect)
-		{
+		if (redirect === true)
 			setTwoFaEnabled({TwoFaEnabled: true});
-			
-		}
 		else
 		{
-			setErrorCode({errorCode:true});
+			setErrorCode({errorCode:redirect as string});
 			setTwoFaEnabled({TwoFaEnabled: false});
 		}
 		console.log(errorCode);
@@ -78,8 +75,8 @@ interface InsertCodeProps {
 	TwoFaEnabled: boolean;
 	setTwoFaEnabled: React.Dispatch<React.SetStateAction<{ TwoFaEnabled: boolean }>>;
 	setCode: React.Dispatch<React.SetStateAction<{ code: string }>>;
-	errorCode: boolean;
-	setErrorCode: React.Dispatch<React.SetStateAction<{ errorCode: boolean }>>;
+	errorCode: string;
+	setErrorCode: React.Dispatch<React.SetStateAction<{ errorCode: string }>>;
 }
 
 const InsertCode: React.FC<InsertCodeProps> = ({ code, TwoFaEnabled, setTwoFaEnabled, setCode, errorCode, setErrorCode }) => {
@@ -119,7 +116,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 		TwoFaDisable: false,
 		QrCodeImg: null,
 		Code: '',
-		errorCode: false,
+		errorCode: '',
 		});
 
 	const handleEnable2FAClick = async () => {
@@ -211,7 +208,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 												TwoFaEnabled={state.TwoFaEnabled}
 												setTwoFaEnabled={setState}
 												setCode={setState}
-												errorCode={false}
+												errorCode={''}
 												setErrorCode={setState}
 											/>
 										</Grid>
@@ -233,13 +230,13 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 										<div>{'Error Loading QR code...'}</div>
 									)}
 									<Grid item xs={12} sx={{ marginTop: 6 }}>
-										{state.errorCode ? (<label style={{backgroundColor:'red'}}>Error! Try again.</label>): (<label></label>)}
+										{state.errorCode ? (<label style={{backgroundColor:'red'}}>{state.errorCode}</label>): (<label></label>)}
 										<InsertCode
 											code={state.code}
 											TwoFaEnabled={state.TwoFaEnabled}
 											setTwoFaEnabled={setState}
 											setCode={setState}
-											errorCode={false}
+											errorCode={''}
 											setErrorCode={setState}
 											
 										/>
