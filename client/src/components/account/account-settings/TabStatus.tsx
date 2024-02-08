@@ -53,11 +53,11 @@ const TabStatus: React.FC<TabStatusProps> = ({ currentUser }) => {
                 <StatisticsCard userStats={userStats} />
               </Grid>
             </Grid>
-            <Grid item xs={15}>
-              <MatchHistory />
-            </Grid>
             <Grid item xs={12}>
               <DashboardTable AllUserStats={AllUserStats}/>
+            </Grid>
+            <Grid item xs={15}>
+              <MatchHistory />
             </Grid>
         </CardContent>
           
