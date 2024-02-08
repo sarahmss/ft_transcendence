@@ -69,7 +69,7 @@ const AccountSettings = () => {
     setValue(newValue)
   }
 
-  if (redirect === '.home') {
+  if (redirect === 'home') {
     return <Navigate to={'/'} />;
   }
 
@@ -124,8 +124,8 @@ const AccountSettings = () => {
 		    </TabPanel>
 
         <TabPanel sx={{ p: 0 }} value='status'>
-          {/* {currentUser && <TabStatus currentUser={currentUser}/>} */}
-          {<TabStatus currentUser={currentUser}/>}
+          {currentUser && <TabStatus currentUser={currentUser}/>}
+          {/* {<TabStatus currentUser={currentUser}/>} */}
 
         </TabPanel>
         

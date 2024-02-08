@@ -27,8 +27,6 @@ interface StatisticsCardProps {
 }
 
 const buildStatsData = (userStats: IUserStats | null): DataType[] => {
-  // if (!userStats) return [];
-
   return [
     {
       stats: userStats?.matches || '0',
@@ -83,7 +81,7 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({ userStats }) => {
   return (
     <Card>
       <CardHeader
-        title='Statistics Card'
+        title='Personal History'
         action={
           <IconButton size='small' aria-label='settings' className='card-more-options' sx={{ color: 'text.secondary' }}>
             <DotsVertical />
