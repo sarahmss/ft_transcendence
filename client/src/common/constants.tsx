@@ -10,6 +10,11 @@ export const GameLink = BackLink + "/game"
 export const ChatLink = BackLink + "/room"
 export const MessagePostLink = BackLink + "/message"
 
+export const GROUP: number = 1;
+export const DIRECT: number = 2;
+export const GLOBAL_BLOCK: number = 3;
+export const LOCAL_BLOCK: number = 4;
+
 export const TwoFaDisableLink = TwoFaLink + "/disable"
 export const TwoFaEnableLink = TwoFaLink + "/enable"
 export const TwoFaGenerateLink = TwoFaLink + "/generate"

@@ -18,7 +18,8 @@ import SendIcon from "@mui/icons-material/Send";
 import { ChatLink, MessagePostLink } from "../../common/constants";
 
 import socketClient from 'socket.io-client';
-import AuthService from "../../services/auth.service";
+import authService from "../../services/auth.service";
+import roomService from "../../services/chat/room.service";
 
 const messagesByRoom: any = {};
 
@@ -37,17 +38,29 @@ const chatSocket = socketClient(ChatLink, {
 const ChatComponent = () => {
 	const [input, setInput] = React.useState("");
 
+
 	const handleSend = async () => {
 		if (input.trim() !== "") {
 			try {
 
+				chatSocket.emit('message', "something is off");
+
+				chatSocket.on('client-response', (response) => {
+				  console.log('Received client-response:', response);
+				});
+
+				chatSocket.on('message-response', (response) => {
+				  console.log('Received message-response:', response);
+				});
+				console.log(roomService.getRoom(authService.getIdFromToken()));
+	
 				// console.log(messagesByRoom);
 				// if (!messagesByRoom["something"])
 				// 	messagesByRoom["something"] = [];
 				// else
 				// 	messagesByRoom["something"].push("woah");
 				// console.log(messagesByRoom);
-				console.log(AuthService.getIdFromToken());
+
 				// const data = {
 
 				//     message: {
