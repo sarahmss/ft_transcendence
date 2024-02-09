@@ -204,6 +204,8 @@ const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
 				const teste = photoProfile instanceof HTMLImageElement ? photoProfile.src : '';
 				setProfilePic(teste);
 			  }
+			  else
+			  	setProfilePic(user.profilePicture);
 			} else {
 			  setIsLogged(false);
 			  setProfilePic(DefaultPic);
