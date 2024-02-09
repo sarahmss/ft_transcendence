@@ -4,6 +4,7 @@ import { GameService } from './game.service';
 import { PlayerModel } from './game.service';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
+
 @WebSocketGateway ({
 	namespace: '/game',
 	cors: {
@@ -27,11 +28,11 @@ export class GameGateway
 				const decodedToken = this.authService.IsValidJwt(token);
 				const user = await this.authService.IsValidUser(decodedToken.userId);
 				client.data.user = user;
-				} catch {
+				this.gameService.logger.log(`Client connected: ${client.id}`);
+			} catch {
 				client.emit('Unauthorized', new UnauthorizedException());
 				this.disconnect(client);
-				}
-				this.gameService.logger.log(`Client connected: ${client.id}`);
+			}
 		}
 
 		private disconnect(client: Socket) {
@@ -70,7 +71,7 @@ export class GameGateway
 					id: client.id,
 				};
 				delete this.gameService.game.players[oldSocketId];
-				this.gameService.rejoinRoom(client, oldSocketId);
+				this.gameService.rejoinRoom(client, oldSocketId, this.server);
 				this.gameService.refreshPlayers(this.server);
 				this.gameService.refreshRooms(this.server);
 			}else {
@@ -79,8 +80,11 @@ export class GameGateway
 		}
 
 	@SubscribeMessage('login')
-		handleLogin(client: Socket, name: any): void {
-			this.gameService.game.players[client.id] = new PlayerModel({name: name, id: client.id});
+		handleLogin(client: Socket, payload: {name: any, userIdDataBase: any}): void {
+			console.log('USERID-DB passado COMO PARAMETRO P/ LOGIN: ', payload.userIdDataBase, ' | Nome é: ', payload.name);
+			this.gameService.game.players[client.id] = new PlayerModel({name: payload.name, id: client.id});
+			this.gameService.game.players[client.id].userIdDataBase = payload.userIdDataBase;
+			console.log('PLAYER CRIADO: ', this.gameService.game.players[client.id]);
 			this.gameService.refreshPlayers(this.server);
 			this.gameService.refreshRooms(this.server);
 			this.gameService.logger.log('Game: ', JSON.stringify(this.gameService.game));
@@ -93,7 +97,8 @@ export class GameGateway
 
 		@SubscribeMessage('addOnQueue')
 				handleAddOnQueue(client: Socket): void {
-						this.gameService.addOnQueue(client, this.server);
+					this.gameService.logger.log(`User no banco em addOnQueue: ${JSON.stringify(client.data.user)}`);	
+					this.gameService.addOnQueue(client, this.server);
 				}
 
 		@SubscribeMessage('execMatch')

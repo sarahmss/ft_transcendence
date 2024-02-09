@@ -13,7 +13,6 @@ import MuiTab, { TabProps } from '@mui/material/Tab'
 // ** Icons Imports
 import AccountOutline from 'mdi-material-ui/AccountOutline'
 import LockOpenOutline from 'mdi-material-ui/LockOpenOutline'
-import InformationOutline from 'mdi-material-ui/InformationOutline'
 import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 
 // ** Demo Tabs Imports
@@ -53,8 +52,6 @@ const AccountSettings = () => {
     const fetchData = async () => {
       try {
         const user = await authService.getCurrentUser();
-        console.log("user AcountSettings: ", user);
-
         if (user) {
           setCurrentUser(user);
         } else {
@@ -108,15 +105,6 @@ const AccountSettings = () => {
             }
           />
           <Tab
-            value='info'
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <InformationOutline />
-                <TabName>Info</TabName>
-              </Box>
-            }
-          />
-          <Tab
             value='status'
             label={
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -130,12 +118,17 @@ const AccountSettings = () => {
         <TabPanel sx={{ p: 0 }} value='account'>
           {currentUser && <TabAccount currentUser={currentUser}/>}
         </TabPanel>
+
         <TabPanel sx={{ p: 0 }} value='security'>
-			{currentUser && <TabSecurity currentUser={currentUser} />}
-		</TabPanel>
+			    {currentUser && <TabSecurity currentUser={currentUser} />}
+		    </TabPanel>
+
         <TabPanel sx={{ p: 0 }} value='status'>
-            {currentUser && <TabStatus currentUser={currentUser}/>}
+          {currentUser && <TabStatus currentUser={currentUser}/>}
+          {/* {<TabStatus currentUser={currentUser}/>} */}
+
         </TabPanel>
+        
       </TabContext>
     </Card>
 	</div>

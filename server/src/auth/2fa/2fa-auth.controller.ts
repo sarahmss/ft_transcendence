@@ -15,12 +15,14 @@ import {
 	ParseUUIDPipe
 } from "@nestjs/common";
 import { MessagesHelper } from "src/helpers/messages.helpers";
+import { UsersService } from '../../users/users.service';
 
 @Controller("2fa-auth")
 	export class TwoFaAuthController {
 		constructor(
 			private _2faService: TwoFaAuthService,
 			private _jwtService: JwtService,
+			private usersService: UsersService,
 		){}
 
 		/********************************* GET ******************************/
@@ -59,6 +61,7 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 				response.cookie('accessToken',
 									token,
 									{sameSite: 'lax', });
+				this.usersService.setStatusOn(userId);	
 				return response.status(200).json({
 					cookie: response.getHeader('set-cookie'),
 				});

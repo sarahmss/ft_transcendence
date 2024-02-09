@@ -19,9 +19,7 @@ export class UsersService {
 
 	/********************************* FIND ******************************/
 	async findAll(): Promise<User[]> {
-		return this.usersRepository.find({
-		select: ["userId", "userName", "email", "profilePicture"]
-	});
+		return this.usersRepository.find({ select: ["userId", "userName", "email", "profilePicture"] });
 	}
 
 	async findById(userId: string): Promise<User> {
@@ -69,6 +67,46 @@ export class UsersService {
 			status: user.status,
 		};
 	}
+	
+
+	async getUserStats(userId: string)
+	{
+		const user = await this.checkUser(userId);
+		return {
+			userName: user.userName,
+			email: user.email,
+			level: user.level,
+			gamesWonToLevelUp: user.gamesWonToLevelUp,
+			totalGamesWon: user.totalGamesWon,
+			totalGamesLost: user.totalGamesLost,
+			victories: user.winningGames,
+			defeats: user.losingGames,
+			matches: user.totalGamesWon + user.totalGamesLost
+		};
+	}
+
+	async getAllUserStats() {
+		const allUsers = await this.usersRepository.find();
+	
+		const allUserStats = [];
+	
+		for (const user of allUsers) {
+			const userStats = {
+				userName: user.userName,
+				email: user.email,
+				level: user.level,
+				totalGamesWon: user.totalGamesWon,
+				totalGamesLost: user.totalGamesLost,
+				matches: user.totalGamesWon + user.totalGamesLost,
+				status: user.status
+			};
+			
+			allUserStats.push(userStats);
+		}
+	
+		return allUserStats;
+	}
+	
 
 	async getUserStatus(userId: string): Promise<status>
 	{

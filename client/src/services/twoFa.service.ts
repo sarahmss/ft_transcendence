@@ -1,10 +1,12 @@
 import axios from 'axios';
+import { AxiosError } from 'axios';
 import AuthService from './auth.service';
 import { TwoFaLink,
 		TwoFaDisableLink,
 		TwoFaEnableLink,
 		TwoFaGenerateLink,
 		TwoFaLoginLink } from '../common/constants';
+import { truncate } from 'fs';
 
 class TwoFaService {
 
@@ -41,8 +43,13 @@ class TwoFaService {
 			await axios.post(TwoFaEnableLink, { code: code }, { headers: authToken });
 			return true;
 		} catch (error) {
-			console.error(error);
-			return false;
+			if (axios.isAxiosError(error)) {
+				console.log("teste", error);
+				return (error as AxiosError).message;
+			} else {
+				console.log("Unknown Error: ", error);
+			}
+			return error;
 		}
 	}
 

@@ -2,9 +2,9 @@ import * as session from 'express-session';
 import { Request } from 'express';
 
 export enum status {
-	ON = 'online',
-	OFF = 'offline',
-	PLAYING = 'playing',
+	ON = 'Online',
+	OFF = 'Offline',
+	PLAYING = 'Playing',
 }
 
 export type IntraUserData = {
