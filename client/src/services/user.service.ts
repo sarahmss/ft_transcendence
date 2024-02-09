@@ -76,6 +76,47 @@ class UserService {
 			throw error;
 		}
 	}
+
+	async RequestProfilePic(picture: string){
+		try {
+			const authTokenQr = AuthService.getAuthToken();
+			const response = await axios.get(BackLink + picture,
+											{ headers: authTokenQr, responseType: 'arraybuffer' });
+			return (response);
+		} catch (error) {
+			console.error("Error requesting profilePic:", error);
+			throw error;
+		}
+	}
+
+	async getProfilePicture(picture: string, userId: string): Promise<string> {
+		let pic = picture;
+		if (picture.includes(userId) === true) {
+			await this.RequestProfilePic(picture).then(
+				response => {
+					if (response.data) {
+						const imageBase64 = btoa(
+							new Uint8Array(response.data)
+							.reduce((data, byte) => data + String.fromCharCode(byte), '')
+						)
+						const imgElement = document.createElement('img');
+						imgElement.src = `data:image/png;base64,${imageBase64}`;
+						pic = imgElement.src;
+					}
+				},
+				error => {
+					const resMessage =
+							(error.response &&
+							error.response.data &&
+							error.response.data.message) ||
+							error.message ||
+							error.toString();
+					console.log(resMessage);
+				}
+				);			
+		}
+		return (pic);		
+	}
 }
 const userService = new UserService();
 

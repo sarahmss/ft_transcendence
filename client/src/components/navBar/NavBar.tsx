@@ -15,14 +15,14 @@ import MenuIcon from '@mui/icons-material/Menu';
 import { Link} from 'react-router-dom';
 
 
-import { DefaultPic, pictureStarter } from '../../common/constants';
+import { DefaultPic } from '../../common/constants';
 
 import {useSelector} from "react-redux";
 import {userLog} from "../../services/reduce";
+import userService from '../../services/user.service';
 
 const pagesLogged = [
-	{ label: 'Profile', link: '/profile' },
-	{ label: 'Settings', link: '/settings' },
+	{ label: 'Account', link: '/settings' },
 	{ label: 'Logout', link: '/logout' },
   { label: 'Game', link: '/game' },
 ];
@@ -59,15 +59,10 @@ const NavBar: React.FC = () => {
   const fetchData = async () => {
     try {
       const user = await authService.getCurrentUser();
-        console.log(user);
         if (user) {
           setIsLogged(true);
-          if (user.profilePicture != pictureStarter)
-          {
-            const photoProfile = await authService.getProfilePicture(user.profilePicture);
-            const teste = photoProfile instanceof HTMLImageElement ? photoProfile.src : '';
-            setProfilePic(teste);
-          }
+          const picture = await userService.getProfilePicture(user.profilePicture, user.userId);
+			    setProfilePic(picture);
         } else {
           setIsLogged(false);
           setProfilePic(DefaultPic);
@@ -81,21 +76,6 @@ const NavBar: React.FC = () => {
     fetchData();
     console.log("Hello")
   }, [users]);
-
-
-  // const handleLogoutClick = async () => {
-  //   try {
-  //     console.log("entrou no try logOut 2");
-  //     await authService.logout();
-  //     fetchData();
-  //   } catch (error) {
-  //     console.error('Error during logout:', error);
-  //   }
-  // };
-
-  const logout = () => {
-    //
-	};
 
   return (
     <AppBar position="static" sx={{ backgroundColor: '#B700cc' }}>

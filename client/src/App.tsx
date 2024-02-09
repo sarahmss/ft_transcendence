@@ -6,7 +6,6 @@ import "./App.css";
 import Login from "./components/login/login.component";
 import Register from "./components/login/register.component";
 import Home from "./components/home.component";
-import Profile from "./components/profile/profile.component";
 import Pong from "./components/game/Pong";
 import NavBar from "./components/navBar/NavBar"
 import Login2Fa from "./components/login/login2fa.component";
@@ -35,7 +34,6 @@ class App extends Component<Props, State> {
 						<Route path="/logout" element={<Logout />} />
 						<Route path='/2fa' element={<Login2Fa/>} />
 						<Route path="/register" element={<Register />} />
-						<Route path="/profile" element={<Profile />} />
 						<Route path="/settings" element={<AccountSettings />} />
 						<Route path="/game" element={
 							<div>

@@ -8,7 +8,7 @@ import { IntraloginLink } from "../../common/constants";
 import './css/login.component.css'
 import AuthService from "../../services/auth.service";
 import * as Yup from "yup";
-import FooterIllustration from "../../common/FooterIllustration";
+import BackgroundIllustration from "../../common/BackgroundIllustration";
 
 type Props = {};
 
@@ -233,7 +233,7 @@ export default class Login extends Component<Props, State> {
                     justifyContent: 'left'
                   }}
                 >
-                  <FooterIllustration />
+                  <BackgroundIllustration />
                 </Box>
 			</Box>
 		);

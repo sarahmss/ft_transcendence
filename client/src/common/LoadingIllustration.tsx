@@ -16,12 +16,8 @@ const Img1 = styled('img')(({ theme }) => ({
   left: '0rem',
   bottom: '0rem',
   position: 'absolute',
-  [theme.breakpoints.down('lg')]: {
-    left: 0,
-    bottom: 0
-  }
-}))
 
+}))
 
 const Img2 = styled('img')(() => ({
   right: 0,

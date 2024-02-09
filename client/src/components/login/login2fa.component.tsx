@@ -25,6 +25,7 @@ import twoFaService from "../../services/twoFa.service";
 
 import {useSelector, useDispatch} from "react-redux";
 import {addUser, userLog} from "../../services/reduce";
+import BackgroundIllustration from "../../common/BackgroundIllustration";
 
 const Loging2FaButton = ({userId, code, setState,}: {
 	userId: string;
@@ -180,6 +181,7 @@ export const Login2Fa = () => {
 					</CardActions>
 				</Card>
 			</Box>
+		<BackgroundIllustration/>
 		</>
 	);
 };

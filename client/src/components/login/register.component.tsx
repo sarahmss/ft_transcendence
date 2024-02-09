@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import AuthService from "../../services/auth.service";
 import {Button, Card, CardContent, Box} from '@mui/material';
 import './css/login.component.css'
-import FooterIllustration from "../../common/FooterIllustration";
+import BackgroundIllustration from "../../common/BackgroundIllustration";
 
 type Props = {};
 
@@ -211,7 +211,7 @@ export default class Register extends Component<Props, State> {
 						<p className="lorem">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi laborum ad commodi quos voluptate perspiciatis consectetur a, sapiente nam ab necessitatibus, ipsa quidem? Id aliquam, eligendi quidem dolor perferendis error.</p>
 					</CardContent>
 				</Card>
-                <FooterIllustration />
+                <BackgroundIllustration />
 			</Box>
 		);
 	}

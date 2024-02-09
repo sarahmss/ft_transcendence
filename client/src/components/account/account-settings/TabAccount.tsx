@@ -21,7 +21,7 @@ import {useSelector, useDispatch} from "react-redux";
 import {addUser, userLog} from "../../../services/reduce";
 
 // ** Icons Imports
-import { DefaultPic, pictureStarter } from '../../../common/constants'
+import { DefaultPic } from '../../../common/constants'
 import { reducer } from '../../../common/helper'
 
 const ImgStyled = styled('img')(({ theme }) => ({
@@ -188,26 +188,13 @@ const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
 		name: (currentUser?.userName || "name"),
 		email: (currentUser?.email || "email"),
 	});
-
 	const [profilePic, setProfilePic] = React.useState('');
-	const [isLogged, setIsLogged] = React.useState(false);
 
 	const fetchData = async () => {
 		try {
-		  const user = await authService.getCurrentUser();
-			console.log(user);
-			if (user) {
-			  setIsLogged(true);
-			  if (user.profilePicture !== pictureStarter)
-			  {
-				const photoProfile = await authService.getProfilePicture(user.profilePicture);
-				const teste = photoProfile instanceof HTMLImageElement ? photoProfile.src : '';
-				setProfilePic(teste);
-			  }
-			} else {
-			  setIsLogged(false);
-			  setProfilePic(DefaultPic);
-			}
+		  	const user = await authService.getCurrentUser();
+			const picture = await userService.getProfilePicture(user.profilePicture, user.userId);
+			setProfilePic(picture);
 		  } catch (error) {
 			console.error("Error fetching user data:", error);
 		  }
