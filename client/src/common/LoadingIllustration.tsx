@@ -1,5 +1,4 @@
-import Astronauta from '../assets/Astronauta.png';
-import Raquete from '../assets/Raquete.png'
+import LoadingImg from '../assets/loading.png';
 // ** React Imports
 import { Fragment, ReactNode } from 'react'
 
@@ -7,7 +6,7 @@ import { Fragment, ReactNode } from 'react'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
 
-interface FooterIllustrationsProp {
+interface LoadingIllustrationsProp {
   image1?: ReactNode
   image2?: ReactNode
 }
@@ -30,7 +29,7 @@ const Img2 = styled('img')(() => ({
   position: 'absolute',
 }))
 
-const FooterIllustration = (props: FooterIllustrationsProp) => {
+const LoadingIllustration = (props: LoadingIllustrationsProp) => {
   const { image1, image2 } = props
 
   const theme = useTheme()
@@ -40,8 +39,8 @@ const FooterIllustration = (props: FooterIllustrationsProp) => {
   if (!hidden) {
     return (
       <Fragment>
-        {image1 || <Img1 alt='Astronauta' src={Astronauta} />}
-        {image2 || <Img2 alt='Pong' src={Raquete} />}
+        {image1 || <Img1 alt='Loading1' src={LoadingImg} />}
+        {image2 || <Img2 alt='Loading2' src={LoadingImg} />}
       </Fragment>
     )
   } else {
@@ -49,6 +48,6 @@ const FooterIllustration = (props: FooterIllustrationsProp) => {
   }
 }
 
-export default FooterIllustration
+export default LoadingIllustration
 
 

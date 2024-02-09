@@ -9,12 +9,13 @@ import {
 	Button,
 	Box,
 	CircularProgress,
-	Grid
+	Grid,
+	Typography
 } from '@mui/material';
 import './css/game_styles.css';
 import { Navigate } from 'react-router-dom';
 import SportsTennisIcon from '@mui/icons-material/SportsTennis';
-import FooterIllustration from '../../common/FooterIllustration';
+import LoadingIllustration from '../../common/LoadingIllustration';
 
 const Connecting = () => {
 	return (
@@ -28,13 +29,14 @@ const Connecting = () => {
 		  fontFamily: 'Arial, sans-serif'
 		}}
 	  >
-		<div>
-		  Connecting...
-		</div>
+ 		<Typography variant="h2">
+        Connecting...
+      	</Typography>
 		<CircularProgress
 		  color="secondary"
 		  variant="indeterminate"
 		/>
+		<LoadingIllustration/>
 	  </Box>
 	);
   }
@@ -109,7 +111,6 @@ const Pong: React.FC = () => {
 		)
 		:
 		( <Navigate to="/" /> )}
-	<FooterIllustration />
 
 	</>
   );
