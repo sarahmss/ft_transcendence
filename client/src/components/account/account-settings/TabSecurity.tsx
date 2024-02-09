@@ -9,7 +9,8 @@ import {Box,
 		CardContent,
 		FormControl,
 		OutlinedInput,
-		InputAdornment
+		InputAdornment,
+		Alert
 	} from '@mui/material';
 
 
@@ -24,7 +25,6 @@ import AuthService from '../../../services/auth.service';
 import axios from 'axios';
 import IUser from '../../../types/user.type';
 import { reducer } from '../../../common/helper';
-import { red } from '@mui/material/colors';
 
 interface SendButtonProps {
 	code: string;
@@ -32,27 +32,38 @@ interface SendButtonProps {
 	setTwoFaEnabled: React.Dispatch<React.SetStateAction<{ TwoFaEnabled: boolean }>>;
 	errorCode: string;
 	setErrorCode: React.Dispatch<React.SetStateAction<{ errorCode: string }>>;
+	setQrCodeImgAvailable: React.Dispatch<React.SetStateAction<{  QrCodeImgAvailable: boolean }>>;
 }
 
 const SendButton: React.FC<SendButtonProps> =({ code,
-	TwoFaEnabled,
-	setTwoFaEnabled, errorCode, setErrorCode }) => {
+	TwoFaEnabled, setTwoFaEnabled,
+	errorCode, setErrorCode,
+	setQrCodeImgAvailable
+ }) => {
 
 	const handleRedirectToEnable2Fa = async () => {
-		const redirect = await TwoFaService.redirectToEnable2FA(code);
-		if (redirect === true)
-			setTwoFaEnabled({TwoFaEnabled: true});
-		else
-		{
-			setErrorCode({errorCode:redirect as string});
-			setTwoFaEnabled({TwoFaEnabled: false});
-		}
-		console.log(errorCode);
+		await TwoFaService.redirectToEnable2FA(code).then(
+			response => {
+				setTwoFaEnabled({TwoFaEnabled: true});
+			},
+			error => {
+				const resMessage =
+						(error.response &&
+						error.response.data &&
+						error.response.data.message) ||
+						error.message ||
+						error.toString()
+
+				setErrorCode({errorCode: resMessage});
+				setTwoFaEnabled({TwoFaEnabled: false}); 
+				}
+			);
 	};
 
 	const handleRedirectToDisable2Fa = () => {
 		TwoFaService.redirectToDisable2FA(code);
 		setTwoFaEnabled({TwoFaEnabled: false});
+		setQrCodeImgAvailable({ QrCodeImgAvailable: false });
 	};
 
 	return (
@@ -77,9 +88,11 @@ interface InsertCodeProps {
 	setCode: React.Dispatch<React.SetStateAction<{ code: string }>>;
 	errorCode: string;
 	setErrorCode: React.Dispatch<React.SetStateAction<{ errorCode: string }>>;
+	setQrCodeImgAvailable: React.Dispatch<React.SetStateAction<{ QrCodeImgAvailable: boolean }>>;
 }
 
-const InsertCode: React.FC<InsertCodeProps> = ({ code, TwoFaEnabled, setTwoFaEnabled, setCode, errorCode, setErrorCode }) => {
+const InsertCode: React.FC<InsertCodeProps> = ({ code, TwoFaEnabled, setTwoFaEnabled, setCode, errorCode, setErrorCode, setQrCodeImgAvailable }) => {
+
 	const handle2FaChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setCode({ code: event.target.value });
 	};
@@ -100,7 +113,13 @@ const InsertCode: React.FC<InsertCodeProps> = ({ code, TwoFaEnabled, setTwoFaEna
 			</InputAdornment>
 			}
 		/>
-		<SendButton code={code} TwoFaEnabled={TwoFaEnabled} setTwoFaEnabled={setTwoFaEnabled} errorCode={errorCode} setErrorCode={setErrorCode} />
+		<SendButton code={code}
+					TwoFaEnabled={TwoFaEnabled}
+					setTwoFaEnabled={setTwoFaEnabled}
+					errorCode={errorCode}
+					setErrorCode={setErrorCode}
+					setQrCodeImgAvailable={setQrCodeImgAvailable}
+		/>
 		</FormControl>
 	);
 	};
@@ -109,22 +128,13 @@ interface TabSecurityProps {
 	currentUser: IUser | null;
 }
 const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
-	const [state, setState] = useReducer(reducer, {
-		TwoFaEnabled: currentUser?.hasTwoFactorAuth || false,
-		QrCodeGenerated: currentUser?.hasTwoFactorAuth || false,
-		QrCodeImgAvailable:	false,
-		TwoFaDisable: false,
-		QrCodeImg: null,
-		Code: '',
-		errorCode: '',
-		});
 
 	const handleEnable2FAClick = async () => {
 		try {
 		if (state.QrCodeGenerated === false) {
 			await TwoFaService.generateQrCode();
 			setState({ ...state, QrCodeGenerated: true });
-			console.log("ErrorCode: ",state.errorCode);
+			console.log("ErrorCode: ", state.errorCode);
 		}
 		await getQrCode();
 		} catch (error) {
@@ -168,7 +178,16 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 			}
 		});
 	};
-
+	
+	const [state, setState] = useReducer(reducer, {
+		TwoFaEnabled: currentUser?.hasTwoFactorAuth || false,
+		QrCodeGenerated: currentUser?.hasTwoFactorAuth || false,
+		QrCodeImgAvailable:	currentUser?.hasTwoFactorAuth || false,
+		TwoFaDisable: false,
+		QrCodeImg: null,
+		Code: '',
+		errorCode: '',
+		});
 
 	return (
 		<form>
@@ -194,7 +213,8 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 						>
 							<LockOpenOutline sx={{ fontSize: '1.75rem', backgroundColor: '#B700cc'	}} />
 						</Avatar>
-						{state.QrCodeImgAvailable ? (
+						{state.QrCodeImgAvailable ?
+						(
 							<Typography sx={{ fontWeight: 600, marginTop: 3.5, marginBottom: 3.5 }}>
 							{state.TwoFaEnabled ?
 							(
@@ -207,6 +227,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 												code={state.code}
 												TwoFaEnabled={state.TwoFaEnabled}
 												setTwoFaEnabled={setState}
+												setQrCodeImgAvailable={setState}
 												setCode={setState}
 												errorCode={''}
 												setErrorCode={setState}
@@ -222,7 +243,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 								)
 							)
 							:
-							 (
+							(
 								<div>
 									{state.QrCodeImg ? (
 										<img src={state.QrCodeImg.src} alt='' />
@@ -230,19 +251,20 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 										<div>{'Error Loading QR code...'}</div>
 									)}
 									<Grid item xs={12} sx={{ marginTop: 6 }}>
-										{state.errorCode ? (<label style={{backgroundColor:'red'}}>{state.errorCode}</label>): (<label></label>)}
+										{state.errorCode ? (<Alert severity="error"> {state.errorCode} </Alert>):(<label></label>)}
 										<InsertCode
-											code={state.code}
-											TwoFaEnabled={state.TwoFaEnabled}
-											setTwoFaEnabled={setState}
-											setCode={setState}
-											errorCode={''}
-											setErrorCode={setState}
-											
+												code={state.code}
+												TwoFaEnabled={state.TwoFaEnabled}
+												setTwoFaEnabled={setState}
+												setQrCodeImgAvailable={setState}
+												setCode={setState}
+												errorCode={''}
+												setErrorCode={setState}
 										/>
 									</Grid>
 								</div>
-							)}
+							)
+							}
 							</Typography>
 						)
 						:
@@ -250,7 +272,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 							<Typography sx={{ fontWeight: 600, marginTop: 3.5, marginBottom: 3.5 }}>
 								Two factor authentication is not enabled yet.
 							</Typography>
-			)}
+						)}
 
 				<Typography variant='body2'>
 				Two-factor authentication adds an additional layer of security to your account by requiring more than just

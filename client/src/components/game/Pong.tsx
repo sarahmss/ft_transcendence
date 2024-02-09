@@ -7,11 +7,34 @@ import Customizing from './Customizing';
 import PongGame from './Game';
 import {
 	Button,
-	Box
+	Box,
+	CircularProgress
 } from '@mui/material';
 import './css/game_styles.css';
-
 import { Navigate } from 'react-router-dom';
+
+const Connecting = () => {
+	return (
+	  <Box
+		sx={{
+		  display: 'flex',
+		  flexDirection: 'column',
+		  alignItems: 'center',
+		  justifyContent: 'center',
+		  height: '100vh',
+		  fontFamily: 'Arial, sans-serif'
+		}}
+	  >
+		<div>
+		  Connecting...
+		</div>
+		<CircularProgress
+		  color="secondary"
+		  variant="indeterminate"
+		/>
+	  </Box>
+	);
+  }
 
 const Pong: React.FC = () => {
   const { isConnected, isUserLogged, players, match, current_player } = useContext(GameContext) as State;
@@ -19,10 +42,11 @@ const Pong: React.FC = () => {
   return (
 	<>
 		
-			{isUserLogged ?
-			(
+		{isUserLogged ?
+		(
 			<>
-			{!isConnected && <Box>Connecting...</Box>}
+			{!isConnected && <Connecting/>}
+
 			{current_player?.name && !current_player?.state && (
 				<Box component="span" className='list-title'>
 				{!current_player?.state && !current_player?.room && (
@@ -62,10 +86,10 @@ const Pong: React.FC = () => {
 			)}
 			
 				</>
-		) : (
-			<Navigate to="/" />
-		)}
-		</>
+		)
+		:
+		( <Navigate to="/" /> )}
+	</>
   );
 };
 

@@ -40,16 +40,13 @@ class TwoFaService {
 	async redirectToEnable2FA(code: string) {
 		try {
 			const authToken = AuthService.getAuthToken();
-			await axios.post(TwoFaEnableLink, { code: code }, { headers: authToken });
-			return true;
+			const response = await axios.post(TwoFaEnableLink,
+				 							{ code: code },
+											{ headers: authToken });
+			return response;
 		} catch (error) {
-			if (axios.isAxiosError(error)) {
-				console.log("teste", error);
-				return (error as AxiosError).message;
-			} else {
-				console.log("Unknown Error: ", error);
-			}
-			return error;
+			console.error("Error while enable 2fa:", error);
+			throw error;
 		}
 	}
 

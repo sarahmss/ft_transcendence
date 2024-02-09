@@ -4,6 +4,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "fund": "^1.0.0",
     "react-redux": "^9.1.0",
+    "react-scripts": "^5.0.1",
     "socket.io": "^4.7.2"
   }
 }
