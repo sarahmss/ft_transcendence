@@ -8,8 +8,9 @@
     "@emotion/styled": "^11.11.0",
     "@mui/icons-material": "^5.15.3",
     "@mui/lab": "^5.0.0-alpha.159",
-    "@mui/material": "^5.15.0",
+    "@mui/material": "^5.15.9",
     "@mui/system": "^5.15.4",
+    "@preact/signals-react": "^2.0.0",
     "@reduxjs/toolkit": "^2.0.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -64,6 +65,7 @@
     ]
   },
   "devDependencies": {
+    "@preact/signals-react-transform": "^0.3.0",
     "@types/react-datepicker": "^4.19.5"
   }
 }

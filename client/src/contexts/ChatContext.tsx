@@ -1,5 +1,5 @@
 
-import socketClient from 'socket.io-client';
+import { io } from "socket.io-client"
 import { ChatLink } from '../common/constants';
 import { Signal, effect, signal } from "@preact/signals-react";
 
@@ -31,11 +31,7 @@ const chat: Signal<Chat> = signal({
   participants: signal([]),
 });
 
-const chatSocket = socketClient(ChatLink, {
-  autoConnect: true,
-  transports: ['websocket'],
-  withCredentials: true,
-});
+const chatSocket = io(ChatLink);
 
 type test = {
   id: number,
@@ -49,6 +45,7 @@ const messages: Signal<test[]> = signal([
 	{ id: 3, text: signal("How can I assist you today?"), sender: "bot" },
 ]);
 
+// Change to the real implementation later
 let id = 4;
 const setMessage = (response: any) => {
   	messages.value = [
@@ -61,7 +58,28 @@ const setMessage = (response: any) => {
     ];
 }
 
+// const removeRoom = (roomData: any) => {
+//   chat.value.rooms.value = chat.value.rooms.value.filter((room: any) => {
+//     room.roomId !== roomData.roomId
+//   });
+// }
+
+// const joinRoom = (roomData: any) => {
+
+//   chat.value.rooms.value = [
+//     ...chat.value.rooms.value,
+//     roomData.room
+//   ]
+
+//   chat.value.rooms.value = [
+//     ...chat.value.participants.value,
+//     roomData.user
+//   ]
+// }
+
 chatSocket.on('message-response', setMessage);
+// chatSocket.on('left', removeRoom);
+
 
 export {
   chat,

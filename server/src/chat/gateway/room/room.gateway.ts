@@ -77,24 +77,23 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			}
 			else {
 				user = await this.checkUser(<string> client.handshake.headers.jwt); 
-
 			}
+
 
 			client.data.user = user;
 			this.connectedUserService.addConnection(user.userId, client);
 		}
 		catch (error) {
-			console.log(error);
 			console.log("User auth failure");
-			if (client.data.user)
-				this.handleDisconnect(client);
+			this.handleDisconnect(client);
 		}
 	}
 
 	handleDisconnect(client: Socket) {
 
-		this.connectedUserService
-			.removeConnection(client.data.user.userId);
+		if (client.data.user && client.data.user.userId)
+			this.connectedUserService
+				.removeConnection(client.data.user.userId);
 
 		client.disconnect();
 		console.log("User disconnected");
@@ -104,8 +103,12 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('message')
 	handleMessage(client: Socket, payload: any) {
 		
-		client.emit("client-response", payload);
-		this.connectedUserService.getConnection(client.data.userId).emit("client-response", "service working");
+		// client.emit("client-response", payload);
+		const socket = this.connectedUserService
+													.getConnection(client.data.user.userId);
+
+		socket.emit("client-response", "service working");
+
 		this.server.emit("message-response", payload);
 	}
 
@@ -160,7 +163,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		receivingClients.forEach((membershipData: Membership) => {
 			let targetSocket: Socket = this.connectedUserService
 																				.getConnection(membershipData.userId);
-			if (targetSocket)
+			if (targetSocket) {
 				targetSocket.emit("message-response",
 													{
 														message: message.message,
@@ -169,6 +172,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 														authorId: message.userId,
 														author: author,
 													});
+			}
 		});
 	}
 }

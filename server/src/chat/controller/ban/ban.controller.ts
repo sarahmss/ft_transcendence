@@ -73,7 +73,7 @@ export class BanController {
       throw new UnauthorizedException("Not enough privileges to ban");
   }
 
-  @Delete()
+  @Post('unban')
   async unbanUser(
     @Body('userId') userId: string,
     @Body('targetId') targetId: string,

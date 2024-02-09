@@ -46,6 +46,8 @@ export class RoomController {
 
 	@Post('list_room')
 	async getListRoom(@Body('userId') userId: string) {
+
+
 		if (!userId)
 			throw new BadRequestException("User id not given");
 		
@@ -83,7 +85,7 @@ export class RoomController {
 		this.eventEmitter.emit('room.delete', members, room, "delete", (__: any, _:any) => {return {}});
 	}
 
-	@Delete('leave')
+	@Post('leave')
 	async leaveRoom(
 		@Body('roomId') roomId: string,
 		@Body('userId') userId: string){

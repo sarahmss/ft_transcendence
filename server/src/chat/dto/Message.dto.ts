@@ -33,9 +33,18 @@ export class UpdateMessage {
 
 	@IsNotEmpty()
 	newMessage: string;
+
+	@IsNotEmpty()
+	userId: string;
 }
 
 export class DeleteMessage {
 	@IsNotEmpty()
 	messageId: string;
+
+	@IsNotEmpty()
+	userId: string;
+
+	@IsNotEmpty()
+	roomId: string;
 }

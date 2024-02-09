@@ -4,6 +4,7 @@ import { Body,
 	Get,
 	HttpException,
 	NotFoundException,
+	Param,
 	Patch, 
   Post,
   UnauthorizedException} from '@nestjs/common';
@@ -96,9 +97,6 @@ export class MessageController {
 			}
 		});
 
-		console.log("number of messages VVV");
-		console.log(sendMessages.length);
-
 		return sendMessages;
 	}
 
@@ -110,6 +108,9 @@ export class MessageController {
 
 			if (!user || !room)
 				throw new NotFoundException();
+			const memberException = await this.checkIfUserIsMember(message.userId, message.roomId)
+			if (memberException)
+				throw memberException;
 
 			const banList = await this.banService.findBanRoomUser(room);
 			const exception = this.banService.checkBanListIfUserBan(banList, user);
@@ -166,6 +167,9 @@ export class MessageController {
 
 		if (!user || !room)
 			throw new NotFoundException('User or Room not found');
+		const exception = await this.checkIfUserIsMember(roomAndUser.userId, roomAndUser.roomId)
+		if (exception)
+			throw exception;
 
 		const messages = await this.messageService.findMessageWithPage(
 			room,
@@ -209,9 +213,17 @@ export class MessageController {
 	@Patch()
 	async updateMessage(@Body() updateMessage: UpdateMessage) {
 
+
 		let message = await this.messageService.findMessageById(updateMessage.messageId);
 		if (!message)
 			throw new HttpException('Message doesn\'t exist!', 404);
+
+		const exception = await this.checkIfUserIsMember(updateMessage.userId, message.roomId);
+		if (exception)
+			return exception;
+
+		if (message.userId !== updateMessage.userId)
+			throw new UnauthorizedException('The message doesn\'t belong to him');
 
 		const ban = await this.banService.findBanById(message.roomId, message.userId);
 		if (ban)
@@ -221,13 +233,20 @@ export class MessageController {
 												 updateMessage.newMessage);
 	}
 
-	@Delete()
-	async deleteMessage(@Body() deleteMessage: DeleteMessage) {
+	@Delete(':msgId')
+	async deleteMessage(
+		@Param('msgId') messageId: string,
+		@Param('userId') userId: string,
+	) {
 
-		let message = await this.messageService.findMessageById(deleteMessage.messageId);
+		let message = await this.messageService.findMessageById(messageId);
 
 		if (!message)
 			throw new HttpException('Message doesn\'t exist!', 404);
+
+		const exception = await this.checkIfUserIsMember(userId, message.roomId);
+		if (exception)
+			throw exception;
 
 		const ban = await this.banService.findBanById(message.roomId, message.userId);
 		if (ban)
@@ -235,5 +254,11 @@ export class MessageController {
 
 		this.messageService.deleteMessage(message.messageId);
 		return "The message has been deleted";
+	}
+
+	async checkIfUserIsMember(userId: string, roomId: string) {
+		if (!(await this.membershipService.checkIfUserIsMember(roomId, userId)))
+			return new UnauthorizedException('This user it\'s not a member');
+		return false;
 	}
 }
