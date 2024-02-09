@@ -38,6 +38,7 @@ class App extends Component<Props, State> {
 						<Route path="/register" element={<Register />} />
 						<Route path="/profile" element={<Profile />} />
 						<Route path="/settings" element={<AccountSettings />} />
+
 						<Route path="/game" element={
 							<div>
 									<GameProvider>

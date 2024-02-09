@@ -80,7 +80,7 @@ const Pong: React.FC = () => {
 			)}
 			{current_player?.name && (current_player?.state === 'waiting' || current_player?.state === 'in_room' ) && match?.status !== 'CUSTOM' && (
 				<Box component="span" className='list-title'>
-				<Queue />
+					<Queue />
 				</Box>
 			)}
 			{current_player?.name && match?.status === 'CUSTOM' && current_player?.state !== 'watching' && (
@@ -99,7 +99,6 @@ const Pong: React.FC = () => {
 							<Grid item > 
 								<Rooms />
 							</Grid>
-
 							<Grid item > 
 								<PlayerList players={players} />
 							</Grid>
