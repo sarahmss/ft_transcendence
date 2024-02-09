@@ -104,8 +104,7 @@ const Pong: React.FC = () => {
 							</Grid>
 						</Grid>
 					</Box>
-			)}
-			
+			)}			
 				</>
 		)
 		:

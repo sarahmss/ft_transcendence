@@ -38,22 +38,33 @@ const Rooms: React.FC = () => {
 
       />
       <CardContent>
-        {!current_player.room &&
-          Object.keys(rooms).map((key) => (
-        (rooms[key].player1 && rooms[key].player2) ? (
-            <Stack key={`room_${key}`} justifyContent="space-between" alignItems="center" spacing={3}>
-              {rooms[key].name}
-              <Button
-                  onClick={() => enterSpectator(key)}
-                  disabled={!rooms[key].player1 || !rooms[key].player2}
-                  sx={{ backgroundColor:"#B700cc" }}
-                >
-                  Watch Match
-              </Button>
-            </Stack>)
-        : null
+        <Box
+          sx={{
+            position: 'relative',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            fontFamily: 'Arial, sans-serif'
+          }}>
+          {!current_player.room &&
+            Object.keys(rooms).map((key) => (
+          (rooms[key].player1 && rooms[key].player2) ? (
+              <Stack key={`room_${key}`} justifyContent="space-between" alignItems="center" spacing={3}>
+                {rooms[key].name}
+            
+                  <Button
+                    onClick={() => enterSpectator(key)}
+                    disabled={!rooms[key].player1 || !rooms[key].player2}
+                    sx={{ backgroundColor:"#B700cc", color: "#fff" }}
+                  >
+                    Watch Match
+                </Button>                
+              </Stack> 
+              )
+          : null
           ))}
-
+        </Box>
       </CardContent>
     </Card>
 
