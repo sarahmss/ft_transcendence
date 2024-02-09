@@ -13,6 +13,7 @@ import {
 	InputAdornment,
 	IconButton,
 	Avatar,
+	Alert
 } from "@mui/material";
 
 import QrCodeIcon from "@mui/icons-material/QrCode";
@@ -25,31 +26,42 @@ import twoFaService from "../../services/twoFa.service";
 import {useSelector, useDispatch} from "react-redux";
 import {addUser, userLog} from "../../services/reduce";
 
-
-
-interface State {
-	code: string;
-	verified: boolean;
-}
-
-const Loging2FaButton = ({userId, code, setState,
-}: {
+const Loging2FaButton = ({userId, code, setState,}: {
 	userId: string;
 	code: string;
-	setState: React.Dispatch<React.SetStateAction<State>>;
-}) => {
+	setState: React.Dispatch<React.SetStateAction<{
+		code: string;
+		verified: boolean;
+		errorMessage: string;}>>;
+	}) => {
+
 	const users = useSelector(userLog);
 	const dispatch = useDispatch();
 
 	const handleAuthentication = async () => {
-	const check = await twoFaService.login2Fa(code, userId);
-	setState({code:"", verified: check});
-	if (check)
-	{
-		console.log("First: ",users);
-		dispatch(addUser("ai"));
-		console.log("Second: ",users);
-	}
+		await twoFaService.login2Fa(
+			code,
+			userId
+		).then(
+			response => {
+					document.cookie = response.data.cookie;
+					sessionStorage.setItem("Logged", "ok");
+					setState({code:"", verified: true, errorMessage: ""});
+					dispatch(addUser("ai"));
+				},
+				error => {
+					const resMessage =
+						(error.response &&
+						error.response.data &&
+						error.response.data.message) ||
+						error.message ||
+						error.toString();
+
+					setState({code:"",
+							verified: false,
+							errorMessage: resMessage});
+				}
+			);
 	};
 
 	return (
@@ -76,11 +88,8 @@ interface TwoFactorAuthContentProps {
 	code: string;
 	setState: React.Dispatch<React.SetStateAction<{ code: string }>>;
 }
+const TwoFactorAuthContent: React.FC<TwoFactorAuthContentProps> = ({ code, setState,}) => {
 
-const TwoFactorAuthContent: React.FC<TwoFactorAuthContentProps> = ({
-	code,
-	setState,
-}) => {
 	const handle2FaChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		setState({ code: event.target.value });
 	};
@@ -90,18 +99,6 @@ const TwoFactorAuthContent: React.FC<TwoFactorAuthContentProps> = ({
 			event.preventDefault();
 		}
 	};
-
-	const [state, setStates] = useReducer(reducer, {
-		code: "",
-		verified: false,
-	});
-
-	const [searchParams, setSearchParams] = useSearchParams();
-
-	const userId = searchParams.get('user');
-
-	console.log(userId);
-
 	return (
 		<>
 			<CardContent style={{ paddingLeft: 35, paddingTop: 25 }}>
@@ -142,20 +139,16 @@ const TwoFactorAuthContent: React.FC<TwoFactorAuthContentProps> = ({
 };
 
 export const Login2Fa = () => {
+
+	const [searchParams, setSearchParams] = useSearchParams();
 	const [state, setState] = useReducer(reducer, {
 		code: "",
 		verified: false,
+		errorMessage: "",
 	});
-
-	const [searchParams, setSearchParams] = useSearchParams();
-
 	const userId = searchParams.get('user');
 
-	if (!userId) {
-		return <Navigate to="/" />;
-	}
-
-	if (state.verified) {
+	if (!userId || state.verified) {
 		return <Navigate to="/" />;
 	}
 
@@ -180,7 +173,9 @@ export const Login2Fa = () => {
 					</Box>
 
 					<TwoFactorAuthContent code={state.code} setState={setState} />
+
 					<CardActions sx={{ justifyContent: "center", paddingTop: 5 }}>
+						{state.errorMessage ? (<Alert severity="error"> {state.errorMessage} </Alert>):(<label></label>)}
 						<Loging2FaButton userId={userId} code={state.code} setState={setState} />
 					</CardActions>
 				</Card>

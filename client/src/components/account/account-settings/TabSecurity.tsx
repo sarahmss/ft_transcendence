@@ -30,15 +30,13 @@ interface SendButtonProps {
 	code: string;
 	TwoFaEnabled: boolean;
 	setTwoFaEnabled: React.Dispatch<React.SetStateAction<{ TwoFaEnabled: boolean }>>;
-	errorCode: string;
 	setErrorCode: React.Dispatch<React.SetStateAction<{ errorCode: string }>>;
 	setQrCodeImgAvailable: React.Dispatch<React.SetStateAction<{  QrCodeImgAvailable: boolean }>>;
 }
 
 const SendButton: React.FC<SendButtonProps> =({ code,
 	TwoFaEnabled, setTwoFaEnabled,
-	errorCode, setErrorCode,
-	setQrCodeImgAvailable
+	setErrorCode, setQrCodeImgAvailable
  }) => {
 
 	const handleRedirectToEnable2Fa = async () => {
@@ -61,9 +59,23 @@ const SendButton: React.FC<SendButtonProps> =({ code,
 	};
 
 	const handleRedirectToDisable2Fa = () => {
-		TwoFaService.redirectToDisable2FA(code);
-		setTwoFaEnabled({TwoFaEnabled: false});
-		setQrCodeImgAvailable({ QrCodeImgAvailable: false });
+
+		TwoFaService.redirectToDisable2FA(code).then(
+			response => {
+				setTwoFaEnabled({TwoFaEnabled: false});
+				setQrCodeImgAvailable({ QrCodeImgAvailable: false });
+			},
+			error => {
+				const resMessage =
+						(error.response &&
+						error.response.data &&
+						error.response.data.message) ||
+						error.message ||
+						error.toString()
+
+				setErrorCode({errorCode: resMessage});
+				}
+			);
 	};
 
 	return (
@@ -86,15 +98,20 @@ interface InsertCodeProps {
 	TwoFaEnabled: boolean;
 	setTwoFaEnabled: React.Dispatch<React.SetStateAction<{ TwoFaEnabled: boolean }>>;
 	setCode: React.Dispatch<React.SetStateAction<{ code: string }>>;
-	errorCode: string;
 	setErrorCode: React.Dispatch<React.SetStateAction<{ errorCode: string }>>;
 	setQrCodeImgAvailable: React.Dispatch<React.SetStateAction<{ QrCodeImgAvailable: boolean }>>;
 }
 
-const InsertCode: React.FC<InsertCodeProps> = ({ code, TwoFaEnabled, setTwoFaEnabled, setCode, errorCode, setErrorCode, setQrCodeImgAvailable }) => {
+const InsertCode: React.FC<InsertCodeProps> = ({ code, TwoFaEnabled, setTwoFaEnabled, setCode, setErrorCode, setQrCodeImgAvailable }) => {
 
-	const handle2FaChange = (event: ChangeEvent<HTMLInputElement>) => {
+	const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
 		setCode({ code: event.target.value });
+	};
+
+	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+		if (event.key === "Enter") {
+			event.preventDefault();
+		}
 	};
 
 	return (
@@ -103,7 +120,8 @@ const InsertCode: React.FC<InsertCodeProps> = ({ code, TwoFaEnabled, setTwoFaEna
 		<OutlinedInput
 			label='Code'
 			id='account-insert-code'
-			onChange={handle2FaChange}
+			onChange={handleChange}
+			onKeyDown={handleKeyDown}
 			type={'text'}
 			endAdornment={
 			<InputAdornment position='end'>
@@ -116,13 +134,13 @@ const InsertCode: React.FC<InsertCodeProps> = ({ code, TwoFaEnabled, setTwoFaEna
 		<SendButton code={code}
 					TwoFaEnabled={TwoFaEnabled}
 					setTwoFaEnabled={setTwoFaEnabled}
-					errorCode={errorCode}
 					setErrorCode={setErrorCode}
 					setQrCodeImgAvailable={setQrCodeImgAvailable}
 		/>
 		</FormControl>
 	);
-	};
+};
+
 
 interface TabSecurityProps {
 	currentUser: IUser | null;
@@ -134,11 +152,10 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 		if (state.QrCodeGenerated === false) {
 			await TwoFaService.generateQrCode();
 			setState({ ...state, QrCodeGenerated: true });
-			console.log("ErrorCode: ", state.errorCode);
 		}
 		await getQrCode();
 		} catch (error) {
-		console.error("Erro ao habilitar 2FA:", error);
+			console.error("Erro ao habilitar 2FA:", error);
 		}
 	};
 
@@ -174,7 +191,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 				reject(error);
 			}
 			} else {
-			reject(new Error("Unavailable Qr Code"));
+				reject(new Error("Unavailable Qr Code"));
 			}
 		});
 	};
@@ -229,7 +246,6 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 												setTwoFaEnabled={setState}
 												setQrCodeImgAvailable={setState}
 												setCode={setState}
-												errorCode={''}
 												setErrorCode={setState}
 											/>
 										</Grid>
@@ -258,7 +274,6 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 												setTwoFaEnabled={setState}
 												setQrCodeImgAvailable={setState}
 												setCode={setState}
-												errorCode={''}
 												setErrorCode={setState}
 										/>
 									</Grid>

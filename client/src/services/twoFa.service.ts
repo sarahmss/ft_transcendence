@@ -53,25 +53,22 @@ class TwoFaService {
 	async redirectToDisable2FA(code: string) {
 		try {
 			const authToken = AuthService.getAuthToken();
-			await axios.post(TwoFaDisableLink, { code: code }, { headers: authToken });
+			const response = await axios.post(TwoFaDisableLink, { code: code }, { headers: authToken });
+			return (response);
 		} catch (error) {
-			console.error(error);
+			console.error("Error while disable 2fa:", error);
+			throw error;
 		}
 	}
 
-	async login2Fa(code: string, userId: string): Promise<boolean> {
+	async login2Fa(code: string, userId: string) {
 		try {
 			const response = await axios.post(`${TwoFaLoginLink}?user=${userId}`,
-			{ code: code })
-			.then((response) => {
-				document.cookie = response.data.cookie;
-				sessionStorage.setItem("Logged", "ok");
-			});
-
-			return true;
+			{ code: code });
+			return response;
 		} catch (error) {
-			console.error(error);
-			return false;
+			console.error("Error while login 2fa:", error);
+			throw error;
 		}
 	}
 }
