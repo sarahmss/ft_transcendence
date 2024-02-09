@@ -9,6 +9,7 @@ import { TwoFaAuthController } from './2fa/2fa-auth.controller';
 import { TwoFaAuthService } from './2fa/2fa-auth.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../entity/user.entity';
+import { MatchHistory } from 'src/entity/match.entity';
 import { JwtStrategy } from './strategies/jwt.strategy';
 
 @Module({
