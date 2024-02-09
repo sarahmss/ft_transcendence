@@ -8,10 +8,13 @@ import PongGame from './Game';
 import {
 	Button,
 	Box,
-	CircularProgress
+	CircularProgress,
+	Grid
 } from '@mui/material';
 import './css/game_styles.css';
 import { Navigate } from 'react-router-dom';
+import SportsTennisIcon from '@mui/icons-material/SportsTennis';
+import FooterIllustration from '../../common/FooterIllustration';
 
 const Connecting = () => {
 	return (
@@ -48,17 +51,29 @@ const Pong: React.FC = () => {
 			{!isConnected && <Connecting/>}
 
 			{current_player?.name && !current_player?.state && (
-				<Box component="span" className='list-title'>
-				{!current_player?.state && !current_player?.room && (
-					<Button
-						variant="contained"
-						size="large"
-						onClick={addOnQueue}
-						sx={{backgroundColor:"#B700cc", mb:5}}
-					>
-						Enter a game
-					</Button>
-				)}
+
+				<Box
+					component="span"
+					className='list-title'
+					sx={{
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						justifyContent: 'center',
+						paddingTop: '20px',
+						fontFamily: 'Arial, sans-serif'
+					}}>
+					{!current_player?.state && !current_player?.room && (
+						<Button
+							variant="contained"
+							size="large"
+							onClick={addOnQueue}
+							sx={{backgroundColor:"#B700cc", mb:5}}
+						>
+							Enter a game  
+							<SportsTennisIcon />
+						</Button>
+					)}
 				</Box>
 			)}
 			{current_player?.name && (current_player?.state === 'waiting' || current_player?.state === 'in_room' ) && match?.status !== 'CUSTOM' && (
@@ -77,18 +92,25 @@ const Pong: React.FC = () => {
 				</>
 			)}
 				{(current_player?.name && (!match?.status || match?.status !== 'CUSTOM') && !current_player.room && !current_player?.state) && (
-				<Box style={{ width: '100%' }}>
-				<Box className='list-container'>
-					<Rooms />
-					<PlayerList players={players} />
-				</Box>
-				</Box>
+					<Box className='list-container' style={{ width: '200%' }}>
+						<Grid container spacing={2}>
+							<Grid item > 
+								<Rooms />
+							</Grid>
+
+							<Grid item > 
+								<PlayerList players={players} />
+							</Grid>
+						</Grid>
+					</Box>
 			)}
 			
 				</>
 		)
 		:
 		( <Navigate to="/" /> )}
+	<FooterIllustration />
+
 	</>
   );
 };

@@ -1,29 +1,57 @@
 import React from 'react';
 import {
   Stack,
-  Box
+  Box,
+  Card,
+  CardContent,
+  CardHeader,
+  Typography
 } from '@mui/material';
 import './css/game_styles.css';
-
+import PeopleIcon from '@mui/icons-material/People';
 interface PlayerListProps {
   players: {
     [key: string]: {
       name: string;
     };
   };
-}
+} 
 
 const PlayerList: React.FC<PlayerListProps> = (props) => {
   
   return (
-    <Box className='list-group flex-center'>
-      <Box component="span" className='list-title flex-center'>Users</Box>
-      {Object.keys(props.players).map((key) => (
-         <Stack key={key} className='list-item flex-center'>
-           {props.players[key].name}
-         </Stack>
-       ))}
-    </Box>
+    <Card >
+      <CardHeader
+        title='Users'
+        action={
+            <PeopleIcon/>
+        }
+        subheader={
+          <Typography variant='body2'>
+            <Box component='span' sx={{ fontWeight: 600, color: 'text.primary' }}>
+            If an opponent is available you can play against them
+            </Box>{' '}
+          </Typography>
+        }
+        titleTypographyProps={{
+          sx: {
+            mb: 2.5,
+            lineHeight: '2rem !important',
+            letterSpacing: '0.15px !important'
+          }
+        }}        
+      />
+      <Box className='list-group flex-center'>
+
+        {Object.keys(props.players).map((key) => (
+          <Stack key={key} className='list-item flex-center'>
+            {props.players[key].name}
+          </Stack>
+        ))}
+      </Box>     
+
+    </Card>
+
   );
 
   // return (
