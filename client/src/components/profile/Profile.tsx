@@ -88,10 +88,10 @@ const Profile = () => {
         <Grid item sx={{width:"100%"}}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <DashboardTable AllUserStats={AllUserStats} />
+              <MatchHistoryComponent userStats={userStats}/>
             </Grid>
             <Grid item xs={12}>
-              <MatchHistoryComponent userStats={userStats}/>
+              <DashboardTable AllUserStats={AllUserStats} />
             </Grid>
           </Grid>
         </Grid>
