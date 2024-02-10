@@ -18,7 +18,6 @@ import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 // ** Demo Tabs Imports
 import TabAccount from './account-settings/TabAccount'
 import TabSecurity from './account-settings/TabSecurity'
-import TabStatus from './account-settings/TabStatus'
 
 import authService from '../../services/auth.service'
 import { Navigate } from "react-router-dom";
@@ -122,12 +121,6 @@ const AccountSettings = () => {
         <TabPanel sx={{ p: 0 }} value='security'>
 			    {currentUser && <TabSecurity currentUser={currentUser} />}
 		    </TabPanel>
-
-        <TabPanel sx={{ p: 0 }} value='status'>
-          {currentUser && <TabStatus currentUser={currentUser}/>}
-          {/* {<TabStatus currentUser={currentUser}/>} */}
-
-        </TabPanel>
         
       </TabContext>
     </Card>

@@ -3,10 +3,11 @@ import Card from '@mui/material/Card'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import { styled, useTheme } from '@mui/material/styles'
-import TrophySrc from '../../../../assets/trophy.png';
-import TriangleSrc from '../../../../assets/triangle-light.png';
-import IUserStats from '../../../../types/userStats.type'
-// Styled component for the triangle shaped background image
+
+import TrophySrc from '../../../assets/trophy.png';
+import TriangleSrc from '../../../assets/triangle-light.png';
+import IUserStats from '../../../types/userStats.type'
+
 const TriangleImg = styled('img')({
   right: 0,
   bottom: 0,
@@ -29,7 +30,7 @@ interface TrophyProps {
 const Trophy: React.FC<TrophyProps> = ({ userStats }) => {
 
   return (
-    <Card sx={{ position: 'relative' }}>
+    <Card sx={{ position: 'relative', height: "100%" }}>
       <CardContent>
         <Typography variant='h6'>Welcome {userStats?.userName}! 🥳</Typography>
         <Typography variant='body2' sx={{ letterSpacing: '0.25px' }}>

@@ -4,14 +4,13 @@ import Grid from '@mui/material/Grid'
 import Card from '@mui/material/Card'
 import Avatar from '@mui/material/Avatar'
 import CardHeader from '@mui/material/CardHeader'
-import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import CardContent from '@mui/material/CardContent'
 import TrendingUp from 'mdi-material-ui/TrendingUp'
 import TrendingDown from 'mdi-material-ui/TrendingDown'
 import TimelineIcon from '@mui/icons-material/Timeline';
-import DotsVertical from 'mdi-material-ui/DotsVertical'
-import IUserStats from '../../../../types/userStats.type'
+import IUserStats from '../../../types/userStats.type'
+import { styled } from '@mui/material/styles'
 
 type ThemeColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
 
@@ -22,9 +21,12 @@ interface DataType {
   icon: ReactElement
 }
 
-interface StatisticsCardProps {
-	userStats: IUserStats | null
-}
+const ImgStyled = styled('img')(({ theme }) => ({
+	width: 180,
+	height: 180,
+	marginRight: theme.spacing(6.25),
+	borderRadius: theme.shape.borderRadius,
+}))
 
 const buildStatsData = (userStats: IUserStats | null): DataType[] => {
   return [
@@ -75,7 +77,11 @@ const renderStats = (StatsData: DataType[]) => {
   ))
 }
 
-const StatisticsCard: React.FC<StatisticsCardProps> = ({ userStats }) => {
+interface StatisticsCardProps {
+	userStats: IUserStats | null,
+  profilePic: string
+}
+const StatisticsCard: React.FC<StatisticsCardProps> = ({ userStats, profilePic }) => {
   const StatsData = buildStatsData(userStats);
 
   return (
@@ -83,14 +89,14 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({ userStats }) => {
       <CardHeader
         title='Personal History'
         action={
-          <IconButton size='small' aria-label='settings' className='card-more-options' sx={{ color: 'text.secondary' }}>
-            <DotsVertical />
-          </IconButton>
+          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+							<ImgStyled src={profilePic} alt='Profile Pic' />
+						</Box>
         }
         subheader={
           <Typography variant='body2'>
             <Box component='span' sx={{ fontWeight: 600, color: 'text.primary' }}>
-              You played {userStats?.matches} matches
+              {userStats?.userName} played {userStats?.matches} matches
             </Box>{' '}
             😎 
           </Typography>

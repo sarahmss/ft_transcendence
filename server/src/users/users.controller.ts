@@ -44,8 +44,6 @@ export class UsersController {
 		return this.usersService.getUserProfile(userId);
 	}
 
-
-
 	/********************************* PATCH ******************************/
 
 	@Patch(':userId')

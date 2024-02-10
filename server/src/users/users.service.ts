@@ -69,9 +69,15 @@ export class UsersService {
 	}
 	
 
-	async getUserStats(userId: string)
-	{
-		const user = await this.checkUser(userId);
+	async getUserStats(userId: string) {
+		await this.checkUser(userId);
+		const user = await this.usersRepository
+			.createQueryBuilder("user")
+			.where("user.userId = :userId", { userId })
+			.leftJoinAndSelect("user.losingGames", "losingGames")
+			.leftJoinAndSelect("user.winningGames", "winningGames")
+			.getOne();
+	
 		return {
 			userName: user.userName,
 			email: user.email,
@@ -79,14 +85,15 @@ export class UsersService {
 			gamesWonToLevelUp: user.gamesWonToLevelUp,
 			totalGamesWon: user.totalGamesWon,
 			totalGamesLost: user.totalGamesLost,
-			victories: user.winningGames,
-			defeats: user.losingGames,
+			victories: user.winningGames, 
+			defeats: user.losingGames, 
 			matches: user.totalGamesWon + user.totalGamesLost
 		};
 	}
+	
 
 	async getAllUserStats() {
-		const allUsers = await this.usersRepository.find();
+		const allUsers = await this.usersRepository.find({ relations: ['losingGames', 'winningGames'] });
 	
 		const allUserStats = [];
 	

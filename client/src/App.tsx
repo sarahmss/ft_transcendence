@@ -14,6 +14,8 @@ import { GameProvider } from './contexts/GameContext';
 import AccountSettings from "./components/account/AcountSettings";
 import { Provider } from 'react-redux';
 import store from './services/store';
+import Profile from "./components/profile/Profile";
+
 type Props = {};
 
 type State = {
@@ -35,6 +37,8 @@ class App extends Component<Props, State> {
 						<Route path='/2fa' element={<Login2Fa/>} />
 						<Route path="/register" element={<Register />} />
 						<Route path="/settings" element={<AccountSettings />} />
+						<Route path="/profile" element={<Profile />} />
+
 						<Route path="/game" element={
 							<div>
 									<GameProvider>

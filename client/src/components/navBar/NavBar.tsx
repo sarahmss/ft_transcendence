@@ -22,6 +22,7 @@ import {userLog} from "../../services/reduce";
 import userService from '../../services/user.service';
 
 const pagesLogged = [
+	{ label: 'Profile', link: '/profile' },
 	{ label: 'Account', link: '/settings' },
 	{ label: 'Logout', link: '/logout' },
   { label: 'Game', link: '/game' },

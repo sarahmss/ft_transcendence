@@ -60,6 +60,17 @@ class UserService {
 		}
 	}
 
+	async RequestUserProfile(userId: string){
+		try {
+			const response = await axios.get((UserContentLink + userId + "/profile"),
+				{ headers: AuthService.getAuthToken() });
+			return (response.data);
+		} catch (error) {
+			console.error('Error while requesting user Profile:', error);
+			throw error;
+		}
+	}
+
 	
 	async RequestAllUserStats(){
 		const userId = AuthService.getIdFromToken();

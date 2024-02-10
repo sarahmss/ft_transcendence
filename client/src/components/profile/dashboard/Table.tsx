@@ -9,7 +9,7 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
-import IUserStats from '../../../../types/userStats.type';
+import IUserStats from '../../../types/userStats.type'
 
 // ** Types Imports
 type ThemeColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';

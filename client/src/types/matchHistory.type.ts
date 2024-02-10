@@ -2,8 +2,8 @@ import  IUser  from './user.type'; // Certifique-se de que o caminho está corre
 
 export default interface MatchHistory {
     gameId: string;
-    winner: IUser;
-    loser: IUser;
+    winnerId: string;
+    loserId: string;
     winnerScore: number;
     loserScore: number;
     gameTime: number;
