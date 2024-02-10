@@ -8,7 +8,7 @@ import { AuthService } from 'src/auth/auth.service';
 @WebSocketGateway ({
 	namespace: '/game',
 	cors: {
-		origin: [process.env.FRONT_URL, process.env.BACK_URL],
+		origin: '*',
 		credentials: true,
 		methods: 'GET',
 	},
