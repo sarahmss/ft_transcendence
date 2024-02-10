@@ -6,7 +6,8 @@ import {Card,
         Box,
         Avatar,
         Grid,
-        Paper} from '@mui/material/';
+        Paper,
+        CardMedia} from '@mui/material/';
 
 import MuiDivider, { DividerProps } from '@mui/material/Divider';
 import { styled } from '@mui/material/styles';
@@ -14,21 +15,16 @@ import IUserStats from '../../../types/userStats.type';
 import CloseIcon from '@mui/icons-material/Close';
 import { DefaultPic } from '../../../common/constants';
 import userService from '../../../services/user.service';
-import IUser from '../../../types/user.type';
+import MatchHistory from '../../../types/matchHistory.type';
 
-interface DataType {
-  gameId: string;
-  winnerScore: number;
-  loserScore: number;
-  gameTime: number;
-  winnerId: string;
-  loserId: string;
-}
 
-interface MatchHistoryProps {
+import  winner  from '../../../assets/winner.png';
+import  loser  from '../../../assets/loser.png';
+
+
+
+interface MatchHistoryComponentProps {
   userStats: IUserStats | null;
-  profilePic: string;
-  currentUser: IUser | null;
 }
 
 const Divider = styled(MuiDivider)<DividerProps>(({ theme }) => ({
@@ -42,35 +38,32 @@ const Divider = styled(MuiDivider)<DividerProps>(({ theme }) => ({
 }));
 
 interface MatchDisplayProps {
-  profilePic: string
-  winnerId: string
-  looserId: string
-  isWinner: boolean
-  stats: DataType | null
+  stats: MatchHistory | null
 }
-const MatchDisplay: React.FC<MatchDisplayProps> = ({ profilePic,
-  winnerId,
-  looserId,
-  isWinner,
-  stats }) => {
+const MatchDisplay: React.FC<MatchDisplayProps> = ({ stats }) => {
 
-  const [OpponentProfilePic, setProfilePic] = useState(DefaultPic);
+  const [winnerPic, setWinnerPic] = useState(DefaultPic);
+  const [loserPic, setLoserPic] = useState(DefaultPic);
 
-  const loadOpponentProfilePic = async (userId: string) => {
+  const loadAvatars = async (stats: MatchHistory | null) => {
     try {
-      const opponent = await userService.RequestUserProfile(userId);
-      const picture = await userService.getProfilePicture(opponent.profilePic, userId);
-      setProfilePic(picture);
+      if (stats){
+        const winnerUrl = stats.winner.profilePicture || DefaultPic;
+        const loserUrl = stats.loser.profilePicture || DefaultPic;
+
+        const Pic1 = await userService.getProfilePicture(winnerUrl, stats.winner.userId);
+        const Pic2 = await userService.getProfilePicture(loserUrl, stats.loser.userId);
+
+        setWinnerPic(Pic1);
+        setLoserPic(Pic2);        
+      }
     } catch (error) {
       console.error('Error loading OpponentProfilePic:', error);
     }
   };
 
   useEffect(() => {
-    const opponentId = isWinner ? looserId : winnerId;
-    if (opponentId){
-      loadOpponentProfilePic(opponentId);
-    }
+    loadAvatars(stats);
   }, []);
 
   return (
@@ -78,27 +71,41 @@ const MatchDisplay: React.FC<MatchDisplayProps> = ({ profilePic,
       <Grid container spacing={2} direction="row"  sx={{paddingLeft:"5px"}}>
           <Grid item>
             <Box sx={{ minWidth: 38, display: 'flex', justifyContent: 'center' }}>
-              <Avatar alt="currentUser" src={profilePic} />
+              <Avatar alt="Winner" src={winnerPic} />
             </Box>
             <Typography  variant="subtitle2" >
-              Score {isWinner ? stats?.winnerScore :stats?.loserScore}
+              {stats?.winner.userName} score {stats?.winnerScore}
             </Typography>            
           </Grid>
           <Grid item>
-            <CloseIcon color="secondary"/>
+            <Box sx={{  position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center',}}>
+              <CloseIcon />
+            </Box>
+
           </Grid>          
           <Grid item>
             <Box sx={{ minWidth: 38, display: 'flex', justifyContent: 'center' }}>
-                <Avatar alt="Opponent" src={OpponentProfilePic} />
+                <Avatar alt="Loser" src={loserPic} />
             </Box>
             <Typography variant="subtitle2" >
-              Score {!isWinner ? stats?.winnerScore :stats?.loserScore}
+              {stats?.loser.userName} score {stats?.loserScore}
             </Typography>    
           </Grid>
           <Grid item>
+            <Box
+              sx={{
+                position: 'relative',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                width: '100%',
+                fontFamily: 'Arial, sans-serif'
+              }}
+              >
             <Typography variant="subtitle1">
-              Match Time: {stats?.gameTime}
-            </Typography>   
+              Match Time {stats?.gameTime}
+            </Typography> 
+            </Box>
           </Grid>
         </Grid>
     </Paper>
@@ -106,72 +113,60 @@ const MatchDisplay: React.FC<MatchDisplayProps> = ({ profilePic,
   );
 }
 
-const MatchHistory: React.FC<MatchHistoryProps> = ({ userStats, profilePic, currentUser }) => {
+const MatchHistoryComponent: React.FC<MatchHistoryComponentProps> = ({ userStats }) => {
   if (!userStats) return null;
   const { victories, defeats } = userStats;
 
   return (
 
-
-    <Card sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: ['column', 'column', 'row'] }}>
-
-      <Box sx={{ width: '100%' }}>
+    <Paper elevation={3} >
+      <Card sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: ['column', 'column', 'row'] }}>
+      <CardMedia sx={{ objectFit:"cover", height: '9rem'}} image={winner} />
+      <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%',}}>
         <CardHeader
-          title='Victories'
-          sx={{ pt: 5.5, alignItems: 'center', '& .MuiCardHeader-action': { mt: 0.6 } }}
-          action={<Typography variant='caption'>View All</Typography>}
-          titleTypographyProps={{
-            variant: 'h6',
-            sx: { lineHeight: '1.6 !important', letterSpacing: '0.15px !important' }
-          }}
-        />
-
-
-        <CardContent sx={{ pb: theme => `${theme.spacing(5.5)} !important` }}>
-          {victories && victories.map((victory: DataType) => (
-            <Box
-              key={victory.gameId}
-              sx={{ display: 'flex', alignItems: 'center', mb: 6 }}>
-              
+            title='Victories'            
+            sx={{ pt: 5.5, alignItems: 'center', '& .MuiCardHeader-action': { mt: 0.6 } }}
+            titleTypographyProps={{
+              variant: 'h4',
+              sx: { lineHeight: '1.6 !important', letterSpacing: '0.15px !important' }
+            }}
+          />
+          <CardContent sx={{ pb: theme => `${theme.spacing(5.5)} !important`}}>
+            {victories && victories.map((victory: MatchHistory) => (
+              <Box
+                key={victory.gameId}
+                sx={{ display: 'flex', alignItems: 'center', mb: 6 }}>
+                
                 <MatchDisplay
-                  profilePic={profilePic}
-                  winnerId={victory.winnerId} 
-                  looserId={victory.loserId}
-                  stats={victory}
-                  isWinner={victory.winnerId === currentUser?.userId}
-                 />
-            </Box>
-          ))}
-        </CardContent>
-      </Box>
-
-      <Divider flexItem />
-
-      <Box sx={{ width: '100%' }}>
-        <CardHeader
-          title='Defeats'
-          sx={{ pt: 5.5, alignItems: 'center', '& .MuiCardHeader-action': { mt: 0.6 } }}
-          titleTypographyProps={{
-            variant: 'h6',
-            sx: { lineHeight: '1.6 !important', letterSpacing: '0.15px !important' }
-          }}
-        />
-        <CardContent sx={{ pb: theme => `${theme.spacing(5.5)} !important` }}>
-          {defeats && defeats.map((defeat: DataType) => (
-            <Box key={defeat.gameId} sx={{ display: 'flex', alignItems: 'center', mb: 6 }}>
-                <MatchDisplay
-                  profilePic={profilePic}
-                  winnerId={defeat.winnerId} 
-                  looserId={defeat.loserId}
-                  stats={defeat}
-                  isWinner={defeat.winnerId === currentUser?.userId}
-                 />
-            </Box>
-          ))}
-        </CardContent>
-      </Box>
-    </Card>
+                    stats={victory}
+                  />
+              </Box>
+            ))}
+          </CardContent>
+        </Box>
+        <CardMedia sx={{ objectFit:"cover", height: '9rem'}} image={loser} />
+        <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%',}}>              
+          <CardHeader
+            title='Defeats'
+            sx={{ pt: 5.5, alignItems: 'center', '& .MuiCardHeader-action': { mt: 0.6 } }}
+            titleTypographyProps={{
+              variant: 'h4',
+              sx: { lineHeight: '1.6 !important', letterSpacing: '0.15px !important' }
+            }}
+          />
+          <CardContent sx={{ pb: theme => `${theme.spacing(5.5)} !important` }}>
+            {defeats && defeats.map((defeat: MatchHistory) => (
+              <Box key={defeat.gameId} sx={{ display: 'flex', alignItems: 'center', mb: 6 }}>
+                  <MatchDisplay
+                    stats={defeat}
+                  />
+              </Box>
+            ))}
+          </CardContent>
+        </Box>
+      </Card>
+    </Paper>
   );
 }
 
-export default MatchHistory;
+export default MatchHistoryComponent;

@@ -14,7 +14,7 @@ import {
   Paper,
   Grid} from '@mui/material';
 import './css/game_styles.css';
-import CustomIllustration from '../../common/CustomIllustration';
+import CustomIllustration from '../../common/Illustrations/CustomIllustration';
 interface StepAuxProps {
   setActiveStep: React.Dispatch<React.SetStateAction<number>>;
   prevActiveStep: number;

@@ -91,7 +91,7 @@ const StatisticsCard: React.FC<StatisticsCardProps> = ({ userStats, profilePic }
         action={
           <Box sx={{ display: 'flex', alignItems: 'center' }}>
 							<ImgStyled src={profilePic} alt='Profile Pic' />
-						</Box>
+					</Box>
         }
         subheader={
           <Typography variant='body2'>

@@ -15,7 +15,7 @@ import {
 import './css/game_styles.css';
 import { Navigate } from 'react-router-dom';
 import SportsTennisIcon from '@mui/icons-material/SportsTennis';
-import LoadingIllustration from '../../common/LoadingIllustration';
+import LoadingIllustration from '../../common/Illustrations/LoadingIllustration';
 
 const Connecting = () => {
   return (

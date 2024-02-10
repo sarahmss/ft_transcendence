@@ -1,4 +1,4 @@
-import Table from '../assets/Playing1.png';
+import Table from '../../assets/Playing1.png';
 // ** React Imports
 import { Fragment, ReactNode } from 'react'
 

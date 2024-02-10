@@ -1,4 +1,5 @@
-import LoadingImg from '../assets/loading.png';
+import Playing1 from '../../assets/Playing1.png';
+import Playing2 from '../../assets/Playing2.png'
 // ** React Imports
 import { Fragment, ReactNode } from 'react'
 
@@ -6,26 +7,28 @@ import { Fragment, ReactNode } from 'react'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { styled, useTheme } from '@mui/material/styles'
 
-interface LoadingIllustrationsProp {
+interface PlayingIllustrationsProp {
   image1?: ReactNode
   image2?: ReactNode
 }
 
 
 const Img1 = styled('img')(({ theme }) => ({
-  left: '0rem',
-  bottom: '0rem',
+  left: '100%',
+  bottom: '25%',
   position: 'absolute',
-
+  zIndex: -1,
 }))
+
 
 const Img2 = styled('img')(() => ({
-  right: 0,
-  top: '5%',
+  right: "100%",
+  top: '25%',
   position: 'absolute',
+  zIndex: -1,
 }))
 
-const LoadingIllustration = (props: LoadingIllustrationsProp) => {
+const PlayingIllustration = (props: PlayingIllustrationsProp) => {
   const { image1, image2 } = props
 
   const theme = useTheme()
@@ -35,8 +38,8 @@ const LoadingIllustration = (props: LoadingIllustrationsProp) => {
   if (!hidden) {
     return (
       <Fragment>
-        {image1 || <Img1 alt='Loading1' src={LoadingImg} />}
-        {image2 || <Img2 alt='Loading2' src={LoadingImg} />}
+        {image1 || <Img1 alt='Playing1' src={Playing2} />}
+        {image2 || <Img2 alt='Playing' src={Playing2} />}
       </Fragment>
     )
   } else {
@@ -44,6 +47,6 @@ const LoadingIllustration = (props: LoadingIllustrationsProp) => {
   }
 }
 
-export default LoadingIllustration
+export default PlayingIllustration
 
 

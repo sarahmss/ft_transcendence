@@ -8,7 +8,7 @@ import { IntraloginLink } from "../../common/constants";
 import './css/login.component.css'
 import AuthService from "../../services/auth.service";
 import * as Yup from "yup";
-import BackgroundIllustration from "../../common/BackgroundIllustration";
+import BackgroundIllustration from "../../common/Illustrations/BackgroundIllustration";
 
 type Props = {};
 

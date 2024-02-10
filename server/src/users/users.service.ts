@@ -71,25 +71,59 @@ export class UsersService {
 
 	async getUserStats(userId: string) {
 		await this.checkUser(userId);
-		const user = await this.usersRepository
-			.createQueryBuilder("user")
-			.where("user.userId = :userId", { userId })
-			.leftJoinAndSelect("user.losingGames", "losingGames")
-			.leftJoinAndSelect("user.winningGames", "winningGames")
-			.getOne();
+		const user = await this.usersRepository.findOne({ 
+			where: { userId:  userId},
+			relations: ['losingGames',
+						'winningGames',
+						'winningGames.winner',
+						'winningGames.loser',
+						'losingGames.winner',
+						'losingGames.loser'],
+		});
 	
 		return {
 			userName: user.userName,
-			email: user.email,
 			level: user.level,
 			gamesWonToLevelUp: user.gamesWonToLevelUp,
 			totalGamesWon: user.totalGamesWon,
 			totalGamesLost: user.totalGamesLost,
-			victories: user.winningGames, 
-			defeats: user.losingGames, 
+			victories: user.winningGames.map(game => ({
+				gameId: game.gameId,
+				winnerScore: game.winnerScore,
+				loserScore: game.loserScore,			
+				gameTime: game.gameTime,
+				winner: {
+					userId: game.winner.userId,
+					userName: game.winner.userName,
+					profilePicture: game.winner.profilePicture
+				},
+				loser: {
+					userId: game.loser.userId,
+					userName: game.loser.userName,
+					profilePicture: game.loser.profilePicture
+				}
+			})),
+			defeats: user.losingGames.map(game => ({
+				gameId: game.gameId,
+				winnerScore: game.winnerScore,
+				loserScore: game.loserScore,			
+				gameTime: game.gameTime,
+				winner: {
+					userId: game.winner.userId,
+					userName: game.winner.userName,
+					profilePicture: game.winner.profilePicture
+				},
+				loser: {
+					userId: game.loser.userId,
+					userName: game.loser.userName,
+					profilePicture: game.loser.profilePicture
+				}
+			})),
 			matches: user.totalGamesWon + user.totalGamesLost
 		};
 	}
+	
+    
 	
 
 	async getAllUserStats() {

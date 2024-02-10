@@ -8,7 +8,7 @@ import {
   CircularProgress,
   Grid
 } from '@mui/material';
-import PlayingIllustration from '../../common/PlayingIllustration';
+import PlayingIllustration from '../../common/Illustrations/PlayingIllustration';
 
 const Queue: React.FC = () => {
 

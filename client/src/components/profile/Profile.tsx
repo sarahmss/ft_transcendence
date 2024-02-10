@@ -10,7 +10,7 @@ import IUserStats from '../../types/userStats.type';
 import Trophy from './dashboard/Trophy';
 import StatisticsCard from './dashboard/StatisticsCard';
 import DashboardTable from './dashboard/Table';
-import MatchHistory from './dashboard/MatchHistory';
+import MatchHistoryComponent from './dashboard/MatchHistory';
 
 import userService from '../../services/user.service';
 import authService from '../../services/auth.service';
@@ -71,23 +71,31 @@ const Profile = () => {
       <CardHeader>
 
       </CardHeader>
-      <CardContent>
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={4}>
-            <Trophy userStats={userStats} />
-          </Grid>
-          <Grid item xs={12} md={8}>
-            <StatisticsCard userStats={userStats} profilePic={profilePic} />
-          </Grid>
-        </Grid>
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <DashboardTable AllUserStats={AllUserStats} />
-          </Grid>
-          <Grid item xs={12}>
-            <MatchHistory userStats={userStats} profilePic={profilePic} currentUser={currentUser}/>
+      <CardContent >
+      <Grid container spacing={2}>
+
+        <Grid item sx={{width:"100%"}}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={4}>
+              <Trophy userStats={userStats} />
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <StatisticsCard userStats={userStats} profilePic={profilePic} />
+            </Grid>
           </Grid>
         </Grid>
+
+        <Grid item sx={{width:"100%"}}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <DashboardTable AllUserStats={AllUserStats} />
+            </Grid>
+            <Grid item xs={12}>
+              <MatchHistoryComponent userStats={userStats}/>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
       </CardContent>
     </Card>
   );

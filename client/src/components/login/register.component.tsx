@@ -4,7 +4,7 @@ import * as Yup from "yup";
 import AuthService from "../../services/auth.service";
 import {Button, Card, CardContent, Box} from '@mui/material';
 import './css/login.component.css'
-import BackgroundIllustration from "../../common/BackgroundIllustration";
+import BackgroundIllustration from "../../common/Illustrations/BackgroundIllustration";
 
 type Props = {};
 

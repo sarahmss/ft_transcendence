@@ -1,5 +1,5 @@
-import Astronauta from '../assets/Astronauta.png';
-import Raquete from '../assets/Raquete.png'
+import Astronauta from '../../assets/Astronauta.png';
+import Raquete from '../../assets/Raquete.png'
 // ** React Imports
 import { Fragment, ReactNode } from 'react'
 
