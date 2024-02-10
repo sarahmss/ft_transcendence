@@ -34,7 +34,7 @@ class AuthService {
 			const authToken = this.getAuthToken();
 			const userId = this.getIdFromToken();
 			sessionStorage.clear();
-			await axios.get(BackLink + `${userId}/auth/logout`, { headers: authToken });
+			await axios.get(BackLink + `/auth/${userId}/logout`, { headers: authToken });
 		} catch (error) {
 			console.error("Error during logout:", error);
 			throw error;
