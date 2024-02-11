@@ -1,19 +1,17 @@
 
 import {
 	Box,
-	TextField,
-	Button,
-	Typography,
-	Avatar,
-	Grid,
-	Paper,
-	Select,
-	Card
+	Card,
+    Tab,
+    Tabs
 } from "@mui/material";
 
 import { messages } from '../../contexts/ChatContext'
 import { useSignals } from "@preact/signals-react/runtime";
 import PromptComponent from "./prompt.component";
+import RoomSelectionComponent from "./room_selection.component";
+import Message from "./message.component";
+import ChatTabComponent from "./chatTabs.component";
 
 const ChatComponent = () => {
 	useSignals();
@@ -21,6 +19,8 @@ const ChatComponent = () => {
 	return (
 
 		<Card sx={{margin:'10px',}}>
+
+			<ChatTabComponent/>
 
 			<Box
 				sx={{
@@ -36,6 +36,7 @@ const ChatComponent = () => {
 					))}
 				</Box>
 
+				<RoomSelectionComponent/>
 				<PromptComponent/>
 			</Box>
 
@@ -43,42 +44,5 @@ const ChatComponent = () => {
 	);
 };
 
-const Message = ({ message }: { message: { id: number; text: string; sender: string } }) => {
-	const isBot = message.sender === "bot";
-
-	return (
-		<Box
-			sx={{
-				display: "flex",
-				justifyContent: isBot ? "flex-start" : "flex-end",
-				mb: 2,
-			}}
-		>
-			<Box
-				sx={{
-					display: "flex",
-					flexDirection: isBot ? "row" : "row-reverse",
-					alignItems: "center",
-				}}
-			>
-				<Avatar sx={{ bgcolor: "secondary.light", color: "white" }}>
-					{isBot ? "B" : "U"}
-				</Avatar>
-				<Paper
-					variant="outlined"
-					sx={{
-						p: 2,
-						ml: isBot ? 1 : 0,
-						mr: isBot ? 0 : 1,
-						backgroundColor: "secondary.light",
-						borderRadius: isBot ? "20px 20px 20px 5px" : "20px 20px 5px 20px",
-					}}
-				>
-					<Typography variant="body1">{message.text}</Typography>
-				</Paper>
-			</Box>
-		</Box>
-	);
-};
 
 export default ChatComponent;

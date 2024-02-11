@@ -17,6 +17,7 @@ import { DefaultPic, pictureStarter } from '../../common/constants';
 
 import {useSelector, useDispatch} from "react-redux";
 import {addUser, userLog} from "../../services/reduce";
+import { userLogged } from '../../contexts/ChatContext';
 
 const pagesLogged = [
 	{ label: 'Profile', link: '/profile' },
@@ -41,6 +42,7 @@ const NavBar: React.FC = () => {
         console.log(user);
         if (user) {
           setIsLogged(true);
+          userLogged.value = true;
           if (user.profilePicture != pictureStarter)
           {
             const photoProfile = await authService.getProfilePicture(user.profilePicture);
@@ -49,6 +51,7 @@ const NavBar: React.FC = () => {
           }
         } else {
           setIsLogged(false);
+          userLogged.value = false;
           setProfilePic(DefaultPic);
         }
       } catch (error) {

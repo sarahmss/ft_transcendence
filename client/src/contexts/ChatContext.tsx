@@ -2,36 +2,40 @@
 import { io } from "socket.io-client"
 import { ChatLink } from '../common/constants';
 import { Signal, effect, signal } from "@preact/signals-react";
+import { getToken } from "../common/helper";
 
 type Message = {
-  messageId: string,
   author: string,
-  date: Date,
-  messageContent: Signal<string>,
-};
-
-type Room = {
-  roomId: string,
-  roomName: Signal<string>,
-  messages: Message[],
+  authorId: string,
+  messageId: string,
+  message: Signal<string>,
+  messageTimestamp: Date,
 };
 
 type User = {
   userId: string,
   userName: string,
+  status: string,
+  profileImage: string,
 }
 
-type Chat = {
-  rooms: Signal<Room[]>,
-  participants: Signal<User[]>,
-}
+type Room = {
+  roomId: string,
+  roomName: Signal<string>,
+  messages: Signal<Message[]>,
+  userList: Signal<User[]>
+  creationDate: Date,
+  isProtected?: boolean,
+};
 
-const chat: Signal<Chat> = signal({
-  rooms: signal([]),
-  participants: signal([]),
+const roomData: Signal<Room[]> = signal([]);
+
+const chatSocket = io(ChatLink, {
+  auth: {
+    token: getToken(),
+  },
+  withCredentials: true
 });
-
-const chatSocket = io(ChatLink);
 
 type test = {
   id: number,
@@ -40,22 +44,51 @@ type test = {
 }
 
 const messages: Signal<test[]> = signal([
+
 	{ id: 1, text: signal("Hi there!"), sender: "bot" },
 	{ id: 2, text: signal("Hello!"), sender: "user" },
 	{ id: 3, text: signal("How can I assist you today?"), sender: "bot" },
+
 ]);
 
+const makeMessage = (response: any) => {
+  return {
+    author: response.author,
+    authorId: response.authorId,
+    messageId: response.messageId,
+    message: signal(response.message),
+    messageTimestamp: response.messsageTimestamp,
+  }
+}
+
 // Change to the real implementation later
+// Test
 let id = 4;
-const setMessage = (response: any) => {
-  	messages.value = [
-      ...messages.value,
-      {
-        id: id++,
-        text: signal(response.message),
-        sender: response.author
-      }
-    ];
+const insertMessage = (response: any) => {
+
+  // Real implementation
+  // const room = chatData.value.rooms.value.find(response.roomId);
+  // if (!room)
+  //   return;
+
+  // room.messages.value = [
+  //   ...room.messages.value,
+  //   makeMessage(response)
+  // ]
+
+	messages.value = [
+    ...messages.value,
+    {
+      id: id++,
+      text: signal(response.message),
+      sender: response.author
+    }
+  ];
+
+  messages.value.forEach((msg) => {
+    
+    msg.text.value = "test";
+  })
 }
 
 // const removeRoom = (roomData: any) => {
@@ -77,12 +110,24 @@ const setMessage = (response: any) => {
 //   ]
 // }
 
-chatSocket.on('message-response', setMessage);
+chatSocket.on('message-response', insertMessage);
 // chatSocket.on('left', removeRoom);
 
+const currentRoom: Signal<string> = signal("");
+const userLogged: Signal<boolean> = signal(false);
+
+// Signals knows what event is triggered base on the signal
+effect(
+  () => {
+    if (userLogged.value === false)
+      currentRoom.value = "";
+  }
+);
 
 export {
-  chat,
+  roomData,
   chatSocket,
+  currentRoom,
+  userLogged,
   messages
 };

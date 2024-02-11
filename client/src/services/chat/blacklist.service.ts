@@ -1,5 +1,6 @@
 import axios from "axios"
 import { BackLink } from "../../common/constants";
+import authService from "../auth.service";
 
 class BlackListService {
 
@@ -19,7 +20,7 @@ class BlackListService {
       duration: duration,
     }
 
-    await axios.post(BackLink + "/blacklist/single", packaged);
+    await axios.post(BackLink + "/blacklist/single", packaged, {headers: authService.getAuthToken()});
     
   }
 
@@ -36,7 +37,7 @@ class BlackListService {
       roomId: roomId
     }
 
-    await axios.post(BackLink + "/ban/bulk", packaged);
+    await axios.post(BackLink + "/ban/bulk", packaged, {headers: authService.getAuthToken()});
   }
 
   async unblock (
@@ -51,7 +52,7 @@ class BlackListService {
       roomId: roomId,
     }
 
-    await axios.patch(BackLink + "/ban/unblock", packaged);
+    await axios.patch(BackLink + "/ban/unblock", packaged, {headers: authService.getAuthToken()});
       
     } catch (error) {
       

@@ -1,6 +1,7 @@
 
 import axios from "axios";
 import { BackLink } from "../../common/constants";
+import authService from "../auth.service";
 
 
 class BanService {
@@ -19,7 +20,7 @@ class BanService {
         roomId: roomId,
         duration: duration
       }
-      return await axios.post(BackLink + "/ban", packaged);
+      return await axios.post(BackLink + "/ban", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
       console.log(error);
@@ -41,7 +42,7 @@ class BanService {
         targetId: targetId,
         roomId: roomId
       }
-      return await axios.post(BackLink + "/ban/unban", packaged);
+      return await axios.post(BackLink + "/ban/unban", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
       console.log(error);

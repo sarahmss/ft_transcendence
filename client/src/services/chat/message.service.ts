@@ -31,11 +31,8 @@ class ChatMessageService {
 
       const packaged = this.formatMessage(message, userId, roomId);
       await axios.post(BackLink + '/message', packaged, {headers: authService.getAuthToken()});
-
     } catch (error) {
-
       console.log('Unable to send the message', error);
-      throw error;
     }
   }
 
@@ -53,11 +50,9 @@ class ChatMessageService {
       }
       
       const resp = await axios.patch(BackLink + "/message", packaged, {headers: authService.getAuthToken()});
-      console.log(resp);
+      return resp;
     } catch (error) {
-
       console.log("update message: " + error);
-      throw error;
     }
   }
 
@@ -66,11 +61,9 @@ class ChatMessageService {
   ) {
     try {
   
-      await axios.delete(BackLink + `/message/${messageId}`);
+      await axios.delete(BackLink + `/message/${messageId}`, {headers: authService.getAuthToken()});
     } catch (error) {
-
       console.log(error);
-      throw error;
     }
   }
 
@@ -90,12 +83,10 @@ class ChatMessageService {
 
     try {
       
-      const messageList = await axios.post(BackLink + "/message/get", packaged);
+      const messageList = await axios.post(BackLink + "/message/get", packaged, {headers: authService.getAuthToken()});
       return messageList;
     } catch (error) {
-      
       console.log("getMessage: " + error );
-      throw error;
     }
 
   }

@@ -16,15 +16,11 @@ import { OnEvent } from '@nestjs/event-emitter';
 
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
-import { MembershipService } from 'src/chat/service/membership/membership.service';
 
 import { Membership } from 'src/entity/membership.entity';
 
-import { Room } from 'src/entity/room.entity';
 import { ForbiddenException } from '@nestjs/common';
 import { ConnectedUserService } from 'src/chat/service/connected-user/connected-user.service';
-import { RoomService } from 'src/chat/service/room/room.service';
-import { Message } from 'src/entity/message.entity';
 import { BlackList } from 'src/entity/blacklist.entity';
 import { Ban } from 'src/entity/ban.entity';
 
@@ -69,22 +65,25 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		try {
 
 			let user: any;
+			let token: string = null;
 
-			if (client.handshake.headers.cookie) {
-				const token = client.handshake.headers.cookie.split('=')[1];
-				const decodedToken = this.authService.IsValidJwt(token);
-				user = await this.authService.IsValidUser(decodedToken.userId);
-			}
-			else {
-				user = await this.checkUser(<string> client.handshake.headers.jwt); 
-			}
+			if (client.handshake.auth.token)
+				token = client.handshake.auth.token;
 
+			else if (client.handshake.headers.cookie)
+				token = client.handshake.headers.cookie.split('=')[1];
+
+			else if (client.handshake.headers.jwt)
+				token = <string> client.handshake.headers.jwt; 
+
+			user = await this.checkUser(token); 
 
 			client.data.user = user;
 			this.connectedUserService.addConnection(user.userId, client);
 		}
 		catch (error) {
 			console.log("User auth failure");
+			console.log(error);
 			this.handleDisconnect(client);
 		}
 	}
@@ -134,13 +133,15 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	// Will listen the event emitted by the emitter in the controller
 	@OnEvent('message.create')
-	async handleMessageEmission(message: Message,
-		author: string,
+	async handleMessageEmission(
+		messageResp: any,
 		blackList: any[],
 		participantList: any[],
-		banList: any[]
+		banList: any[],
+		event: string = "message-response"
 	) {
 
+		console.log("hey!");
 		let receivingClients: any;
 
 		if (blackList.length > 0) {
@@ -159,19 +160,26 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			receivingClients = participantList;
 		}
 
+		await this.sendToMembers(messageResp, receivingClients, event);
+
+	}
+
+	@OnEvent('broadcast.delete')
+	@OnEvent('broadcast.update')
+	async sendToMembers (
+		messageResp: any,
+		receivingClients: any[],
+		event: string
+	) {
+		console.log(receivingClients);
+
+		
 		// Emit the message to the user
 		receivingClients.forEach((membershipData: Membership) => {
 			let targetSocket: Socket = this.connectedUserService
 																				.getConnection(membershipData.userId);
 			if (targetSocket) {
-				targetSocket.emit("message-response",
-													{
-														message: message.message,
-														messageId: message.messageId,
-														messageTimestamp: message.timestamp,
-														authorId: message.userId,
-														author: author,
-													});
+				targetSocket.emit(event, messageResp);
 			}
 		});
 	}

@@ -5,34 +5,29 @@ import {
 	Box,
 	TextField,
 	Button,
-	Typography,
-	Avatar,
 	Grid,
-	Paper,
-	Select,
-	Card
 } from "@mui/material";
-
-import SendIcon from "@mui/icons-material/Send";
 
 import authService from "../../services/auth.service";
 import messageService from "../../services/chat/message.service";
 import { useSignals } from "@preact/signals-react/runtime";
+import { userLogged } from "../../contexts/ChatContext";
 
 const PromptComponent = () => {
+
 	useSignals();
 
 	const [input, setInput] = React.useState("");
+
 
 	const handleSend = async () => {
 		if (input.trim() !== "") {
 			try {
 
-				console.log(authService.getIdFromToken());
 				messageService.sendMessage(
 					input,
 					authService.getIdFromToken(),
-					"341c2d88-0e18-466e-a3d9-b829048f4386"
+					"1c8d7395-c3e9-4d2a-9021-22001f17f517"
 				);
 			}
 
@@ -51,25 +46,35 @@ const PromptComponent = () => {
 		<Box sx={{ p: 2, backgroundColor: "background.default" }}>
 			<Grid container spacing={2}>
 				<Grid item xs={10}>
-					<TextField
-						size="small"
-						fullWidth
-						placeholder="Type a message"
-						variant="outlined"
-						value={input}
-						onChange={handleInputChange}
-					/>
+
+					{userLogged ?
+						(<TextField
+							size="small"
+							fullWidth
+							placeholder="Type a message"
+							variant="outlined"
+							value={input}
+							onChange={handleInputChange}
+						/>) :
+						(<TextField
+							size="small"
+							fullWidth
+							placeholder="Please Login first"
+							variant="outlined"
+							disabled
+						/>)
+					}
+
 				</Grid>
 
 				<Grid item xs={1}>
 
 					<Button
-						fullWidth
 						variant="contained"
-						endIcon={<SendIcon />}
 						onClick={handleSend}
 						sx={{backgroundColor:"#B700cc"}}
 					>
+						<b>Send</b>
 					</Button>
 				</Grid>
 
