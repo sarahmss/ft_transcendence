@@ -62,7 +62,7 @@ class UserService {
 		try {
 			const response = await axios.get((UserContentLink + userId + "/profile"),
 				{ headers: AuthService.getAuthToken() });
-			return (response.data);
+			return (response);
 		} catch (error) {
 			console.error('Error while requesting user Profile:', error);
 			throw error;

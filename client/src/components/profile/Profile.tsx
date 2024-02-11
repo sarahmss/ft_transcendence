@@ -37,20 +37,34 @@ const Profile = () => {
     }
   };
 
-
-  const SetUserProfile = async ( userId: string) => {
+  const SetUserStats = async (userId: string, profilePic:string) => {
     try {
-      const userProfile = await userService.RequestUserProfile(userId);
       const userStats = await userService.RequestUserStats(userId);
-      const AllUserStats = await userService.RequestAllUserStats();
-      
-      loadProfilePic(userProfile.profilePicture, userId);
-      if (userStats) {
-        setUserStats(userStats);
-      }
-      if (AllUserStats) {
-        setAllUserStats(AllUserStats);
-      }
+        const AllUserStats = await userService.RequestAllUserStats();
+        
+        loadProfilePic(profilePic, userId);
+        if (userStats) {
+          setUserStats(userStats);
+        }
+        if (AllUserStats) {
+          setAllUserStats(AllUserStats);
+        }
+    } catch (error) {
+      console.error('Error seting user stats:', error); }
+  }
+
+  const SetUserProfile = async (userId: string) => {
+    try {
+      await userService.RequestUserProfile(userId).then(
+        response =>{
+          const userProfile = response.data;
+          SetUserStats(userId, userProfile.profilePicture);
+        },
+        error => {
+          setRedirect('home');
+        }
+      );
+
     } catch (error) {
       console.error('Error fetching user data:', error);
     }
