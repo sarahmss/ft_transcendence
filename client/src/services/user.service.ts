@@ -44,9 +44,7 @@ class UserService {
 		}
 	}
 
-	async RequestUserStats(){
-		const userId = AuthService.getIdFromToken();
-
+	async RequestUserStats(userId: string){
 		try {
 			if (AuthService.getIsLogged() != null)
 			{
@@ -73,8 +71,6 @@ class UserService {
 
 	
 	async RequestAllUserStats(){
-		const userId = AuthService.getIdFromToken();
-
 		try {
 			if (AuthService.getIsLogged() != null)
 			{

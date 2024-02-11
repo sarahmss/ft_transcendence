@@ -1,17 +1,25 @@
+import React, { useEffect, useState  } from 'react';
+
+
 // ** MUI Imports
-import Box from '@mui/material/Box';
-import Card from '@mui/material/Card';
-import Chip from '@mui/material/Chip';
-import Table from '@mui/material/Table';
-import TableRow from '@mui/material/TableRow';
-import TableHead from '@mui/material/TableHead';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import Typography from '@mui/material/Typography';
-import TableContainer from '@mui/material/TableContainer';
+import{ Box, 
+        Card, 
+        Chip, 
+        Table,
+        TableRow,
+        TableHead,
+        TableBody,
+        TableCell,
+        Typography,
+        TableContainer,
+        Avatar,
+        Link} from '@mui/material';
+
+
 import IUserStats from '../../../types/userStats.type'
 import { Paper } from '@mui/material';
-
+import { DefaultPic, FrontLink } from '../../../common/constants';
+import userService from '../../../services/user.service';
 // ** Types Imports
 type ThemeColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
 
@@ -22,6 +30,8 @@ interface RowType {
   email: string;
   defeats: string;
   status: string;
+  picture: string;
+  link: string;
 }
 
 interface StatusObj {
@@ -41,18 +51,39 @@ interface DashboardTableProps {
 }
 
 const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats }) => {
-  const rows: RowType[] | undefined = AllUserStats?.map((userStats: IUserStats) => {
-    const row: RowType = {
-      matches: userStats?.matches || '0',
-      status: userStats?.status || 'Offline',
-      victories: userStats?.totalGamesWon || '0',
-      defeats: userStats?.totalGamesLost || '0',
-      name: userStats?.userName || 'user',
-      email: userStats?.email || 'user@email',
-    } ;
 
-    return row;
-  });
+  const [rows, setRows] = useState<RowType[]>([]);
+  
+  useEffect(() => {
+    if (AllUserStats) {
+      const fetchUserStats = async () => {
+        const updatedRows: RowType[] = [];
+        for (const userStats of AllUserStats) {
+          try {
+            let profilePic = userStats.profilePicture || DefaultPic;
+            profilePic = await userService.getProfilePicture(profilePic, userStats.userId);
+            const row: RowType = {
+              matches: userStats.matches || '0',
+              picture: profilePic || DefaultPic,
+              status: userStats.status || 'Offline',
+              victories: userStats.totalGamesWon || '0',
+              defeats: userStats.totalGamesLost || '0',
+              name: userStats.userName || 'user',
+              email: userStats.email || 'user@email',
+              link: FrontLink + `/profile?user=${userStats.userId}`
+            };
+            updatedRows.push(row);
+            console.log(row.link);
+
+          } catch (error) {
+            console.error('Error fetching user data:', error);
+          }
+        }
+        setRows(updatedRows);
+      };
+      fetchUserStats();
+    }
+  }, [AllUserStats]);
 
   return (
     <Paper elevation={3}>
@@ -61,7 +92,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats }) => {
             <Table sx={{ minWidth: 800 }} aria-label='table in dashboard'>
               <TableHead>
                 <TableRow>
-                  <TableCell>Name</TableCell>
+                  <TableCell>User</TableCell>
                   <TableCell>Email</TableCell>
                   <TableCell>Matches</TableCell>
                   <TableCell>Victories</TableCell>
@@ -73,9 +104,12 @@ const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats }) => {
                 {rows?.map((row: RowType) => (
                   <TableRow hover key={row.name} sx={{ '&:last-of-type td, &:last-of-type th': { border: 0 } }}>
                     <TableCell sx={{ py: theme => `${theme.spacing(0.5)} !important` }}>
-                      <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                        <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{row.name}</Typography>
-                      </Box>
+                      <Link href={row.link}>
+                        <Avatar alt="profile" src={row.picture} />
+                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                          <Typography sx={{ fontWeight: 500, fontSize: '0.875rem !important' }}>{row.name}</Typography>
+                        </Box>                      
+                      </Link>
                     </TableCell>
                     <TableCell>{row.email}</TableCell>
                     <TableCell>{row.matches}</TableCell>

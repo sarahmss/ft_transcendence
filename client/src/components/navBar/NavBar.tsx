@@ -36,6 +36,8 @@ const pagesUnlogged = [
 const NavBar: React.FC = () => {
   const [isLogged, setIsLogged] = React.useState(false);
   const [profilePic, setProfilePic] = React.useState('');
+  const [userName, setUserName] = React.useState('');
+
   let users = useSelector(userLog);
 
 
@@ -62,6 +64,7 @@ const NavBar: React.FC = () => {
       const user = await authService.getCurrentUser();
         if (user) {
           setIsLogged(true);
+          setUserName(user.userName)
           const picture = await userService.getProfilePicture(user.profilePicture, user.userId);
 			    setProfilePic(picture);
         } else {
@@ -189,10 +192,10 @@ const NavBar: React.FC = () => {
               ))
               )}
           </Box>
-          <Box sx={{ flexGrow: 0 }}>
+          <Box sx={{ flexGrow: 0}}>
             <Tooltip title="Profile Picture">
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src={profilePic} />
+               <Typography color='white'> {userName} </Typography>  <Avatar alt="Remy Sharp" src={profilePic} />
               </IconButton>
             </Tooltip>
                       <Menu

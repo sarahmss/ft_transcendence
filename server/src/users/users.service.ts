@@ -123,17 +123,16 @@ export class UsersService {
 		};
 	}
 	
-    
-	
-
 	async getAllUserStats() {
-		const allUsers = await this.usersRepository.find({ relations: ['losingGames', 'winningGames'] });
+		const allUsers = await this.usersRepository.find();
 	
 		const allUserStats = [];
 	
 		for (const user of allUsers) {
 			const userStats = {
 				userName: user.userName,
+				userId: user.userId,
+				profilePicture: user.profilePicture,
 				email: user.email,
 				level: user.level,
 				totalGamesWon: user.totalGamesWon,
