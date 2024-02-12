@@ -58,7 +58,7 @@ const Profile = () => {
           SetUserStats(userId, userProfile.profilePicture);
         },
         error => {
-          setRedirect('home');
+          setRedirect('error');
         }
       );
 
@@ -79,7 +79,7 @@ const Profile = () => {
           SetUserProfile(user.userId)
         }       
       } else {
-        setRedirect('home');
+        setRedirect('error');
       }
     } catch (error) {
       console.error('Error fetching user stats:', error);
@@ -90,8 +90,8 @@ const Profile = () => {
     fetchData();
   }, []);
 
-  if (redirect === 'home') {
-    return <Navigate to={'/'} />;
+  if (redirect === 'error') {
+    return <Navigate to={'/error'} />;
   }
 
   return (
