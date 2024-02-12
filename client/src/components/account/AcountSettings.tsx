@@ -76,7 +76,7 @@ const AccountSettings = () => {
 
 	<div className="settings-content">
 	<div className="md-layout md-gutter container mt-3">
-		<div style={{ margin: '100px 0' }} className="md-layout-item md-layout md-gutter md-alignment-top-center">
+	<div style={{ margin: '100px 0' }} className="md-layout-item md-layout md-gutter md-alignment-top-center">
 
     <Card style={{ minWidth: '300px' }} className="md-layout-item md-size-65">
       <TabContext value={value}>

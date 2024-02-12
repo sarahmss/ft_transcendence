@@ -3,7 +3,13 @@ import React, { useEffect, useState, useReducer  } from 'react';
 import { Navigate, useSearchParams} from 'react-router-dom';
 
 // ** MUI Imports
-import { Card, CardContent, CardHeader, Grid, CardMedia } from '@mui/material';
+import { Card,
+        CardContent,
+        CardHeader,
+        Grid,
+        CardMedia,
+        Typography,
+        Box } from '@mui/material';
 
 import IUserStats from '../../types/userStats.type';
 import DashboardTable from './dashboard/Table';
@@ -68,18 +74,25 @@ const Community = () => {
     fetchData();
   }, []);
 
-  if (redirect) {
-    return <Navigate to={redirect} />;
+  if (redirect.redirect) {
+    return <Navigate to={redirect.redirect} />;
   }
 
   return (
-    <Card>
+    <Card sx={{margin: "50px"}}>
       <CardMedia sx={{ objectFit:"cover",
                         height: '9rem',
                         borderTop: "5px"}} image={communityImg} />
 
       <CardHeader>
-
+        <Box sx={{
+              display: "flex",
+              justifyContent:"center"}}>
+          <Typography variant='h1'>
+            Community 
+          </Typography>
+        </Box>
+        
       </CardHeader>
       <CardContent >
       <Grid container spacing={2}>

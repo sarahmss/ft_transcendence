@@ -1,5 +1,5 @@
 import React from "react";
-import img from "./../assstes/error.jpg"
+import img from "../../assets/error.jpg"
 
 const Error: React.FC = () => {
   const messageStyle: React.CSSProperties = {

@@ -90,11 +90,11 @@ const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats, setRedire
           try {
             let profilePic = userStats.profilePicture || DefaultPic;
             profilePic = await userService.getProfilePicture(profilePic, userStats.userId);
-            const friends = getFriendship(userStats.userId);
+            // const friends = getFriendship(userStats.userId);
             const row: RowType = {
               matches: userStats.matches || '0',
               picture: profilePic || DefaultPic,
-              friendship: friends,
+              friendship: "AddFriend",
               victories: userStats.totalGamesWon || '0',
               defeats: userStats.totalGamesLost || '0',
               name: userStats.userName || 'user',
