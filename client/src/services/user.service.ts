@@ -122,18 +122,87 @@ class UserService {
 		return (pic);		
 	}
 
-	async getFriendship(friendId: string){
+	async getFriends(userId: string) {
 		try {
 			const authTokenQr = AuthService.getAuthToken();
-			const userId = AuthService.getIdFromToken();
-			const response = await axios.get(BackLink + `/${userId}/friends/${friendId}` ,
-											{ headers: authTokenQr });
-			return (response);
+			const response = await axios.get(`${UserContentLink}${userId}/friends/`, { headers: authTokenQr });
+			return response;
 		} catch (error) {
-			console.error("Error requesting profilePic:", error);
+			console.error('Error fetching friends:', error);
 			throw error;
 		}
 	}
+	
+	async sendFriendshipRequest(friendId: string) {
+		try {
+			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
+				const ownerId = AuthService.getIdFromToken();
+				const authTokenQr = AuthService.getAuthToken();
+				const response = await axios.get(`${UserContentLink}${ownerId}/friends/${friendId}/send-request`, { headers: authTokenQr });
+				return response;
+			}
+		} catch (error) {
+			console.error("Error SendingFriendshipRequest", error);
+			throw error;
+		}
+	}
+	
+	async acceptFriendshipRequest(friendId: string) {
+		try {
+			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
+				const ownerId = AuthService.getIdFromToken();
+				const authTokenQr = AuthService.getAuthToken();
+				const response = await axios.get(`${UserContentLink}${ownerId}/friends/${friendId}/accept-request`, { headers: authTokenQr });
+				return response;
+			}
+		} catch (error) {
+			console.error("Error AcceptingFriendshipRequest", error);
+			throw error;
+		}
+	}
+	
+	async denyFriendshipRequest(friendId: string) {
+		try {
+			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
+				const ownerId = AuthService.getIdFromToken();
+				const authTokenQr = AuthService.getAuthToken();
+				const response = await axios.get(`${UserContentLink}${ownerId}/friends/${friendId}/deny-request`, { headers: authTokenQr });
+				return response;
+			}
+		} catch (error) {
+			console.error("Error DenyingFriendshipRequest", error);
+			throw error;
+		}
+	}
+	
+	async removeFriend(friendId: string) {
+		try {
+			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
+				const ownerId = AuthService.getIdFromToken();
+				const authTokenQr = AuthService.getAuthToken();
+				const response = await axios.get(`${UserContentLink}${ownerId}/friends/${friendId}/remove`, { headers: authTokenQr });
+				return response;
+			}
+		} catch (error) {
+			console.error("Error RemovingFriend", error);
+			throw error;
+		}
+	}
+	
+	async getFriendshipStatus(friendId: string) {
+		try {
+			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
+				const ownerId = AuthService.getIdFromToken();
+				const authTokenQr = AuthService.getAuthToken();
+				const response = await axios.get(`${UserContentLink}${ownerId}/friends/${friendId}/status`, { headers: authTokenQr });
+				return response;
+			}
+		} catch (error) {
+			console.error("Error GettingFriendshipStatus", error);
+			throw error;
+		}
+	}
+	
 }
 const userService = new UserService();
 

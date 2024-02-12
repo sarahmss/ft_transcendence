@@ -59,7 +59,5 @@ export class User {
 	@OneToMany(() =>Friends, friendsTable => friendsTable.owner, {
 		cascade: true,
 	})
-	friends: Friends[];
-
-	
+	friends: Friends[];	
 }

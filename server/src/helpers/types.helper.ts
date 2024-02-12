@@ -7,6 +7,15 @@ export enum status {
 	PLAYING = 'Playing',
 }
 
+export enum FriendshipStatus {
+	FRIENDS = "Friends",
+	SENT = "RequestSent",
+	RECEIVED = "RequestReceived",
+	DENIED = "RequestDenied",
+	REMOVED = "FriendRemoved",
+	NOREALATION = "NoRelationship"
+}
+
 export type IntraUserData = {
 	externalId: number;
 	userName: string;
@@ -41,7 +50,6 @@ export const UserHelper = {
 	};
 
 export const ftSession = session({
-	cookie: { maxAge: 86400000},
-	secret: process.env.SESSION_SECRET,
+	cookie = ss.env.SESSION_SECRET,
 	resave: false,
 	saveUninitialized: false,});

@@ -68,15 +68,8 @@ const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats, setRedire
   
   const getFriendship = async (friendId: string) => {
     try {
-      await userService.getFriendship(friendId).then(
-        response =>{
-          return response.data.status;
-        },
-        error => {
-          setRedirect({redirect: "error"});
-        }
-      );
-      return ("AddFriend");
+      const Friendship = await userService.getFriendshipStatus(friendId)
+      return (Friendship || "AddFriend");
     } catch (error) {
       console.error('Error fetching user stats:', error);
     }
@@ -90,7 +83,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats, setRedire
           try {
             let profilePic = userStats.profilePicture || DefaultPic;
             profilePic = await userService.getProfilePicture(profilePic, userStats.userId);
-            // const friends = getFriendship(userStats.userId);
+            const friends = getFriendship(userStats.userId);
             const row: RowType = {
               matches: userStats.matches || '0',
               picture: profilePic || DefaultPic,

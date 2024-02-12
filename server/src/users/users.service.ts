@@ -1,13 +1,15 @@
 import { Injectable,
 	NotFoundException,
-	UnprocessableEntityException} from '@nestjs/common';
+	UnprocessableEntityException,
+	BadRequestException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
 import { UpdateUserDto, CreateUserDto } from "./dto/user.dto";
-import { status } from "../helpers/types.helper"
+import { FriendshipStatus, status } from "../helpers/types.helper"
 import { IntraUserData, UserHelper } from '../helpers/types.helper';
 import * as bcrypt from 'bcrypt';
+import { Friends } from 'src/entity/friends.entity';
 
 @Injectable()
 export class UsersService {
@@ -15,6 +17,8 @@ export class UsersService {
 	constructor(
 		@InjectRepository(User)
 		private readonly usersRepository: Repository<User>,
+		@InjectRepository(Friends)
+		private readonly FriendRepository: Repository<Friends>,
 	) {}
 
 	/********************************* FIND ******************************/
@@ -68,7 +72,6 @@ export class UsersService {
 		};
 	}
 	
-
 	async getUserStats(userId: string) {
 		await this.checkUser(userId);
 		const user = await this.usersRepository.findOne({ 
@@ -147,7 +150,6 @@ export class UsersService {
 		return allUserStats;
 	}
 	
-
 	async getUserStatus(userId: string): Promise<status>
 	{
 		const user = await this.checkUser(userId);
@@ -161,6 +163,75 @@ export class UsersService {
 	}
 
 	/********************************* SET ******************************/
+	
+	private async CreateNewFriendship(ownerId: string, friendId: string, status: FriendshipStatus) {
+		const user = await this.checkUser(ownerId);
+		const Friendship = new Friends();
+	
+		Friendship.friendId = friendId;
+		Friendship.status = status;
+		user.friends.push(Friendship);
+		await this.usersRepository.save(user);
+	}
+	
+	private async RemoveFriendship(ownerId: string, friendId: string) {
+		const user = await this.checkUser(ownerId);
+	
+		const index = user.friends.findIndex(friend => friend.friendId === friendId);
+		if (index !== -1) {
+			user.friends.splice(index, 1);
+		}
+		await this.usersRepository.save(user);
+	}
+	
+	
+	async SendFriendshipRequest(ownerId: string, friendId: string, response: any) {
+		await this.CreateNewFriendship(ownerId, friendId, FriendshipStatus.SENT);
+		await this.CreateNewFriendship(friendId, ownerId, FriendshipStatus.RECEIVED);
+		return response.send({ FriendshipStatus: FriendshipStatus.SENT });
+	}
+	
+	async AcceptFriendshipRequest(ownerId: string, friendId: string, response: any) {
+		await this.CreateNewFriendship(ownerId, friendId, FriendshipStatus.FRIENDS);
+		await this.CreateNewFriendship(friendId, ownerId, FriendshipStatus.FRIENDS);
+		return response.send({ FriendshipStatus: FriendshipStatus.FRIENDS });
+	}
+	
+	async DenyFriendshipRequest(ownerId: string, friendId: string, response: any) {
+		await this.RemoveFriendship(ownerId, friendId);
+		await this.RemoveFriendship(friendId, ownerId);
+		response.send({ FriendshipStatus: FriendshipStatus.DENIED });
+	}
+
+	async GetFriends(userId: string) {
+		await this.checkUser(userId);
+		const user = await this.usersRepository.findOne({ 
+			where: { userId: userId },
+			relations: ['friends'], 
+		});		
+		if (!user) {
+			throw new NotFoundException('User not found');
+		}
+		return user.friends;
+	}	
+	
+	async RemoveFriend(ownerId: string, friendId: string, response: any) {
+		await this.RemoveFriendship(ownerId, friendId);
+		await this.RemoveFriendship(friendId, ownerId);
+		return response.send({ FriendshipStatus: FriendshipStatus.REMOVED });
+	}
+	
+	async getFriendshipStatus(ownerId: string, friendId: string, response: any) {
+		const user = await this.checkUser(ownerId);
+		const friendship = user.friends.find(friend => friend.friendId === friendId);
+	  
+		if (friendship) {
+			return response.send({ FriendshipStatus: friendship.status });
+		}
+		return response.send({ FriendshipStatus: FriendshipStatus.NOREALATION });
+	}
+	
+
 
 	private async setStatus(userId:string, status: status): Promise<User> {
 		const user = await this.checkUser(userId);
