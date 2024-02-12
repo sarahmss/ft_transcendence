@@ -25,6 +25,7 @@ import { InviteService } from './service/invite/invite.service';
 import { InviteController } from './controller/invite/invite.controller';
 import { Invite } from 'src/entity/invite.entity';
 import { AdminController } from './controller/admin/admin.controller';
+import { Friends } from 'src/entity/friends.entity';
 
 @Module({
 	imports: [ 
@@ -36,9 +37,11 @@ import { AdminController } from './controller/admin/admin.controller';
 										GroupRoom,
 										BlackList,
 										Membership,
-										User,
 										HideMessage,
 										Ban,
+										Friends,
+										User,
+
 		]),
 		AuthModule
 	],
