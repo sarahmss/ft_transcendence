@@ -50,6 +50,7 @@ export const UserHelper = {
 	};
 
 export const ftSession = session({
-	cookie = ss.env.SESSION_SECRET,
+	cookie: { maxAge: 86400000},
+	secret: process.env.SESSION_SECRET,
 	resave: false,
 	saveUninitialized: false,});
