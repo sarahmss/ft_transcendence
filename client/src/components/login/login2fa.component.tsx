@@ -149,9 +149,14 @@ export const Login2Fa = () => {
 	});
 	const userId = searchParams.get('user');
 
-	if (!userId || state.verified) {
+	if (!userId) {
+		return <Navigate to="/error" />;
+	}
+
+	if (state.verified) {
 		return <Navigate to="/" />;
 	}
+
 
 	return (
 		<>

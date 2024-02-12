@@ -15,6 +15,7 @@ import AccountSettings from "./components/account/AcountSettings";
 import { Provider } from 'react-redux';
 import store from './services/store';
 import Profile from "./components/profile/Profile";
+import Error from "./components/Error";
 
 type Props = {};
 
@@ -38,14 +39,16 @@ class App extends Component<Props, State> {
 						<Route path="/register" element={<Register />} />
 						<Route path="/settings" element={<AccountSettings />} />
 						<Route path="/profile" element={<Profile />} />
-
+						<Route path="/error" element={<Error />} />
 						<Route path="/game" element={
 							<div>
 									<GameProvider>
 										<Pong />
 									</GameProvider>
 									</div>
-								} /> </Routes>
+								} />
+						<Route path="*" element={<Error />} />		
+						</Routes>
 				</Provider>
 			</div>
 
