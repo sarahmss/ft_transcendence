@@ -2,9 +2,7 @@ import axios from 'axios';
 import { BackLink, UserContentLink } from '../common/constants';
 import AuthService from './auth.service';
 
-class UserService {
-	
-	
+class UserService {		
 	async uploadProfilePic(imgName: string, img: FormData): Promise<string | undefined> {
 		const userId = AuthService.getIdFromToken();
 
@@ -68,7 +66,6 @@ class UserService {
 			throw error;
 		}
 	}
-
 	
 	async RequestAllUserStats(){
 		try {
@@ -123,6 +120,19 @@ class UserService {
 				);			
 		}
 		return (pic);		
+	}
+
+	async getFriendship(friendId: string){
+		try {
+			const authTokenQr = AuthService.getAuthToken();
+			const userId = AuthService.getIdFromToken();
+			const response = await axios.get(BackLink + `/${userId}/friends/${friendId}` ,
+											{ headers: authTokenQr });
+			return (response);
+		} catch (error) {
+			console.error("Error requesting profilePic:", error);
+			throw error;
+		}
 	}
 }
 const userService = new UserService();

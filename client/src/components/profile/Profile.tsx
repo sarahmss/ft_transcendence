@@ -17,9 +17,6 @@ import authService from '../../services/auth.service';
 import IUser from '../../types/user.type';
 import { DefaultPic } from '../../common/constants';
 
-
-
-
 const Profile = () => {
   const [userStats, setUserStats] = useState<IUserStats | null>(null);
   const [AllUserStats, setAllUserStats] = useState<IUserStats[] | null>(null);

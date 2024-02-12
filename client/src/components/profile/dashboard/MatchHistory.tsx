@@ -7,21 +7,18 @@ import {Card,
         Avatar,
         Grid,
         Paper,
-        CardMedia} from '@mui/material/';
+        CardMedia,
+        styled} from '@mui/material/';
 
 import MuiDivider, { DividerProps } from '@mui/material/Divider';
-import { styled } from '@mui/material/styles';
 import IUserStats from '../../../types/userStats.type';
 import CloseIcon from '@mui/icons-material/Close';
 import { DefaultPic } from '../../../common/constants';
 import userService from '../../../services/user.service';
 import MatchHistory from '../../../types/matchHistory.type';
 
-
 import  winner  from '../../../assets/winner.png';
 import  loser  from '../../../assets/loser.png';
-
-
 
 interface MatchHistoryComponentProps {
   userStats: IUserStats | null;

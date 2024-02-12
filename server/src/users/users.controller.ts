@@ -24,6 +24,11 @@ export class UsersController {
 		return this.usersService.findAll();
 	}
 
+	@Get(':user1Id/friends/:user2Id')
+	async CheckFriendship( @Param('userId', ParseUUIDPipe) userId: string ) {
+		return this.usersService.getAllUserStats();
+	}
+
 	@Get('/AllStats')
 	async getAllUserStats(): Promise<User[]> {
 		return this.usersService.getAllUserStats();
