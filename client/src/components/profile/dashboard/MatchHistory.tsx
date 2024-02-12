@@ -115,10 +115,9 @@ const MatchHistoryComponent: React.FC<MatchHistoryComponentProps> = ({ userStats
   const { victories, defeats } = userStats;
 
   return (
-
-    <Paper elevation={3} >
-      <Card sx={{ display: 'flex', justifyContent: 'space-between', flexDirection: ['column', 'column', 'row'] }}>
-      <CardMedia sx={{ objectFit:"cover", height: '9rem'}} image={winner} />
+    <div style={{ display: 'flex', gap: '16px', width: '100%'}}>
+    <Paper elevation={3} style={{flex:1}}>
+      <CardMedia sx={{ objectFit:"cover", height: '9rem', borderTopLeftRadius: '5px', borderTopRightRadius: '5px'}} image={winner} />
       <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%',}}>
         <CardHeader
             title='Victories'            
@@ -141,7 +140,9 @@ const MatchHistoryComponent: React.FC<MatchHistoryComponentProps> = ({ userStats
             ))}
           </CardContent>
         </Box>
-        <CardMedia sx={{ objectFit:"cover", height: '9rem'}} image={loser} />
+      </Paper>
+      <Paper elevation={3} style={{flex:1}}>
+        <CardMedia sx={{ objectFit:"cover", height: '9rem', borderTopLeftRadius: '5px', borderTopRightRadius: '5px'}} image={loser} />
         <Box sx={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%',}}>              
           <CardHeader
             title='Defeats'
@@ -161,8 +162,8 @@ const MatchHistoryComponent: React.FC<MatchHistoryComponentProps> = ({ userStats
             ))}
           </CardContent>
         </Box>
-      </Card>
-    </Paper>
+      </Paper>
+    </div>
   );
 }
 
