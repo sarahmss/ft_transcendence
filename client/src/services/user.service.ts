@@ -195,8 +195,12 @@ class UserService {
 				const ownerId = AuthService.getIdFromToken();
 				const authTokenQr = AuthService.getAuthToken();
 				const response = await axios.get(`${UserContentLink}${ownerId}/friends/${friendId}/status`, { headers: authTokenQr });
-				return response;
+				if (response.data.FriendshipStatus === "NoRelationship") {
+					return ("AddFriend");
+				}
+				return response.data.FriendshipStatus;
 			}
+			return ("YourSelf");
 		} catch (error) {
 			console.error("Error GettingFriendshipStatus", error);
 			throw error;

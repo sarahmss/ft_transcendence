@@ -13,23 +13,14 @@ import{ Box,
         Typography,
         TableContainer,
         Avatar,
-        Link} from '@mui/material';
-
+        Link,
+        } from '@mui/material';
 
 import IUserStats from '../../../types/userStats.type'
 import { Paper } from '@mui/material';
 import { DefaultPic, FrontLink } from '../../../common/constants';
 import userService from '../../../services/user.service';
-
-import GroupAddIcon from '@mui/icons-material/GroupAdd';
-import GroupIcon from '@mui/icons-material/Group';
-import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
-import OutboxIcon from '@mui/icons-material/Outbox';
-// ** Types Imports
-type ThemeColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
-type Icons = typeof GroupIcon;
-
-
+import FriendsButton from './FriendsButton';
 interface RowType {
   matches: string;
   name: string;
@@ -39,23 +30,8 @@ interface RowType {
   friendship: any;
   picture: string;
   link: string;
+  userId: string;
 }
-
-interface StatusObj {
-  [key: string]: {
-    color: ThemeColor;
-    icon: Icons;
-  };
-}
-
-const statusObj: StatusObj = {
-  AddFriend: { color: 'success', icon: GroupAddIcon},
-  RequestSent: { color: 'info', icon: OutboxIcon },
-  AcceptRequest: { color: 'success',  icon: GroupAddIcon},
-  DenyRequest: { color: 'error', icon: GroupRemoveIcon },
-  RemoveFriend: { color: 'error', icon: GroupRemoveIcon },
-  Friends: { color: 'secondary', icon: GroupIcon },
-};
 
 interface DashboardTableProps {
   AllUserStats: IUserStats[] | null;
@@ -65,38 +41,31 @@ interface DashboardTableProps {
 const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats, setRedirect }) => {
 
   const [rows, setRows] = useState<RowType[]>([]);
-  
-  const getFriendship = async (friendId: string) => {
-    try {
-      const Friendship = await userService.getFriendshipStatus(friendId)
-      return (Friendship || "AddFriend");
-    } catch (error) {
-      console.error('Error fetching user stats:', error);
-    }
-  };
 
   useEffect(() => {
-    if (AllUserStats) {      
+    if (AllUserStats) {   
+
       const fetchUserStats = async () => {
         const updatedRows: RowType[] = [];
+       
         for (const userStats of AllUserStats) {
           try {
             let profilePic = userStats.profilePicture || DefaultPic;
             profilePic = await userService.getProfilePicture(profilePic, userStats.userId);
-            const friends = getFriendship(userStats.userId);
+            const friends = await userService.getFriendshipStatus(userStats.userId);
+            
             const row: RowType = {
               matches: userStats.matches || '0',
               picture: profilePic || DefaultPic,
-              friendship: "AddFriend",
+              friendship: friends,
               victories: userStats.totalGamesWon || '0',
               defeats: userStats.totalGamesLost || '0',
               name: userStats.userName || 'user',
               email: userStats.email || 'user@email',
-              link: FrontLink + `/profile?user=${userStats.userId}`
+              link: FrontLink + `/profile?user=${userStats.userId}`,
+              userId: userStats.userId,
             };
             updatedRows.push(row);
-            console.log(row.link);
-
           } catch (error) {
             console.error('Error fetching user data:', error);
           }
@@ -138,17 +107,12 @@ const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats, setRedire
                     <TableCell>{row.victories}</TableCell>
                     <TableCell>{row.defeats}</TableCell>
                     <TableCell>
-                      <Chip
-                        label={row.friendship}
-                        color={statusObj[row.friendship]?.color || 'error'} // Se o status não for encontrado em statusObj, define como 'error'
-                        sx={{
-                          height: 24,
-                          fontSize: '0.75rem',
-                          textTransform: 'capitalize',
-                          '& .MuiChip-label': { fontWeight: 500 },
-                        }}
-                      />
-                    </TableCell>
+                  <FriendsButton
+                    status={row.friendship} 
+                    friendId={row.userId}
+                  />
+                </TableCell>
+
                   </TableRow>
                 ))}
               </TableBody>

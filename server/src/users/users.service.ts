@@ -164,102 +164,6 @@ export class UsersService {
 
 	/********************************* SET ******************************/
 	
-	private async CreateNewFriendship(ownerId: string, friendId: string, status: FriendshipStatus) {
-		try {
-			const user = await this.checkUser(ownerId);
-			if (user){
-				const Friendship = new Friends();
-			
-				Friendship.friendId = friendId;
-				Friendship.status = status;
-				user.friends.push(Friendship);
-				await this.usersRepository.save(user);				
-			}
-		} catch (error) {
-			console.error("Error CreateNewFriendship", error);
-			throw new BadRequestException(error);
-		}
-	}
-	
-	private async RemoveFriendship(ownerId: string, friendId: string) {
-		try {
-			const user = await this.checkUser(ownerId);
-			if (user) {
-				const index = user.friends.findIndex(friend => friend.friendId === friendId);
-				if (index !== -1) {
-					user.friends.splice(index, 1);
-				}
-				await this.usersRepository.save(user);				
-			}
-		} catch (error) {
-			console.error("Error RemoveFriendship", error);
-			throw new BadRequestException(error);
-		}
-	}
-	
-	
-	async SendFriendshipRequest(ownerId: string, friendId: string, response: any) {
-		await this.CreateNewFriendship(ownerId, friendId, FriendshipStatus.SENT);
-		await this.CreateNewFriendship(friendId, ownerId, FriendshipStatus.RECEIVED);
-		return response.send({ FriendshipStatus: FriendshipStatus.SENT });
-	}
-	
-	async AcceptFriendshipRequest(ownerId: string, friendId: string, response: any) {
-		await this.CreateNewFriendship(ownerId, friendId, FriendshipStatus.FRIENDS);
-		await this.CreateNewFriendship(friendId, ownerId, FriendshipStatus.FRIENDS);
-		return response.send({ FriendshipStatus: FriendshipStatus.FRIENDS });
-	}
-	
-	async DenyFriendshipRequest(ownerId: string, friendId: string, response: any) {
-		await this.RemoveFriendship(ownerId, friendId);
-		await this.RemoveFriendship(friendId, ownerId);
-		response.send({ FriendshipStatus: FriendshipStatus.DENIED });
-	}
-
-	async RemoveFriend(ownerId: string, friendId: string, response: any) {
-		await this.RemoveFriendship(ownerId, friendId);
-		await this.RemoveFriendship(friendId, ownerId);
-		return response.send({ FriendshipStatus: FriendshipStatus.REMOVED });
-	}
-
-	async GetFriends(userId: string) {
-		try {
-			await this.checkUser(userId);
-			const user = await this.usersRepository.findOne({ 
-				where: { userId: userId },
-				relations: ['friends'], 
-			});		
-			if (!user) {
-				throw new NotFoundException('User not found');
-			}
-			return user.friends;
-		} catch (error) {
-			console.error("Error RemoveFriendship", error);
-			throw new BadRequestException(error);
-		}
-
-	}	
-	
-
-	
-	async getFriendshipStatus(ownerId: string, friendId: string, response: any) {
-		try {
-			const user = await this.checkUser(ownerId);
-			if (user && user.friends) {
-				const friendship = user.friends.find(friend => friend.friendId === friendId);
-				if (friendship) {
-					return response.send({ FriendshipStatus: friendship.status });
-				}
-			}
-			return response.send({ FriendshipStatus: FriendshipStatus.NOREALATION });
-		} catch (error) {
-			console.error("Error GettingFriendshipStatus", error);
-			throw new BadRequestException(error);
-		}
-	}
-	
-
-
 	private async setStatus(userId:string, status: status): Promise<User> {
 		const user = await this.checkUser(userId);
 		user.status = status;
@@ -384,5 +288,107 @@ export class UsersService {
 		async delete(userId: string): Promise<void> {
 			const user = await this.checkUser(userId);
 			await this.usersRepository.delete(user.userId);
+		}
+
+		async GetFriends(userId: string) {
+			try {
+				await this.checkUser(userId);
+				const user = await this.usersRepository.findOne({ 
+					where: { userId: userId },
+					relations: ['friends'], 
+				});		
+				if (!user) {
+					throw new NotFoundException('User not found');
+				}
+				return user.friends;
+			} catch (error) {
+				console.error("Error RemoveFriendship", error);
+				throw new BadRequestException(error);
+			}
+	
+		}	
+	
+		async getFriendshipStatus(ownerId: string, friendId: string, response: any) {
+			try {
+				const user = await this.checkUser(ownerId);
+				let friends = FriendshipStatus.NOREALATION;
+				if (user && user.friends) {
+					const friendship = user.friends.find(friend => friend.friendId === friendId);
+					if (friendship) {
+						friends =  friendship.status;
+					}
+				}
+				return response.send({ FriendshipStatus:  friends});
+			} catch (error) {
+				console.error("Error GettingFriendshipStatus", error);
+				throw new BadRequestException(error);
+			}
+		}
+		
+
+
+		private async CreateNewFriendship(ownerId: string, friendId: string, status: FriendshipStatus) {
+			try {
+				await this.checkUser(ownerId);
+				const user = await this.usersRepository.findOne({ 
+					where: { userId: ownerId },
+					relations: ['friends'], 
+				});	
+				if (user){
+					const Friendship = new Friends();
+				
+					Friendship.friendId = friendId;
+					Friendship.status = status;
+					user.friends.push(Friendship);
+					await this.usersRepository.save(user);				
+				}
+			} catch (error) {
+				console.error("Error CreateNewFriendship", error);
+				throw new BadRequestException(error);
+			}
+		}
+		
+		private async RemoveFriendship(ownerId: string, friendId: string) {
+			try {
+				await this.checkUser(ownerId);
+				const user = await this.usersRepository.findOne({ 
+					where: { userId: ownerId },
+					relations: ['friends'], 
+				});	
+				if (user) {
+					const index = user.friends.findIndex(friend => friend.friendId === friendId);
+					if (index !== -1) {
+						user.friends.splice(index, 1);
+					}
+					await this.usersRepository.save(user);				
+				}
+			} catch (error) {
+				console.error("Error RemoveFriendship", error);
+				throw new BadRequestException(error);
+			}
+		}
+		
+		async SendFriendshipRequest(ownerId: string, friendId: string, response: any) {
+			await this.CreateNewFriendship(ownerId, friendId, FriendshipStatus.SENT);
+			await this.CreateNewFriendship(friendId, ownerId, FriendshipStatus.RECEIVED);
+			return response.send({ FriendshipStatus: FriendshipStatus.SENT });
+		}
+		
+		async AcceptFriendshipRequest(ownerId: string, friendId: string, response: any) {
+			await this.CreateNewFriendship(ownerId, friendId, FriendshipStatus.FRIENDS);
+			await this.CreateNewFriendship(friendId, ownerId, FriendshipStatus.FRIENDS);
+			return response.send({ FriendshipStatus: FriendshipStatus.FRIENDS });
+		}
+		
+		async DenyFriendshipRequest(ownerId: string, friendId: string, response: any) {
+			await this.RemoveFriendship(ownerId, friendId);
+			await this.RemoveFriendship(friendId, ownerId);
+			response.send({ FriendshipStatus: FriendshipStatus.DENIED });
+		}
+	
+		async RemoveFriend(ownerId: string, friendId: string, response: any) {
+			await this.RemoveFriendship(ownerId, friendId);
+			await this.RemoveFriendship(friendId, ownerId);
+			return response.send({ FriendshipStatus: FriendshipStatus.REMOVED });
 		}
 }

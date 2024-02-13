@@ -1,5 +1,4 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import { constants } from 'perf_hooks';
 
 interface Users {
     name: string;
