@@ -126,7 +126,7 @@ class UserService {
 		try {
 			const authTokenQr = AuthService.getAuthToken();
 			const response = await axios.get(`${FriendsContentLink}${userId}/`, { headers: authTokenQr });
-			return response;
+			return response.data;
 		} catch (error) {
 			console.error('Error fetching friends:', error);
 			throw error;

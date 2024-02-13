@@ -19,7 +19,7 @@ import { DefaultPic } from '../../common/constants';
 
 const Profile = () => {
   const [userStats, setUserStats] = useState<IUserStats | null>(null);
-  const [AllUserStats, setAllUserStats] = useState<IUserStats[] | null>(null);
+  const [AllUserStats, setFriendsList] = useState<IUserStats[] | null>(null);
   const [redirect, setRedirect] = useState<string>('');
   const [profilePic, setProfilePic] = useState(DefaultPic);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -37,14 +37,14 @@ const Profile = () => {
   const SetUserStats = async (userId: string, profilePic:string) => {
     try {
       const userStats = await userService.RequestUserStats(userId);
-        const AllUserStats = await userService.RequestAllUserStats();
+        const FriendsList = await userService.getFriends(userId);
         
         loadProfilePic(profilePic, userId);
         if (userStats) {
           setUserStats(userStats);
         }
-        if (AllUserStats) {
-          setAllUserStats(AllUserStats);
+        if (FriendsList) {
+          setFriendsList(FriendsList);
         }
     } catch (error) {
       console.error('Error seting user stats:', error); }

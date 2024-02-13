@@ -16,7 +16,7 @@ import{ Box,
         Link} from '@mui/material';
 
 
-import IUserStats from '../../../types/userStats.type'
+import IFriends from '../../../types/Friends.type'
 import { Paper } from '@mui/material';
 import { DefaultPic, FrontLink } from '../../../common/constants';
 import userService from '../../../services/user.service';
@@ -47,30 +47,30 @@ const statusObj: StatusObj = {
 };
 
 interface DashboardTableProps {
-  AllUserStats: IUserStats[] | null;
+  FriendsList: IFriends[] | null;
 }
 
-const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats }) => {
+const DashboardTable: React.FC<DashboardTableProps> = ({ FriendsList }) => {
 
   const [rows, setRows] = useState<RowType[]>([]);
   
   useEffect(() => {
-    if (AllUserStats) {
-      const fetchUserStats = async () => {
+    if (FriendsList) {
+      const fetchFriends = async () => {
         const updatedRows: RowType[] = [];
-        for (const userStats of AllUserStats) {
+        for (const friend of FriendsList) {
           try {
-            let profilePic = userStats.profilePicture || DefaultPic;
-            profilePic = await userService.getProfilePicture(profilePic, userStats.userId);
+            let profilePic = friend.profilePicture || DefaultPic;
+            profilePic = await userService.getProfilePicture(profilePic, friend.userId);
             const row: RowType = {
-              matches: userStats.matches || '0',
+              matches: friend.matches || '0',
               picture: profilePic || DefaultPic,
-              status: userStats.status || 'Offline',
-              victories: userStats.totalGamesWon || '0',
-              defeats: userStats.totalGamesLost || '0',
-              name: userStats.userName || 'user',
-              email: userStats.email || 'user@email',
-              link: FrontLink + `/profile?user=${userStats.userId}`
+              status: friend.status || 'Offline',
+              victories: friend.totalGamesWon || '0',
+              defeats: friend.totalGamesLost || '0',
+              name: friend.userName || 'user',
+              email: friend.email || 'user@email',
+              link: FrontLink + `/profile?user=${friend.userId}`
             };
             updatedRows.push(row);
             console.log(row.link);
@@ -81,9 +81,9 @@ const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats }) => {
         }
         setRows(updatedRows);
       };
-      fetchUserStats();
+      fetchFriends();
     }
-  }, [AllUserStats]);
+  }, [FriendsList]);
 
   return (
     <Paper elevation={3}>

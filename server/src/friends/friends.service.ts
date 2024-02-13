@@ -115,19 +115,14 @@ export class FriendshipService {
   private async RemoveFriendship(ownerId: string, friendId: string) {
     try {
       const user = await this.getUserWithFriends(ownerId);
-      if (user) {
-        const index = user.friends.findIndex(friend => friend.friendId === friendId);
-        if (index !== -1) {
-          user.friends.splice(index, 1);
-        }
-        await this.usersRepository.save(user);                
-      }
+      user.friends = user.friends.filter(friend => friend.friendId !== friendId);
+      await this.usersRepository.save(user);
     } catch (error) {
       console.error("Error RemoveFriendship", error);
       throw new BadRequestException(error);
     }
   }
-
+  
   async SendFriendshipRequest(ownerId: string, friendId: string, response: any) {
     await this.CreateNewFriendship(ownerId, friendId, FriendshipStatus.SENT);
     await this.CreateNewFriendship(friendId, ownerId, FriendshipStatus.RECEIVED);
