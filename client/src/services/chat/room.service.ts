@@ -162,6 +162,22 @@ class RoomService {
       console.log(error);
     }
   }
+
+  async getCurrentUser(
+    roomId: string
+  ) {
+    try {
+      const userId = authService.getIdFromToken();
+
+      return (await axios.get(
+        `${BackLink}/room/curr/${roomId}/${userId}`,
+        {headers: authService.getAuthToken()}
+      )).data;
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 
 const roomService = new RoomService();

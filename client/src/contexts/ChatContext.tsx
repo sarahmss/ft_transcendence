@@ -8,10 +8,14 @@ import roomService from "../services/chat/room.service";
 
 const currentRoom: Signal<number> = signal(-1);
 const userLogged: Signal<boolean> = signal(false);
-const messageCurrent: Signal<any> = signal(null);
 const page: Signal<number> = signal(0);
+const privilegedInRoom: {owner: Signal<boolean>, admin: Signal<boolean>} = {
+  owner: signal(false),
+  admin: signal(false)
+};
 
 type Message = {
+  index: number,
   author: string,
   authorId: string,
   messageId: string,
@@ -20,6 +24,7 @@ type Message = {
 };
 
 type User = {
+  index: number,
   admin: boolean,
   owner: boolean,
   userId: string,
@@ -102,7 +107,6 @@ const insertMessage = (response: any) => {
 // }
 
 chatSocket.on('message-response', insertMessage);
-chatSocket.on('get-participants', () => {});
 // chatSocket.on('left', removeRoom);
 
 // Effect knows what event is triggered base on the signal
@@ -123,12 +127,13 @@ effect(
         page.value
       );
 
-      messageCurrent.value = chatData.value[currentRoom.value].messages;
-
-      await fetchParticipants(
+      const currentUser = await fetchParticipants(
         currentRoom.value,
         chatData.value[currentRoom.value].roomId
       );
+
+      privilegedInRoom.admin.value = currentUser.admin;
+      privilegedInRoom.owner.value = currentUser.owner;
     }
   }
 );
@@ -144,7 +149,7 @@ export type {
 export {
   chatData,
   chatSocket,
-  messageCurrent,
+  privilegedInRoom,
   currentRoom,
   userLogged,
   messages

@@ -14,6 +14,7 @@ const addRoom = (room: Room) => {
 
 const addMessage = (room: Room, message: Message) => {
 
+  message.index = room.messages.value.length;
   room.messages.value = [
     ...room.messages.value,
     message
@@ -21,6 +22,8 @@ const addMessage = (room: Room, message: Message) => {
 };
 
 const addUser = (room: Room, user: User) => {
+
+  user.index = room.userList.value.length;
   room.userList.value = [
     ...room.userList.value,
     user
@@ -76,6 +79,7 @@ const messageMaker = (
   messageTimestamp: Date
 ): Message => {
   return {
+    index: -1,
     author: author,
     authorId: authorId,
     messageId: messageId,
@@ -91,10 +95,10 @@ const fetchRooms = async () => {
 
     addRoom(
       roomMaker(
-      room.roomId,
-      room.roomName,
-      room.creationDate,
-      room.isProtected,
+        room.roomId,
+        room.roomName,
+        room.creationDate,
+        room.isProtected,
     ));
 
   });
@@ -134,6 +138,7 @@ const fetchMessageByRoom = async (index: number, roomId: string, pageNumber: num
 
 const fetchParticipants = async (index: number, roomId: string) => {
   const participants: any[] = await roomService.getParticipants(roomId);
+  const currentMember: any = await roomService.getCurrentUser(roomId);
 
   if (!participants || participants.length === 0)
     return ;
@@ -143,6 +148,8 @@ const fetchParticipants = async (index: number, roomId: string) => {
   participants.forEach((user: User) => {
     addUser(room, user);
   });
+
+  return currentMember;
 }
 
 const findRoom = (roomId: string) => {
