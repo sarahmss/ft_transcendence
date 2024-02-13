@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { BackLink, UserContentLink } from '../common/constants';
+import { BackLink, FriendsContentLink, UserContentLink } from '../common/constants';
 import AuthService from './auth.service';
 
 class UserService {		
@@ -125,7 +125,7 @@ class UserService {
 	async getFriends(userId: string) {
 		try {
 			const authTokenQr = AuthService.getAuthToken();
-			const response = await axios.get(`${UserContentLink}${userId}/friends/`, { headers: authTokenQr });
+			const response = await axios.get(`${FriendsContentLink}${userId}/`, { headers: authTokenQr });
 			return response;
 		} catch (error) {
 			console.error('Error fetching friends:', error);
@@ -138,7 +138,7 @@ class UserService {
 			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
 				const ownerId = AuthService.getIdFromToken();
 				const authTokenQr = AuthService.getAuthToken();
-				const response = await axios.get(`${UserContentLink}${ownerId}/friends/${friendId}/send-request`, { headers: authTokenQr });
+				const response = await axios.get(`${FriendsContentLink}${ownerId}/${friendId}/send-request`, { headers: authTokenQr });
 				return response;
 			}
 		} catch (error) {
@@ -152,7 +152,7 @@ class UserService {
 			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
 				const ownerId = AuthService.getIdFromToken();
 				const authTokenQr = AuthService.getAuthToken();
-				const response = await axios.get(`${UserContentLink}${ownerId}/friends/${friendId}/accept-request`, { headers: authTokenQr });
+				const response = await axios.get(`${FriendsContentLink}${ownerId}/${friendId}/accept-request`, { headers: authTokenQr });
 				return response;
 			}
 		} catch (error) {
@@ -166,7 +166,7 @@ class UserService {
 			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
 				const ownerId = AuthService.getIdFromToken();
 				const authTokenQr = AuthService.getAuthToken();
-				const response = await axios.get(`${UserContentLink}${ownerId}/friends/${friendId}/deny-request`, { headers: authTokenQr });
+				const response = await axios.get(`${FriendsContentLink}${ownerId}/${friendId}/deny-request`, { headers: authTokenQr });
 				return response;
 			}
 		} catch (error) {
@@ -180,7 +180,7 @@ class UserService {
 			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
 				const ownerId = AuthService.getIdFromToken();
 				const authTokenQr = AuthService.getAuthToken();
-				const response = await axios.get(`${UserContentLink}${ownerId}/friends/${friendId}/remove`, { headers: authTokenQr });
+				const response = await axios.get(`${FriendsContentLink}${ownerId}/${friendId}/remove`, { headers: authTokenQr });
 				return response;
 			}
 		} catch (error) {
@@ -194,7 +194,7 @@ class UserService {
 			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
 				const ownerId = AuthService.getIdFromToken();
 				const authTokenQr = AuthService.getAuthToken();
-				const response = await axios.get(`${UserContentLink}${ownerId}/friends/${friendId}/status`, { headers: authTokenQr });
+				const response = await axios.get(`${FriendsContentLink}${ownerId}/${friendId}/status`, { headers: authTokenQr });
 				if (response.data.FriendshipStatus === "NoRelationship") {
 					return ("AddFriend");
 				}

@@ -21,10 +21,10 @@ import { reducer } from "../../common/helper";
 
 const Community = () => {
   const [AllUserStats, setAllUserStats] = useState<IUserStats[] | null>(null);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 	const [redirect, setRedirect]= useReducer(reducer, { redirect: "",});
 
-  const SetUserStats = async (userId: string, ProfilePic:string) => {
+  const SetUserStats = async () => {
     try {
         const AllUserStats = await userService.RequestAllUserStats();
         if (AllUserStats) {
@@ -38,8 +38,7 @@ const Community = () => {
     try {
       await userService.RequestUserProfile(userId).then(
         response =>{
-          const userCommunity = response.data;
-          SetUserStats(userId, userCommunity.ProfilePicture);
+          SetUserStats();
         },
         error => {
           setRedirect({redirect : 'home'});
@@ -47,7 +46,7 @@ const Community = () => {
       );
 
     } catch (error) {
-      console.error('Error fetching user data:', error);
+      console.error('Error SetUserCommunity:', error);
     }
   };
 
@@ -66,7 +65,7 @@ const Community = () => {
         setRedirect({redirect : 'home'});
       }
     } catch (error) {
-      console.error('Error fetching user stats:', error);
+      console.error('Error fetching user data:', error);
     }
   };
 

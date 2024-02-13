@@ -24,58 +24,6 @@ export class UsersController {
 		return this.usersService.findAll();
 	}
 
-	@Get(':userId/friends')
-	async getFriends(@Param('userId', ParseUUIDPipe) userId: string) {
-	  const friends = await this.usersService.GetFriends(userId);
-	  return friends; 
-	}
-
-	@Get(':ownerId/friends/:friendId/status')
-	async CheckFriendship(
-	  @Param('ownerId', ParseUUIDPipe) ownerId: string,
-	  @Param('friendId', ParseUUIDPipe) friendId: string,
-	  @Res() res: any,
-	) {
-	  return this.usersService.getFriendshipStatus(ownerId, friendId, res);
-	}
-  
-	@Get(':ownerId/friends/:friendId/remove')
-	async RemoveFriend(
-	  @Param('ownerId', ParseUUIDPipe) ownerId: string,
-	  @Param('friendId', ParseUUIDPipe) friendId: string,
-	  @Res() res: any,
-	) {
-	  return this.usersService.RemoveFriend(ownerId, friendId, res);
-	}
-  
-	@Get(':ownerId/friends/:friendId/send-request')
-	async SendFriendshipRequest(
-	  @Param('ownerId', ParseUUIDPipe) ownerId: string,
-	  @Param('friendId', ParseUUIDPipe) friendId: string,
-	  @Res() res: any,
-	) {
-	  return this.usersService.SendFriendshipRequest(ownerId, friendId, res);
-	}
-  
-	@Get(':ownerId/friends/:friendId/accept-request')
-	async AcceptFriendshipRequest(
-	  @Param('ownerId', ParseUUIDPipe) ownerId: string,
-	  @Param('friendId', ParseUUIDPipe) friendId: string,
-	  @Res() res: any,
-	) {
-	  return this.usersService.AcceptFriendshipRequest(ownerId, friendId, res);
-	}
-  
-	@Get(':ownerId/friends/:friendId/deny-request')
-	async DenyFriendshipRequest(
-	  @Param('ownerId', ParseUUIDPipe) ownerId: string,
-	  @Param('friendId', ParseUUIDPipe) friendId: string,
-	  @Res() res: any,
-	) {
-	  return this.usersService.DenyFriendshipRequest(ownerId, friendId, res);
-	}
-
-
 	@Get('/AllStats')
 	async getAllUserStats(): Promise<User[]> {
 		return this.usersService.getAllUserStats();
@@ -112,8 +60,5 @@ export class UsersController {
 	async delete(@Param('userId') userId: string): Promise<any> {
 		return this.usersService.delete(userId);
 	}
-
-	/********************************* POST ******************************/
-
 
 }

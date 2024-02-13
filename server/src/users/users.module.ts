@@ -4,7 +4,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../entity/user.entity';
 import { Friends } from '../entity/friends.entity';
 import { Module, Logger } from '@nestjs/common';
-
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),

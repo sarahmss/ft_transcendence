@@ -5,6 +5,8 @@ export const IntraloginLink = BackLink + "/auth/login"
 export const LocalSignupLink = BackLink + "/auth/signup"
 export const LocalSigninLink = BackLink + "/auth/signin"
 export const UserContentLink = BackLink + "/users/"
+export const FriendsContentLink = BackLink + "/friends/"
+
 export const TwoFaLink = BackLink + "/2fa-auth"
 export const GameLink = BackLink + "/game"
 
