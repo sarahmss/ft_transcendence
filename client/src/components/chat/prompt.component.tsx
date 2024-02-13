@@ -19,8 +19,32 @@ const PromptComponent = () => {
 
 	const [input, setInput] = React.useState("");
 
+	const handleSendEnterDown = (event: any)  => {
 
-	const handleSend = async () => {
+		switch (event.key) {
+			case "Enter":
+				if (input.trim() !== "") {
+					try {
+
+						messageService.sendMessage(
+							input,
+							authService.getIdFromToken(),
+							"1c8d7395-c3e9-4d2a-9021-22001f17f517"
+						);
+					}
+
+					catch (error) {
+						console.log(error);
+					}
+					setInput("");
+				}
+				break;
+			default:
+				setInput(event.target.value);
+		}
+	};
+
+	const handleSend = () => {
 		if (input.trim() !== "") {
 			try {
 
@@ -47,7 +71,7 @@ const PromptComponent = () => {
 			<Grid container spacing={2}>
 				<Grid item xs={10}>
 
-					{userLogged ?
+					{userLogged.value ?
 						(<TextField
 							size="small"
 							fullWidth
@@ -55,6 +79,7 @@ const PromptComponent = () => {
 							variant="outlined"
 							value={input}
 							onChange={handleInputChange}
+							onKeyDown={handleSendEnterDown}
 						/>) :
 						(<TextField
 							size="small"

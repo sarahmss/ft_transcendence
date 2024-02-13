@@ -20,7 +20,6 @@ class RoomService {
 
     } catch (error) {
       console.log(error);
-      throw error;
     }
   }
 
@@ -32,8 +31,6 @@ class RoomService {
 
     } catch (error) {
       console.log(error);
-      throw error;
-
     }
   }
 
@@ -152,7 +149,17 @@ class RoomService {
       await axios.patch(BackLink + "/room/toggle_private", packaged, {headers: authService.getAuthToken()});
     } catch (error) {
       console.log(error);
-      throw error;
+    }
+  }
+
+  async getParticipants(
+    roomId: string
+  ) {
+    try {
+      const resp = await axios.get(BackLink + `/room/${roomId}`, {headers: authService.getAuthToken()});
+      return resp.data;
+    } catch (error) {
+      console.log(error);
     }
   }
 }

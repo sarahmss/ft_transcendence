@@ -171,9 +171,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		receivingClients: any[],
 		event: string
 	) {
-		console.log(receivingClients);
-
-		
 		// Emit the message to the user
 		receivingClients.forEach((membershipData: Membership) => {
 			let targetSocket: Socket = this.connectedUserService

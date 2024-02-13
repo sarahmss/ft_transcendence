@@ -40,6 +40,7 @@ export default class Home extends Component<Props, State> {
 					<Box sx={{
 						display: "flex",
 						justifyContent:"center"}}>
+
 					{this.state.isLogged ? (
 						<Link href={FrontGame}>
 						<Button

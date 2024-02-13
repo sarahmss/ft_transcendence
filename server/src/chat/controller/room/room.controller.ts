@@ -6,6 +6,7 @@ import { BadRequestException,
 	Delete,
 	Get,
 	NotFoundException,
+	Param,
 	Patch,
 	Post,
 	UnauthorizedException } from '@nestjs/common';
@@ -20,6 +21,7 @@ import { DIRECT, GROUP } from 'src/constants/roomType.constant';
 import * as bcrypt from 'bcrypt';
 import { User } from 'src/entity/user.entity';
 import { UsersService } from 'src/users/users.service';
+import { Membership } from 'src/entity/membership.entity';
 
 
 @Controller('room')
@@ -218,6 +220,26 @@ export class RoomController {
 
 		await this.roomService.unsetPassRoom(roomId);
 		return "password removed";
+	}
+
+	@Get(':roomId')
+	async getParticipants(@Param('roomId') roomId: string) {
+		const getMember: Membership[] = await this.membershipService.findParticipantsNotExclusiveLeftJoin(roomId);
+
+		if (!getMember || !getMember.length)
+			throw new NotFoundException("Members not found!");
+
+		const formattedMember = getMember.map((member: Membership) => {
+			return {
+				admin: member.admin,
+				owner: member.owner,
+				userId: member.userId,
+				userName: member.user.userName,
+				profileImage: member.user.profilePicture,
+			}
+		});
+
+		return formattedMember;
 	}
 
 	@Patch('toggle_private')

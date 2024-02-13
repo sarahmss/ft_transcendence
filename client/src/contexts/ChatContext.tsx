@@ -3,6 +3,13 @@ import { io } from "socket.io-client"
 import { ChatLink } from '../common/constants';
 import { Signal, effect, signal } from "@preact/signals-react";
 import { getToken } from "../common/helper";
+import { fetchMessageByRoom, fetchParticipants, fetchRooms, messageMaker } from "./FetchChatData";
+import roomService from "../services/chat/room.service";
+
+const currentRoom: Signal<number> = signal(-1);
+const userLogged: Signal<boolean> = signal(false);
+const messageCurrent: Signal<any> = signal(null);
+const page: Signal<number> = signal(0);
 
 type Message = {
   author: string,
@@ -13,13 +20,15 @@ type Message = {
 };
 
 type User = {
+  admin: boolean,
+  owner: boolean,
   userId: string,
   userName: string,
-  status: string,
   profileImage: string,
 }
 
 type Room = {
+  index: number,
   roomId: string,
   roomName: Signal<string>,
   messages: Signal<Message[]>,
@@ -28,7 +37,7 @@ type Room = {
   isProtected?: boolean,
 };
 
-const roomData: Signal<Room[]> = signal([]);
+const chatData: Signal<Room[]> = signal([]);
 
 const chatSocket = io(ChatLink, {
   auth: {
@@ -51,44 +60,26 @@ const messages: Signal<test[]> = signal([
 
 ]);
 
-const makeMessage = (response: any) => {
-  return {
-    author: response.author,
-    authorId: response.authorId,
-    messageId: response.messageId,
-    message: signal(response.message),
-    messageTimestamp: response.messsageTimestamp,
-  }
-}
 
 // Change to the real implementation later
 // Test
-let id = 4;
 const insertMessage = (response: any) => {
 
-  // Real implementation
-  // const room = chatData.value.rooms.value.find(response.roomId);
-  // if (!room)
-  //   return;
+  if (currentRoom.value > chatData.value.length)
+    return;
 
-  // room.messages.value = [
-  //   ...room.messages.value,
-  //   makeMessage(response)
-  // ]
+  const room = chatData.value[currentRoom.value];
 
-	messages.value = [
-    ...messages.value,
-    {
-      id: id++,
-      text: signal(response.message),
-      sender: response.author
-    }
-  ];
-
-  messages.value.forEach((msg) => {
-    
-    msg.text.value = "test";
-  })
+  room.messages.value = [
+    ...room.messages.value,
+   messageMaker(
+     response.author,
+     response.authorId,
+     response.messageId,
+     response.message,
+     response.messageTimestamp
+   )
+  ]
 }
 
 // const removeRoom = (roomData: any) => {
@@ -111,22 +102,49 @@ const insertMessage = (response: any) => {
 // }
 
 chatSocket.on('message-response', insertMessage);
+chatSocket.on('get-participants', () => {});
 // chatSocket.on('left', removeRoom);
 
-const currentRoom: Signal<string> = signal("");
-const userLogged: Signal<boolean> = signal(false);
-
-// Signals knows what event is triggered base on the signal
+// Effect knows what event is triggered base on the signal
 effect(
   () => {
     if (userLogged.value === false)
-      currentRoom.value = "";
+      currentRoom.value = -1;
   }
 );
 
+effect(
+  async () => {
+    if (currentRoom.value > -1) {
+
+      fetchMessageByRoom(
+        currentRoom.value,
+        chatData.value[currentRoom.value].roomId,
+        page.value
+      );
+
+      messageCurrent.value = chatData.value[currentRoom.value].messages;
+
+      await fetchParticipants(
+        currentRoom.value,
+        chatData.value[currentRoom.value].roomId
+      );
+    }
+  }
+);
+
+fetchRooms();
+
+export type {
+  Message,
+  Room,
+  User,
+};
+
 export {
-  roomData,
+  chatData,
   chatSocket,
+  messageCurrent,
   currentRoom,
   userLogged,
   messages

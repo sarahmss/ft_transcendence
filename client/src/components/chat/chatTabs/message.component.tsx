@@ -5,9 +5,11 @@ import {
 	Avatar,
 	Paper,
 } from "@mui/material";
+import { Message } from "../../../contexts/ChatContext";
+import authService from "../../../services/auth.service";
 
-const Message = ({ message }: { message: { id: number; text: string; sender: string } }) => {
-	const isCurrentUser = message.sender === "bot";
+const MessageComponent = ({ message }: { message: Message }) => {
+	const isCurrentUser = message.authorId === authService.getIdFromToken();
 
 	return (
 		<Box
@@ -37,12 +39,18 @@ const Message = ({ message }: { message: { id: number; text: string; sender: str
 						borderRadius: isCurrentUser ? "20px 20px 20px 5px" : "20px 20px 5px 20px",
 					}}
 				>
-					<Typography variant="body2"><b>{message.sender}</b></Typography>
-					<Typography variant="body1">{message.text}</Typography>
+					<Typography sx={{maxWidth: "200px", wordWrap: "break-word"}} variant="body2">
+						<b>{message.author}</b>
+					</Typography>
+
+					<Typography sx={{maxWidth: "200px", wordWrap: "break-word"}} variant="body1">
+						{message.message}
+					</Typography>
+
 				</Paper>
 			</Box>
 		</Box>
 	);
 };
 
-export default Message;
+export default MessageComponent;

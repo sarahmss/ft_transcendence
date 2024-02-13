@@ -84,7 +84,7 @@ class ChatMessageService {
     try {
       
       const messageList = await axios.post(BackLink + "/message/get", packaged, {headers: authService.getAuthToken()});
-      return messageList;
+      return messageList.data;
     } catch (error) {
       console.log("getMessage: " + error );
     }
