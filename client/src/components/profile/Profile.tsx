@@ -19,7 +19,7 @@ import { DefaultPic } from '../../common/constants';
 
 const Profile = () => {
   const [userStats, setUserStats] = useState<IUserStats | null>(null);
-  const [AllUserStats, setFriendsList] = useState<IUserStats[] | null>(null);
+  const [FriendsList, setFriendsList] = useState<IUserStats[] | null>(null);
   const [redirect, setRedirect] = useState<string>('');
   const [profilePic, setProfilePic] = useState(DefaultPic);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -119,7 +119,7 @@ const Profile = () => {
               <MatchHistoryComponent userStats={userStats}/>
             </Grid>
             <Grid item xs={12}>
-              <DashboardTable AllUserStats={AllUserStats} />
+              <DashboardTable FriendsList={FriendsList} />
             </Grid>
           </Grid>
         </Grid>

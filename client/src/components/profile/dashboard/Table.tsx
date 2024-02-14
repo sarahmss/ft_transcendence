@@ -16,10 +16,10 @@ import{ Box,
         Link} from '@mui/material';
 
 
-import IFriends from '../../../types/Friends.type'
 import { Paper } from '@mui/material';
 import { DefaultPic, FrontLink } from '../../../common/constants';
 import userService from '../../../services/user.service';
+import IUserStats from '../../../types/userStats.type';
 // ** Types Imports
 type ThemeColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
 
@@ -47,7 +47,7 @@ const statusObj: StatusObj = {
 };
 
 interface DashboardTableProps {
-  FriendsList: IFriends[] | null;
+  FriendsList: IUserStats[] | null;
 }
 
 const DashboardTable: React.FC<DashboardTableProps> = ({ FriendsList }) => {
