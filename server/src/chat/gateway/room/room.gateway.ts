@@ -141,7 +141,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		event: string = "message-response"
 	) {
 
-		console.log("hey!");
 		let receivingClients: any;
 
 		if (blackList.length > 0) {
@@ -150,7 +149,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				(participant: Membership) =>
 					(!blackList.some((blocked: BlackList) =>
 						(participant.userId === blocked.blockedId ||
-						participant.userId === blocked.blockerId)) &&
+						participant.userId === blocked.blockerId) &&
+						participant.userId !== messageResp.authorId) &&
 					!banList.some((banEntry: Ban) =>
 						(banEntry.banId === participant.userId))
 				));

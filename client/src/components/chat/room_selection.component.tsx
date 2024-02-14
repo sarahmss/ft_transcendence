@@ -22,7 +22,7 @@ const RoomSelectionComponent = () => {
 
 const DisabledComponent = () => {
   return (
-    <FormControl sx={{ height: '5%', m: 1, minWidth: 80, width: '75%' }} disabled> 
+    <FormControl sx={{ height: '5%', m: 1, minWidth: 80, width: '75%', label: {marginTop: 0} }} disabled> 
       <InputLabel id="room-selector">Unavailable</InputLabel>
         <Select
           labelId="room-selector"
@@ -47,8 +47,8 @@ const EnabledComponent = () => {
   };
 
   return (
-    <FormControl sx={{ m: 1, minWidth: 80, width: '100%'}} fullWidth required>
-      <InputLabel id="room-selector">Choose a room</InputLabel>
+    <FormControl sx={{ m: 1, minWidth: 80, width: '100%', label: {marginTop: 0}}} fullWidth required>
+      <InputLabel id="room-selector">Room</InputLabel>
       
         <Select
           labelId="room-selector"

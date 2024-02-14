@@ -46,6 +46,22 @@ export class RoomController {
 		return await this.membershipService.getAll();
 	}
 
+	@Get('curr/:rid/:id')
+	async getCurrentMember(@Param('id') userId: string, @Param('rid') roomId: string) {
+		
+		const member = await this.membershipService.findMemberRoom(userId, roomId);
+
+		if (!member)
+			throw new NotFoundException("Member not found");
+
+		const data = {
+			admin: member.admin,
+			owner: member.owner
+		}
+		return data;
+		
+	}
+
 	@Post('list_room')
 	async getListRoom(@Body('userId') userId: string) {
 
@@ -86,7 +102,7 @@ export class RoomController {
 		await this.roomService.deleteRoom(room);
 		this.eventEmitter.emit('room.delete', members, room, "delete", (__: any, _:any) => {return {}});
 	}
-
+	
 	@Post('leave')
 	async leaveRoom(
 		@Body('roomId') roomId: string,

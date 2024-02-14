@@ -4,7 +4,7 @@ import { ChatLink } from '../common/constants';
 import { Signal, effect, signal } from "@preact/signals-react";
 import { getToken } from "../common/helper";
 import { fetchMessageByRoom, fetchParticipants, fetchRooms, messageMaker } from "./FetchChatData";
-import roomService from "../services/chat/room.service";
+import authService from "../services/auth.service";
 
 const currentRoom: Signal<number> = signal(-1);
 const userLogged: Signal<boolean> = signal(false);
@@ -25,11 +25,11 @@ type Message = {
 
 type User = {
   index: number,
-  admin: boolean,
+  admin: Signal<boolean>,
   owner: boolean,
   userId: string,
-  userName: string,
-  profileImage: string,
+  userName: Signal<string>,
+  profileImage: Signal<string>,
 }
 
 type Room = {
@@ -51,23 +51,6 @@ const chatSocket = io(ChatLink, {
   withCredentials: true
 });
 
-type test = {
-  id: number,
-  text: Signal<string>,
-  sender: string
-}
-
-const messages: Signal<test[]> = signal([
-
-	{ id: 1, text: signal("Hi there!"), sender: "bot" },
-	{ id: 2, text: signal("Hello!"), sender: "user" },
-	{ id: 3, text: signal("How can I assist you today?"), sender: "bot" },
-
-]);
-
-
-// Change to the real implementation later
-// Test
 const insertMessage = (response: any) => {
 
   if (currentRoom.value > chatData.value.length)
@@ -85,6 +68,19 @@ const insertMessage = (response: any) => {
      response.messageTimestamp
    )
   ]
+}
+
+const adminUpdate = (response: any) => {
+  const room = chatData.value.find(data => data.roomId === response.roomId);
+  if (!room)
+    return;
+
+  const userAdminStatus = room.userList.value.find(data => data.userId === response.userId);
+  if (userAdminStatus)
+    userAdminStatus.admin.value = response.admin;
+
+  if (authService.getIdFromToken() === response.userId)
+    privilegedInRoom.admin.value = response.admin;
 }
 
 // const removeRoom = (roomData: any) => {
@@ -107,6 +103,7 @@ const insertMessage = (response: any) => {
 // }
 
 chatSocket.on('message-response', insertMessage);
+chatSocket.on('admin-toggle', adminUpdate);
 // chatSocket.on('left', removeRoom);
 
 // Effect knows what event is triggered base on the signal
@@ -152,5 +149,4 @@ export {
   privilegedInRoom,
   currentRoom,
   userLogged,
-  messages
 };

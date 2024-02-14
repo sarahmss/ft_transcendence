@@ -92,8 +92,8 @@ export class MessageController {
 						(participant) =>
 							blackList.some((blocked) =>  
 								(participant.userId === blocked.blockedId ||
-								(participant.userId === blocked.blockerId &&
-								blocked.blockerId !== message.userId))) ||
+								participant.userId === blocked.blockerId) &&
+								participant.userId !== message.userId) ||
 							banList.some((banEntry: Ban) => (
 								(banEntry.banId === participant.userId)
 							))
@@ -104,6 +104,7 @@ export class MessageController {
 					.createHideEntryBulk(messageInstance,
 																room,
 																hideMessageClients);
+
 			}
 
 			const messageResp = {

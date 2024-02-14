@@ -4,35 +4,25 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
 import { useSignals } from '@preact/signals-react/runtime';
-import { Grid, List, Tabs } from '@mui/material';
+import { FormControl, Grid, List, Tabs } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
 import { Message, User, chatData, currentRoom, userLogged } from '../../contexts/ChatContext';
 import MessageComponent from './chatTabs/message.component';
 import ChatUser from './chatTabs/chatUser.component';
+import RoomCreationComponent from './chatTabs/roomCreation.component';
 
 const label = [
-  {k: 0, id: "1", name: "Messsages"},
-  {k: 1, id: "2", name: "Users"},
-  {k: 2, id: "3", name: "Create Room"},
+  {k: 1, id: "1", name: "", icon: SearchIcon},
+  {k: 2, id: "2", name: "Messsages", icon: ""},
+  {k: 3, id: "3", name: "Users", icon: ""},
+  {k: 4, id: "4", name: "Create Room", icon: ""},
 ]
 
 const ChatTabComponent = () => {
   useSignals();
 
   const [tabs, setValue] = React.useState("1");
-  // const messageContainer = React.useRef<HTMLDivElement>(null);
-
-  // const scroll = () => {
-  //   const {offsetHeight, scrollHeight, scrollTop} = messageContainer.current as HTMLDivElement;
-  //   // if (scrollHeight <= scrollTop + offsetHeight + 100) {
-  //     messageContainer.current?.scrollTo(0, scrollHeight);
-  //   // }
-  // };
-
-  // React.useEffect(() => {
-  //   console.log("well?");
-  //   scroll();
-  // }, [messageCurrent.value]);
 
   const handleChange = (event: React.SyntheticEvent, newValue: any) => {
     setValue(newValue);
@@ -46,12 +36,18 @@ const ChatTabComponent = () => {
             userLogged.value ? 
             (
               label.map((tab) => {
-                return (<Tab key={tab.k} label={tab.name} value={tab.id} />);
+                return (<Tab key={tab.k}
+                  label={tab.name}
+                  value={tab.id}
+                  icon={tab.icon === "" ? ("") : (<tab.icon/>) }/>);
               })
             ) :
             (
               label.map((tab) => {
-                return (<Tab key={tab.k} label={tab.name} value={tab.id} disabled />);
+                return (<Tab key={tab.k}
+                  label={tab.name}
+                  value={tab.id}
+                  icon={tab.icon === "" ? ("") : (<tab.icon/>) } disabled/>);
               })
             )
           }
@@ -63,8 +59,22 @@ const ChatTabComponent = () => {
             height: '90vh',
             overflowY: 'auto'
           }}
-          key="Messages"
+          key="Search"
           value="1"
+        >
+     
+          Search Room
+
+        </TabPanel>
+
+        <TabPanel
+          sx={{
+            backgroundColor:"gray.200",
+            height: '90vh',
+            overflowY: 'auto'
+          }}
+          key="Messages"
+          value="2"
         >
      
           <MessageTabComponent/>
@@ -78,7 +88,7 @@ const ChatTabComponent = () => {
             overflowY: 'auto'
           }}
           key="Participants"
-          value="2"
+          value="3"
         >
 
           <ParticipantTabComponent/>
@@ -92,11 +102,9 @@ const ChatTabComponent = () => {
             overflowY: 'auto'
           }}
           key="Create Room"
-          value="3"
+          value="4"
         >
-
           <RoomCreationForm />
-          Item three
         </TabPanel>
       </TabContext>
     </Box>
@@ -155,7 +163,9 @@ const ParticipantTabComponent = () => {
 
 const RoomCreationForm = () => {
   return (
-    <div></div>
+    <Box>
+      <RoomCreationComponent/>
+    </Box>
   );
 }
 

@@ -34,7 +34,7 @@ export default class Home extends Component<Props, State> {
 					/>
 				</div>
 				</Grid>
-				<Grid item xs={12} md={6} lg={4}>
+				<Grid item xs={12} md={6} lg={4} sx={{ paddingLeft: "0px"}}>
 					<ChatComponent/>
 
 					<Box sx={{

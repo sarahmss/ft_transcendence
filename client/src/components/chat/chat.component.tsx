@@ -22,6 +22,7 @@ const ChatComponent = () => {
 					display: "flex",
 					flexDirection: "column",
 					bgcolor: "grey.200",
+					paddingLeft: "0px"
 				}}
 			>
 				<ChatTabComponent/>

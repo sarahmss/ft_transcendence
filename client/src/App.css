@@ -1,38 +1,38 @@
-*{
-	font-family:'Open Sans', 'Helvetica Neue', sans-serif;
+* {
+  font-family: 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 label {
-	display: block;
-	margin-top: 10px;
-  }
-
-  .profile-img-card {
-	width: 96px;
-	height: 96px;
-	margin: 0 auto 10px;
-	display: block;
-	-moz-border-radius: 50%;
-	-webkit-border-radius: 50%;
-	border-radius: 50%;
-  }
-
-.navBarTop{
-    background-color: #8662DE;
-	padding-top: 5px;
-	height: 35px;
+  display: block;
+  margin-top: 10px;
 }
 
-.navBarTop > .register{
-    display: inline-block;
-    text-align: right;
-    padding-right: 10px;
-    color:white;
+.profile-img-card {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 10px;
+  display: block;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
 }
 
-.navMenu{
-    display: inline-block;
-    padding-right: 10px;
-	padding-left: 10px;
-    color:white;
+.navBarTop {
+  background-color: #8662DE;
+  padding-top: 5px;
+  height: 35px;
+}
+
+.navBarTop>.register {
+  display: inline-block;
+  text-align: right;
+  padding-right: 10px;
+  color: white;
+}
+
+.navMenu {
+  display: inline-block;
+  padding-right: 10px;
+  padding-left: 10px;
+  color: white;
 }

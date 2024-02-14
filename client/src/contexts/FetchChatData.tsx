@@ -88,6 +88,25 @@ const messageMaker = (
   }
 };
 
+const userMaker = (
+  admin: boolean,
+  owner: boolean,
+  userId: string,
+  userName: string,
+  profileImage: string
+): User => {
+
+  return ({
+    index: -1,
+    admin: signal(admin),
+    owner: owner,
+    userId: userId,
+    userName: signal(userName),
+    profileImage: signal(profileImage),
+  });
+  
+}
+
 const fetchRooms = async () => {
   const roomRaw: any[] = await roomService.getRoom(authService.getIdFromToken());
 
@@ -145,8 +164,14 @@ const fetchParticipants = async (index: number, roomId: string) => {
 
   const room = chatData.value[index];
 
-  participants.forEach((user: User) => {
-    addUser(room, user);
+  participants.forEach((user: any) => {
+    addUser(room, userMaker(
+      user.admin,
+      user.owner,
+      user.userId,
+      user.userName,
+      user.profileImage
+    ));
   });
 
   return currentMember;
