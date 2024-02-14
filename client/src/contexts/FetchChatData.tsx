@@ -67,6 +67,7 @@ const roomMaker = (
       isProtected: isProtected,
       messages: signal([]),
       userList: signal([]),
+      fetchStatus: false,
     }
   );
 }

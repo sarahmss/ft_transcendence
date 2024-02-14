@@ -47,7 +47,7 @@ const EnabledComponent = () => {
   };
 
   return (
-    <FormControl sx={{ m: 1, minWidth: 80, width: '100%', label: {marginTop: 0}}} fullWidth required>
+    <FormControl sx={{ m: 1, minWidth: 80, width: '90%', label: {marginTop: 0}}} fullWidth required>
       <InputLabel id="room-selector">Room</InputLabel>
       
         <Select
@@ -55,7 +55,6 @@ const EnabledComponent = () => {
           id="room-selector"
           value={currentRoom.value === -1 ? '' : currentRoom.value}
           onChange = {handleRoomChange}
-          autoWidth
           label="Room"
         >
 

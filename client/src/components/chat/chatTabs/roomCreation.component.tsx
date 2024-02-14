@@ -78,7 +78,6 @@ const RoomCreationComponent = () => {
             id="roomtype-select"
             value={roomType === 0 ? '' : roomType}
             onChange = {handleRoomTypeChange}
-            autoWidth
             label="Room Type"
           >
 
@@ -97,5 +96,4 @@ const RoomCreationComponent = () => {
   );
 }
 
-        // '& > :not(style)': { m: 1, width: '25ch' },
 export default RoomCreationComponent;

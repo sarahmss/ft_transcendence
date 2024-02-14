@@ -38,6 +38,7 @@ type Room = {
   roomName: Signal<string>,
   messages: Signal<Message[]>,
   userList: Signal<User[]>
+  fetchStatus: boolean,
   creationDate: Date,
   isProtected?: boolean,
 };
@@ -116,7 +117,9 @@ effect(
 
 effect(
   async () => {
-    if (currentRoom.value > -1) {
+    if (currentRoom.value > -1 &&
+        chatData.value[currentRoom.value].fetchStatus === false
+    ) {
 
       fetchMessageByRoom(
         currentRoom.value,
@@ -131,6 +134,7 @@ effect(
 
       privilegedInRoom.admin.value = currentUser.admin;
       privilegedInRoom.owner.value = currentUser.owner;
+      chatData.value[currentRoom.value].fetchStatus = true;
     }
   }
 );

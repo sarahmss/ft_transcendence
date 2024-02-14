@@ -11,6 +11,7 @@ import { Message, User, chatData, currentRoom, userLogged } from '../../contexts
 import MessageComponent from './chatTabs/message.component';
 import ChatUser from './chatTabs/chatUser.component';
 import RoomCreationComponent from './chatTabs/roomCreation.component';
+import SearchRoomComponent from './chatTabs/searchRoom.component';
 
 const label = [
   {k: 1, id: "1", name: "", icon: SearchIcon},
@@ -22,7 +23,7 @@ const label = [
 const ChatTabComponent = () => {
   useSignals();
 
-  const [tabs, setValue] = React.useState("1");
+  const [tabs, setValue] = React.useState("2");
 
   const handleChange = (event: React.SyntheticEvent, newValue: any) => {
     setValue(newValue);
@@ -63,7 +64,7 @@ const ChatTabComponent = () => {
           value="1"
         >
      
-          Search Room
+          <SearchRoom/>
 
         </TabPanel>
 
@@ -166,6 +167,12 @@ const RoomCreationForm = () => {
     <Box>
       <RoomCreationComponent/>
     </Box>
+  );
+}
+
+const SearchRoom = () => {
+  return (
+    <SearchRoomComponent/>
   );
 }
 

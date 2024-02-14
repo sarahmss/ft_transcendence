@@ -11,7 +11,7 @@ import {
 import authService from "../../services/auth.service";
 import messageService from "../../services/chat/message.service";
 import { useSignals } from "@preact/signals-react/runtime";
-import { userLogged } from "../../contexts/ChatContext";
+import { chatData, currentRoom, userLogged } from "../../contexts/ChatContext";
 
 const PromptComponent = () => {
 
@@ -19,39 +19,14 @@ const PromptComponent = () => {
 
 	const [input, setInput] = React.useState("");
 
-	const handleSendEnterDown = (event: any)  => {
-
-		switch (event.key) {
-			case "Enter":
-				if (input.trim() !== "") {
-					try {
-
-						messageService.sendMessage(
-							input,
-							authService.getIdFromToken(),
-							"1c8d7395-c3e9-4d2a-9021-22001f17f517"
-						);
-					}
-
-					catch (error) {
-						console.log(error);
-					}
-					setInput("");
-				}
-				break;
-			default:
-				setInput(event.target.value);
-		}
-	};
-
-	const handleSend = () => {
+	const send = () => {
 		if (input.trim() !== "") {
 			try {
 
 				messageService.sendMessage(
 					input,
 					authService.getIdFromToken(),
-					"1c8d7395-c3e9-4d2a-9021-22001f17f517"
+					chatData.value[currentRoom.value].roomId
 				);
 			}
 
@@ -60,6 +35,21 @@ const PromptComponent = () => {
 			}
 			setInput("");
 		}
+	}
+
+	const handleSendEnterDown = (event: any)  => {
+
+		switch (event.key) {
+			case "Enter":
+				send();
+				break;
+			default:
+				setInput(event.target.value);
+		}
+	};
+
+	const handleSend = () => {
+		send();
 	};
 
 	const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
