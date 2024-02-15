@@ -13,10 +13,8 @@ export class FriendshipService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    @InjectRepository(Friends)
     private readonly usersService: UsersService,
     private readonly appGateway: AppGateway,
-
   ) {}
 
   private async getUserWithFriends(userId: string): Promise<User> {
