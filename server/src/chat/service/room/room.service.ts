@@ -5,9 +5,7 @@ import { DIRECT, GROUP } from 'src/constants/roomType.constant';
 import { DirectRoom, GroupRoom, Room } from 'src/entity/room.entity';
 import { UsersService } from 'src/users/users.service';
 import { In, Repository } from 'typeorm';
-import { MembershipService } from '../membership/membership.service';
 import * as bcrypt from 'bcrypt';
-import { MessageService } from '../message/message.service';
 
 @Injectable()
 export class RoomService {
@@ -135,5 +133,18 @@ export class RoomService {
 			{isPrivate: status}
 		)
 		return status;
+	}
+
+	async getRoomByQuery(
+		query: string
+	) {
+		console.log(query);
+		console.log(`%${query}%`);
+		return this.groupRepository
+			.createQueryBuilder('group')
+			.innerJoinAndSelect('group.room', 'room')
+			.where('room.roomName LIKE :pattern', {pattern: `%${query}%`})
+			.andWhere('group.is_private = false')
+			.getMany();
 	}
 }

@@ -9,6 +9,7 @@ import { BadRequestException,
 	Param,
 	Patch,
 	Post,
+	Query,
 	UnauthorizedException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
@@ -89,6 +90,24 @@ export class RoomController {
 		}
 		return roomList;
 	}
+
+	@Get("query")
+	async findRoomByQueryString(@Query('q') query: string) {
+		const roomRaw = await this.roomService.getRoomByQuery(query)
+
+		const formattedRes = roomRaw.map((raw: GroupRoom) => {
+			return (
+				{
+					roomId: raw.roomId,
+					roomName: raw.room.roomName,
+					protected: raw.protected
+				}
+			);
+		});
+
+		return formattedRes;
+	}
+	
 
 	@Delete()
 	async deleteRoom(@Body('roomId') roomId: string) {
