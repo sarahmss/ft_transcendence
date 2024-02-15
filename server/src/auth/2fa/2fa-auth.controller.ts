@@ -61,7 +61,6 @@ import { UsersService } from '../../users/users.service';
 				response.cookie('accessToken',
 									token,
 									{sameSite: 'lax', });
-				this.usersService.setStatusOn(userId);	
 				return response.status(200).json({
 					cookie: response.getHeader('set-cookie'),
 				});

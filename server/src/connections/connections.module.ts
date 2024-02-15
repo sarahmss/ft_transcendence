@@ -1,11 +1,10 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConnectedUser } from 'src/entity';
 import { ConnectionsService } from './connections.service';
-
+import { Connections } from 'src/entity/connections.entity';
 @Module({
-  imports: [TypeOrmModule.forFeature([ConnectedUser])],
+  imports: [TypeOrmModule.forFeature([Connections])],
   providers: [ConnectionsService],
   exports: [ConnectionsService],
 })
-export class ConnectedUsersModule {}
+export class ConnectionsModule {}

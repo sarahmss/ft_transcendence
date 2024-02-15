@@ -21,7 +21,6 @@ export class AuthService {
 			response.cookie('accessToken',
 								token,
 								{sameSite: 'lax', });
-			this.usersService.setStatusOn(user.userId);
 			return response.status(200).json({
 				cookie: response.getHeader('set-cookie'),
 			});
@@ -39,12 +38,10 @@ export class AuthService {
 		response.cookie('accessToken',
 							token,
 							{sameSite: 'lax', });
-		this.usersService.setStatusOn(user.userId);
 		return response.redirect(process.env.FRONT_URL);
 	}
 
 	async logout(response: any, userId: string): Promise<any> {
-		this.usersService.setStatusOff(userId);
 		response.clearCookie('accessToken', { sameSite: 'Lax' });
 	}
 
