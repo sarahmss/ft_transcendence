@@ -73,11 +73,6 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	  this.logger.log(`refreshFriends: ${client.id}`);
 	}
 
-	@SubscribeMessage('status')
-	handleStatus(client: Socket, message: string) {
-		client.emit('status', message);
-	}
-
 	async setStatunOn(user: User) {
 		this.usersService
 			.setStatusOn(user.userId);
@@ -85,6 +80,9 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	private async setStatusOff(user: User) {
 		if (!user) {
+			return;
+		}
+		if (await this.connectionsService.hasConnections(user)) {
 			return;
 		}
 		this.usersService
