@@ -21,10 +21,10 @@ const Profile = () => {
   const [FriendsList, setFriendsList] = useState<IUserStats[] | null>(null);
   const [redirect, setRedirect] = useState<string>('');
   const [profilePic, setProfilePic] = useState(DefaultPic);
-  const [searchParams] = useSearchParams();
-  const [userId, setUserId] = useState<string>("");
-  
-  const loadProfilePic = async (profilePic: string) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+
+  const loadProfilePic = async (profilePic: string, userId: string) => {
     try {
       const picture = await userService.getProfilePicture(profilePic, userId);
       setProfilePic(picture);
@@ -33,12 +33,12 @@ const Profile = () => {
     }
   };
 
-  const SetUserStats = async (profilePic: string) => {
+  const SetUserStats = async (userId: string, profilePic:string) => {
     try {
       const userStats = await userService.RequestUserStats(userId);
         const FriendsList = await userService.getFriends(userId);
         
-        loadProfilePic(profilePic);
+        loadProfilePic(profilePic, userId);
         if (userStats) {
           setUserStats(userStats);
         }
@@ -49,12 +49,12 @@ const Profile = () => {
       console.error('Error seting user stats:', error); }
   }
 
-  const SetUserProfile = async () => {
+  const SetUserProfile = async (userId: string) => {
     try {
       await userService.RequestUserProfile(userId).then(
         response =>{
           const userProfile = response.data;
-          SetUserStats(userProfile.profilePicture);
+          SetUserStats(userId, userProfile.profilePicture);
         },
         error => {
           setRedirect('error');
@@ -66,23 +66,8 @@ const Profile = () => {
     }
   };
 
-  const fetchData = async () => {
-    try {
-      const user = await authService.getCurrentUser();
-      
-      if (user) {
-        const outId = searchParams.get('user');
-        setUserId(outId || user.userId);
-        SetUserProfile();
-      } else {
-        setRedirect('error');
-      }
-    } catch (error) {
-      console.error('Error fetching user stats:', error);
-    }
-  };
-
-  const updateFriendsList = async () => {
+  
+  const updateFriendsList = async (userId: string) => {
     try {
       if (userId) {
         appSocket.off('refreshFriends').on('refreshFriends', async () => {
@@ -96,11 +81,28 @@ const Profile = () => {
       console.error('Error fetching user stats:', error);
     }
   };
- 
+
+  const fetchData = async () => {
+    try {
+      const user = await authService.getCurrentUser();
+      
+      if (user) {
+        const userId = searchParams.get('user');
+        if (userId){
+          SetUserProfile(userId)
+        } else {
+          SetUserProfile(user.userId)
+        }       
+      } else {
+        setRedirect('error');
+      }
+    } catch (error) {
+      console.error('Error fetching user stats:', error);
+    }
+  };
 
   useEffect(() => {
     fetchData();
-    updateFriendsList();
   }, []);
 
   if (redirect === 'error') {

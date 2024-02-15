@@ -16,7 +16,6 @@ export class FriendshipService {
     private readonly usersService: UsersService,
     private readonly appGateway: AppGateway,
   ) {}
-
   private async getUserWithFriends(userId: string): Promise<User> {
     try {
       await this.usersService.checkUser(userId);
@@ -29,7 +28,34 @@ export class FriendshipService {
       throw error;
     }
   }
-
+  
+  async GetFriends(userId: string) {
+    try {
+      const user = await this.getUserWithFriends(userId);
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+      const friendsList = [];
+      for (const friend of user.friends) {
+        const friendUser = await this.usersService.findById(friend.friendId);
+        friendsList.push({
+          userName: friendUser.userName,
+          profilePicture: friendUser.profilePicture,
+          email: friendUser.email,
+          level: friendUser.level,
+          totalGamesWon: friendUser.totalGamesWon,
+          totalGamesLost: friendUser.totalGamesLost,
+          matches: friendUser.totalGamesWon + friendUser.totalGamesLost,
+          status: friendUser.status
+        });
+      }
+      return friendsList;
+    } catch (error) {
+      console.error("Error GetFriends", error);
+      throw new BadRequestException(error);
+    }
+  }
+  
   private async IsNewFriendshipValid(user: User, friendId: string): Promise<boolean> {
     try {
       if (!user.friends) {
@@ -42,19 +68,6 @@ export class FriendshipService {
       return true;
     } catch (error) {
       throw error;
-    }
-  }
-
-  async GetFriends(userId: string) {
-    try {
-      const user = await this.getUserWithFriends(userId);
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
-      return user.friends;
-    } catch (error) {
-      console.error("Error GetFriends", error);
-      throw new BadRequestException(error);
     }
   }
 
