@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import { Button } from '@mui/material';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import GroupIcon from '@mui/icons-material/Group';
 import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
 import OutboxIcon from '@mui/icons-material/Outbox';
 import userService from '../../../services/user.service';
+import { reducer } from '../../../common/helper';
 
 // Defina os tipos ThemeColor e Icons conforme necessário
 type ThemeColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
@@ -57,20 +58,24 @@ const statusObj: StatusObj = {
   YourSelf: { color: 'info', icon: <GroupIcon />, onClick: null },
 };
 
-const FriendsButton = ({ status, friendId }: {
-  status: string;
+const FriendsButton = ({ prevStatus, friendId }: {
+  prevStatus: string;
   friendId: string;
 }) => {
 
+  const [state, setState] = useReducer(reducer, {
+		status: prevStatus,
+	});
+
   const handleClick = () => {
-    const onClickFunction = statusObj[status]?.onClick;
+    const onClickFunction = statusObj[state.status]?.onClick;
     if (onClickFunction) {
       onClickFunction(friendId); 
     }
   };
 
   return (
-    status === "RequestReceived" ? (
+    state.status === "RequestReceived" ? (
       <>
         <Button
           onClick={() => Accept(friendId)}
@@ -95,16 +100,16 @@ const FriendsButton = ({ status, friendId }: {
       <>
         <Button
           onClick={handleClick}
-          endIcon={statusObj[status]?.icon} 
+          endIcon={statusObj[state.status]?.icon} 
           variant="contained"
           sx={{ borderRadius: 16 }} 
-          color={statusObj[status]?.color || 'error'}
-          disabled={status === "YourSelf"} 
+          color={statusObj[state.status]?.color || 'error'}
+          disabled={state.status === "YourSelf"} 
         >
-          {status}
+          {state.status}
         </Button>
 
-      {status === "Friends" ? ( 
+      {state.status === "Friends" ? ( 
         <Button
           onClick={() => Remove(friendId)}
           endIcon={<GroupRemoveIcon />} 

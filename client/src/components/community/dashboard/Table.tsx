@@ -108,7 +108,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats, setRedire
                     <TableCell>{row.defeats}</TableCell>
                     <TableCell>
                   <FriendsButton
-                    status={row.friendship} 
+                    prevStatus={row.friendship} 
                     friendId={row.userId}
                   />
                 </TableCell>
