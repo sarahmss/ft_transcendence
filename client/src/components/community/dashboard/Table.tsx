@@ -4,7 +4,6 @@ import React, { useEffect, useState  } from 'react';
 // ** MUI Imports
 import{ Box, 
         Card, 
-        Chip, 
         Table,
         TableRow,
         TableHead,
@@ -21,6 +20,7 @@ import { Paper } from '@mui/material';
 import { DefaultPic, FrontLink } from '../../../common/constants';
 import userService from '../../../services/user.service';
 import FriendsButton from './FriendsButton';
+import authService from '../../../services/auth.service';
 interface RowType {
   matches: string;
   name: string;
@@ -110,6 +110,7 @@ const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats, setRedire
                   <FriendsButton
                     prevStatus={row.friendship} 
                     friendId={row.userId}
+                    ownerId={authService.getIdFromToken()}
                   />
                 </TableCell>
 

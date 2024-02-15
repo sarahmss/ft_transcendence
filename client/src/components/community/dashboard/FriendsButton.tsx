@@ -1,11 +1,12 @@
-import React, { useReducer } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '@mui/material';
 import GroupAddIcon from '@mui/icons-material/GroupAdd';
 import GroupIcon from '@mui/icons-material/Group';
 import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
 import OutboxIcon from '@mui/icons-material/Outbox';
 import userService from '../../../services/user.service';
-import { reducer } from '../../../common/helper';
+import socketClient from 'socket.io-client';
+import { FriendsLink } from '../../../common/constants';
 
 // Defina os tipos ThemeColor e Icons conforme necessário
 type ThemeColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
@@ -18,6 +19,12 @@ interface StatusObj {
     onClick: ((friendId: string) => void) | null;
   };
 }
+
+const friendsSocket = socketClient(FriendsLink, {
+  transports: ['websocket'],
+  withCredentials: true,
+});
+
 
 const Send = async (friendId: string) => {
   try {
@@ -58,24 +65,34 @@ const statusObj: StatusObj = {
   YourSelf: { color: 'info', icon: <GroupIcon />, onClick: null },
 };
 
-const FriendsButton = ({ prevStatus, friendId }: {
+const FriendsButton = ({ prevStatus, friendId, ownerId }: {
   prevStatus: string;
   friendId: string;
+  ownerId: string;
 }) => {
 
-  const [state, setState] = useReducer(reducer, {
-		status: prevStatus,
-	});
+  const [status, setStatus] = useState(prevStatus);
+
+  useEffect(() => {
+    friendsSocket.on(`friendshipStatusUpdate_${ownerId}_${friendId}`, (data: { status: string }) => {
+      setStatus(data.status);
+    });
+
+    return () => {
+      friendsSocket.off(`friendshipStatusUpdate_${ownerId}_${friendId}`);
+    };
+  }, [friendId, ownerId]);
 
   const handleClick = () => {
-    const onClickFunction = statusObj[state.status]?.onClick;
+    const onClickFunction = statusObj[status]?.onClick;
     if (onClickFunction) {
       onClickFunction(friendId); 
     }
   };
+  console.log(status);
 
   return (
-    state.status === "RequestReceived" ? (
+    status === "RequestReceived" ? (
       <>
         <Button
           onClick={() => Accept(friendId)}
@@ -100,16 +117,16 @@ const FriendsButton = ({ prevStatus, friendId }: {
       <>
         <Button
           onClick={handleClick}
-          endIcon={statusObj[state.status]?.icon} 
+          endIcon={statusObj[status]?.icon} 
           variant="contained"
           sx={{ borderRadius: 16 }} 
-          color={statusObj[state.status]?.color || 'error'}
-          disabled={state.status === "YourSelf"} 
+          color={statusObj[status]?.color || 'error'}
+          disabled={status === "YourSelf"} 
         >
-          {state.status}
+          {status}
         </Button>
 
-      {state.status === "Friends" ? ( 
+      {status === "Friends" ? ( 
         <Button
           onClick={() => Remove(friendId)}
           endIcon={<GroupRemoveIcon />} 

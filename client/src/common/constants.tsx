@@ -1,12 +1,16 @@
+import { io } from "socket.io-client";
+
+
 export const BackLink = process.env.REACT_APP_BACK_HOST
 export const FrontLink = process.env.REACT_APP_FRONT_HOST
+
+export const appSocket = io(`${BackLink}/app`, { withCredentials: true });
 
 export const IntraloginLink = BackLink + "/auth/login"
 export const LocalSignupLink = BackLink + "/auth/signup"
 export const LocalSigninLink = BackLink + "/auth/signin"
 export const UserContentLink = BackLink + "/users/"
-export const FriendsContentLink = BackLink + "/friends/"
-
+export const FriendsLink = BackLink + "/friends/"
 export const TwoFaLink = BackLink + "/2fa-auth"
 export const GameLink = BackLink + "/game"
 

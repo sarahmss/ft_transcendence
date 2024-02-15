@@ -9,10 +9,11 @@ import {
 } from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
+import { ConnectionsService } from 'src/connections/connections.service';
 import { User } from 'src/entity/user.entity';
 import { UsersService } from 'src/users/users.service';
 @WebSocketGateway({
-	namespace: '/session',
+	namespace: '/app',
 	cors: {
 		origin: process.env.FRONT_URL,
 		credentials: true,
@@ -23,12 +24,12 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	constructor(
 		private readonly authService: AuthService,
 		private readonly usersService: UsersService,
+		private readonly connectionsService: ConnectionsService,
 	) {}
 	private logger: Logger = new Logger('AppGateway');
 
-	@SubscribeMessage('status')
-	handleStatus(client: Socket, message: string) {
-		client.emit('status', message);
+	onModuleInit() {
+		this.connectionsService.clearConnections();
 	}
 
 	afterInit() {
@@ -41,6 +42,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			const decodedToken = this.authService.IsValidJwt(token);
 			const user = await this.authService.IsValidUser(decodedToken.id);
 			client.data.user = user;
+			await this.connectionsService.newConnection(client.id, user);
 			this.setStatunOn(user);
 		} catch {
 			client.emit('error', new UnauthorizedException());
@@ -50,6 +52,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	async handleDisconnect(client: Socket) {
+		this.connectionsService.removeConnection(client.id);
 		this.setStatusOff(await client.data.user);
 		this.disconnect(client);
 	}
@@ -58,6 +61,17 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	private disconnect(client: Socket) {
 		this.logger.log(`Client disconnected: ${client.id}`);
 		client.disconnect();
+	}
+
+	@SubscribeMessage('refreshFriends')
+	async handleRefreshFriends(client: Socket) {
+	  this.server.emit('refreshFriends');
+	  this.logger.log(`refreshFriends: ${client.id}`);
+	}
+
+	@SubscribeMessage('status')
+	handleStatus(client: Socket, message: string) {
+		client.emit('status', message);
 	}
 
 	async setStatunOn(user: User) {
@@ -72,4 +86,11 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.usersService
 			.setStatusOff(user.userId);
 	}
+
+	async setStatusInGame(user: User) {
+		this.usersService
+		  .setStatusPlaying(user.userId)
+		  .then(() => this.server.emit('refreshFriends'));
+	  }
+
 }

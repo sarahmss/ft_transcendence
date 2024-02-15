@@ -77,7 +77,6 @@ class AuthService {
 		}
 
 	async getCurrentUser() {
-
 		try {
 			if (this.getIsLogged() != null)
 			{
@@ -85,8 +84,8 @@ class AuthService {
 				const userStr = sessionStorage.getItem("LoggedUser");
 				if (userStr)
 					return JSON.parse(userStr);
-				return null;
 			}
+			return null;
 		} catch (error) {
 			console.error("Error during getCurrentUser:", error);
       		throw error;

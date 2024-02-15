@@ -13,6 +13,7 @@ import { ChatModule } from './chat/chat.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { GameModule } from './game/game.module';
 import { FriendsModule } from './friends/friends.module';
+import { AppGatewayModule } from './app/app.gateway.module';
 @Module({
 	imports: [
 		EventEmitterModule.forRoot(),
@@ -24,6 +25,7 @@ import { FriendsModule } from './friends/friends.module';
 		ChatModule,
 		GameModule,
 		FriendsModule,
+		AppGatewayModule,
 		TypeOrmModule.forRoot({
 			type: process.env.DB_TYPE as any,
 			host: process.env.PG_HOST,

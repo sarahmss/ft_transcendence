@@ -81,8 +81,7 @@ const NavBar: React.FC = () => {
 
   React.useEffect(() => {
     fetchData();
-    console.log("Hello")
-  }, [users]);
+  }, );
 
   return (
     <AppBar position="static" sx={{ backgroundColor: '#B700cc' }}>

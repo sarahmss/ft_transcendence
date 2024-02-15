@@ -27,7 +27,6 @@ export class FriendshipService {
 
   async sendFriendshipStatusUpdate(ownerId: string, friendId: string, status: string) {
     this.server.emit(`friendshipStatusUpdate_${ownerId}_${friendId}`, { status });
-    this.server.emit(`friendshipStatusUpdate_${friendId}_${ownerId}`, { status });
   }
 
   private async getUserWithFriends(userId: string): Promise<User> {
@@ -140,8 +139,8 @@ export class FriendshipService {
     await this.CreateNewFriendship(ownerId, friendId, FriendshipStatus.SENT);
     await this.CreateNewFriendship(friendId, ownerId, FriendshipStatus.RECEIVED);
 
-    await this.sendFriendshipStatusUpdate(ownerId, friendId, 'sent');
-    await this.sendFriendshipStatusUpdate(friendId, ownerId, 'received');
+    await this.sendFriendshipStatusUpdate(ownerId, friendId, FriendshipStatus.SENT);
+    await this.sendFriendshipStatusUpdate(friendId, ownerId, FriendshipStatus.RECEIVED);
     
     return response.send({ FriendshipStatus: FriendshipStatus.SENT });
   }
@@ -150,8 +149,8 @@ export class FriendshipService {
     await this.UpdateFriendshipStatus(ownerId, friendId, FriendshipStatus.FRIENDS);
     await this.UpdateFriendshipStatus(friendId, ownerId, FriendshipStatus.FRIENDS);
 
-    await this.sendFriendshipStatusUpdate(ownerId, friendId, 'accepted');
-    await this.sendFriendshipStatusUpdate(friendId, ownerId, 'accepted');
+    await this.sendFriendshipStatusUpdate(ownerId, friendId,  FriendshipStatus.FRIENDS);
+    await this.sendFriendshipStatusUpdate(friendId, ownerId,  FriendshipStatus.FRIENDS);
     
     return response.send({ FriendshipStatus: FriendshipStatus.FRIENDS });
   }
@@ -160,8 +159,8 @@ export class FriendshipService {
     await this.RemoveFriendship(ownerId, friendId);
     await this.RemoveFriendship(friendId, ownerId);
 
-    await this.sendFriendshipStatusUpdate(ownerId, friendId, 'denied');
-    await this.sendFriendshipStatusUpdate(friendId, ownerId, 'denied');
+    await this.sendFriendshipStatusUpdate(ownerId, friendId, FriendshipStatus.DENIED);
+    await this.sendFriendshipStatusUpdate(friendId, ownerId, FriendshipStatus.DENIED);
     
     response.send({ FriendshipStatus: FriendshipStatus.DENIED });
   }
@@ -170,9 +169,8 @@ export class FriendshipService {
     await this.RemoveFriendship(ownerId, friendId);
     await this.RemoveFriendship(friendId, ownerId);
 
-    
-    await this.sendFriendshipStatusUpdate(ownerId, friendId, 'removed');
-    await this.sendFriendshipStatusUpdate(friendId, ownerId, 'removed');
+    await this.sendFriendshipStatusUpdate(ownerId, friendId, FriendshipStatus.REMOVED);
+    await this.sendFriendshipStatusUpdate(friendId, ownerId, FriendshipStatus.REMOVED);
   
     return response.send({ FriendshipStatus: FriendshipStatus.REMOVED });
   }
