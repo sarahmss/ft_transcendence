@@ -6,7 +6,7 @@ import GroupRemoveIcon from '@mui/icons-material/GroupRemove';
 import OutboxIcon from '@mui/icons-material/Outbox';
 import userService from '../../../services/user.service';
 import socketClient from 'socket.io-client';
-import { FriendsLink } from '../../../common/constants';
+import { FriendsLink, appSocket } from '../../../common/constants';
 
 // Defina os tipos ThemeColor e Icons conforme necessário
 type ThemeColor = 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
@@ -19,12 +19,6 @@ interface StatusObj {
     onClick: ((friendId: string) => void) | null;
   };
 }
-
-const friendsSocket = socketClient(FriendsLink, {
-  transports: ['websocket'],
-  withCredentials: true,
-});
-
 
 const Send = async (friendId: string) => {
   try {
@@ -74,12 +68,12 @@ const FriendsButton = ({ prevStatus, friendId, ownerId }: {
   const [status, setStatus] = useState(prevStatus);
 
   useEffect(() => {
-    friendsSocket.on(`friendshipStatusUpdate_${ownerId}_${friendId}`, (data: { status: string }) => {
+    appSocket.on(`friendshipStatusUpdate_${ownerId}_${friendId}`, (data: { status: string }) => {
       setStatus(data.status);
     });
 
     return () => {
-      friendsSocket.off(`friendshipStatusUpdate_${ownerId}_${friendId}`);
+      appSocket.off(`friendshipStatusUpdate_${ownerId}_${friendId}`);
     };
   }, [friendId, ownerId]);
 

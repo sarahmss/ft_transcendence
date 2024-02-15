@@ -3,8 +3,8 @@ import { User } from './user.entity';
 
 @Entity()
 export class Connections {
-  @PrimaryGeneratedColumn()
-  connectionId: number;
+	@PrimaryGeneratedColumn("uuid")
+  connectionId: string;
 
   @Column({ nullable: false })
   client: string;

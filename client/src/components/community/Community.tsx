@@ -44,7 +44,6 @@ const Community = () => {
           setRedirect({redirect : 'home'});
         }
       );
-
     } catch (error) {
       console.error('Error SetUserCommunity:', error);
     }

@@ -57,6 +57,10 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		this.disconnect(client);
 	}
 
+	async UpdateFriendshipStatus(ownerId: string, friendId: string, status: string) {
+		this.server.emit(`friendshipStatusUpdate_${ownerId}_${friendId}`, { status });
+		this.logger.log(`friendshipStatusUpdate${ownerId}_${friendId}: ${status}`);
+	  }
 
 	private disconnect(client: Socket) {
 		this.logger.log(`Client disconnected: ${client.id}`);
@@ -87,7 +91,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 			.setStatusOff(user.userId);
 	}
 
-	async setStatusInGame(user: User) {
+	async setStatusPlaying(user: User) {
 		this.usersService
 		  .setStatusPlaying(user.userId)
 		  .then(() => this.server.emit('refreshFriends'));

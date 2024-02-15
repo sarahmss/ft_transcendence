@@ -5,9 +5,11 @@ import { FriendshipService } from './friends.service';
 import { FriendsController } from './friends.controller';
 import { User } from '../entity/user.entity';
 import { Friends } from '../entity/friends.entity';
+import { AppGatewayModule } from 'src/app/app.gateway.module';
 
 @Module({
   imports: [
+    AppGatewayModule,
     TypeOrmModule.forFeature([User]),
     TypeOrmModule.forFeature([Friends]),
   ],

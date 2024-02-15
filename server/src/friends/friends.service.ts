@@ -5,29 +5,19 @@ import { User } from 'src/entity/user.entity';
 import { Friends } from 'src/entity/friends.entity';
 import { UsersService } from 'src/users/users.service';
 import { FriendshipStatus } from 'src/helpers/types.helper';
-import { Socket } from 'socket.io';
-import { Server } from 'socket.io';
+import { AppGateway } from 'src/app/app.gateway';
 
 @Injectable()
 export class FriendshipService {
-  private server: Server;
 
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     @InjectRepository(Friends)
-    private readonly FriendRepository: Repository<Friends>,
     private readonly usersService: UsersService,
+    private readonly appGateway: AppGateway,
 
   ) {}
-
-  setServer(server: Server) {
-    this.server = server;
-  }
-
-  async sendFriendshipStatusUpdate(ownerId: string, friendId: string, status: string) {
-    this.server.emit(`friendshipStatusUpdate_${ownerId}_${friendId}`, { status });
-  }
 
   private async getUserWithFriends(userId: string): Promise<User> {
     try {
@@ -139,8 +129,8 @@ export class FriendshipService {
     await this.CreateNewFriendship(ownerId, friendId, FriendshipStatus.SENT);
     await this.CreateNewFriendship(friendId, ownerId, FriendshipStatus.RECEIVED);
 
-    await this.sendFriendshipStatusUpdate(ownerId, friendId, FriendshipStatus.SENT);
-    await this.sendFriendshipStatusUpdate(friendId, ownerId, FriendshipStatus.RECEIVED);
+    await this.appGateway.UpdateFriendshipStatus(ownerId, friendId, FriendshipStatus.SENT);
+    await this.appGateway.UpdateFriendshipStatus(friendId, ownerId, FriendshipStatus.RECEIVED);
     
     return response.send({ FriendshipStatus: FriendshipStatus.SENT });
   }
@@ -149,8 +139,8 @@ export class FriendshipService {
     await this.UpdateFriendshipStatus(ownerId, friendId, FriendshipStatus.FRIENDS);
     await this.UpdateFriendshipStatus(friendId, ownerId, FriendshipStatus.FRIENDS);
 
-    await this.sendFriendshipStatusUpdate(ownerId, friendId,  FriendshipStatus.FRIENDS);
-    await this.sendFriendshipStatusUpdate(friendId, ownerId,  FriendshipStatus.FRIENDS);
+    await this.appGateway.UpdateFriendshipStatus(ownerId, friendId,  FriendshipStatus.FRIENDS);
+    await this.appGateway.UpdateFriendshipStatus(friendId, ownerId,  FriendshipStatus.FRIENDS);
     
     return response.send({ FriendshipStatus: FriendshipStatus.FRIENDS });
   }
@@ -159,8 +149,8 @@ export class FriendshipService {
     await this.RemoveFriendship(ownerId, friendId);
     await this.RemoveFriendship(friendId, ownerId);
 
-    await this.sendFriendshipStatusUpdate(ownerId, friendId, FriendshipStatus.DENIED);
-    await this.sendFriendshipStatusUpdate(friendId, ownerId, FriendshipStatus.DENIED);
+    await this.appGateway.UpdateFriendshipStatus(ownerId, friendId, FriendshipStatus.DENIED);
+    await this.appGateway.UpdateFriendshipStatus(friendId, ownerId, FriendshipStatus.DENIED);
     
     response.send({ FriendshipStatus: FriendshipStatus.DENIED });
   }
@@ -169,8 +159,8 @@ export class FriendshipService {
     await this.RemoveFriendship(ownerId, friendId);
     await this.RemoveFriendship(friendId, ownerId);
 
-    await this.sendFriendshipStatusUpdate(ownerId, friendId, FriendshipStatus.REMOVED);
-    await this.sendFriendshipStatusUpdate(friendId, ownerId, FriendshipStatus.REMOVED);
+    await this.appGateway.UpdateFriendshipStatus(ownerId, friendId, FriendshipStatus.REMOVED);
+    await this.appGateway.UpdateFriendshipStatus(friendId, ownerId, FriendshipStatus.REMOVED);
   
     return response.send({ FriendshipStatus: FriendshipStatus.REMOVED });
   }
