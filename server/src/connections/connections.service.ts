@@ -10,6 +10,10 @@ export class ConnectionsService {
     private readonly ConnectionsRepository: Repository<Connections>,
   ) {}
 
+  clearConnections() {
+    this.ConnectionsRepository.clear();
+  }
+
   newConnection(client: string, user: User) {
     const Connections = { client, user };
     return this.ConnectionsRepository.save(Connections);
@@ -17,10 +21,6 @@ export class ConnectionsService {
 
   removeConnection(client: string) {
     return this.ConnectionsRepository.delete({ client });
-  }
-
-  clearConnections() {
-    this.ConnectionsRepository.clear();
   }
 
   async hasConnections(user: User) {

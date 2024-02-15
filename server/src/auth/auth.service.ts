@@ -42,6 +42,7 @@ export class AuthService {
 	}
 
 	async logout(response: any, userId: string): Promise<any> {
+		this.usersService.setStatusOff(userId);
 		response.clearCookie('accessToken', { sameSite: 'Lax' });
 	}
 

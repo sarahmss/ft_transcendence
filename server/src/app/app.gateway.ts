@@ -52,8 +52,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	async handleDisconnect(client: Socket) {
-		this.connectionsService.removeConnection(client.id);
 		this.setStatusOff(await client.data.user);
+		this.connectionsService.removeConnection(client.id);
 		this.disconnect(client);
 	}
 
@@ -82,11 +82,10 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		if (!user) {
 			return;
 		}
-		if (await this.connectionsService.hasConnections(user)) {
+		if (await this.connectionsService.hasConnections(user)  === false) {
 			return;
 		}
-		this.usersService
-			.setStatusOff(user.userId);
+		this.usersService.setStatusOff(user.userId);
 	}
 
 	async setStatusPlaying(user: User) {

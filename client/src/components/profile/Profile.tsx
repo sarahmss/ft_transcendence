@@ -21,7 +21,7 @@ const Profile = () => {
   const [FriendsList, setFriendsList] = useState<IUserStats[] | null>(null);
   const [redirect, setRedirect] = useState<string>('');
   const [profilePic, setProfilePic] = useState(DefaultPic);
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
 
   const loadProfilePic = async (profilePic: string, userId: string) => {
