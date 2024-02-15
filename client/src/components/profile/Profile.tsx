@@ -20,6 +20,8 @@ const Profile = () => {
   const [userStats, setUserStats] = useState<IUserStats | null>(null);
   const [FriendsList, setFriendsList] = useState<IUserStats[] | null>(null);
   const [redirect, setRedirect] = useState<string>('');
+  const [ownerId, SetOwnerId] = useState<string>('');
+
   const [profilePic, setProfilePic] = useState(DefaultPic);
   const [searchParams] = useSearchParams();
 
@@ -75,7 +77,7 @@ const Profile = () => {
           if (FriendsList) {
             setFriendsList(FriendsList);
           }
-        });
+      });
       }
     } catch (error) {
       console.error('Error fetching user stats:', error);
@@ -90,8 +92,10 @@ const Profile = () => {
         const userId = searchParams.get('user');
         if (userId){
           SetUserProfile(userId)
+          SetOwnerId(userId)
         } else {
           SetUserProfile(user.userId)
+          SetOwnerId(user.userId)
         }       
       } else {
         setRedirect('error');
@@ -100,10 +104,10 @@ const Profile = () => {
       console.error('Error fetching user stats:', error);
     }
   };
-
   useEffect(() => {
     fetchData();
-  }, []);
+    updateFriendsList(ownerId); 
+  }, );
 
   if (redirect === 'error') {
     return <Navigate to={'/error'} />;

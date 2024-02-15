@@ -37,17 +37,19 @@ export class FriendshipService {
       }
       const friendsList = [];
       for (const friend of user.friends) {
-        const friendUser = await this.usersService.findById(friend.friendId);
-        friendsList.push({
-          userName: friendUser.userName,
-          profilePicture: friendUser.profilePicture,
-          email: friendUser.email,
-          level: friendUser.level,
-          totalGamesWon: friendUser.totalGamesWon,
-          totalGamesLost: friendUser.totalGamesLost,
-          matches: friendUser.totalGamesWon + friendUser.totalGamesLost,
-          status: friendUser.status
-        });
+        if (friend.status === FriendshipStatus.FRIENDS){
+          const friendUser = await this.usersService.findById(friend.friendId);
+          friendsList.push({
+            userName: friendUser.userName,
+            profilePicture: friendUser.profilePicture,
+            email: friendUser.email,
+            level: friendUser.level,
+            totalGamesWon: friendUser.totalGamesWon,
+            totalGamesLost: friendUser.totalGamesLost,
+            matches: friendUser.totalGamesWon + friendUser.totalGamesLost,
+            status: friendUser.status
+          });  
+        }
       }
       return friendsList;
     } catch (error) {
