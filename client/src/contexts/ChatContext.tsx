@@ -18,6 +18,7 @@ type Message = {
   index: number,
   author: string,
   authorId: string,
+  profileImage: string,
   messageId: string,
   message: Signal<string>,
   messageTimestamp: Date,
@@ -66,7 +67,8 @@ const insertMessage = (response: any) => {
      response.authorId,
      response.messageId,
      response.message,
-     response.messageTimestamp
+     response.messageTimestamp,
+     response.profileImage
    )
   ]
 }

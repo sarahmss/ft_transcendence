@@ -77,13 +77,15 @@ const messageMaker = (
   authorId: string,
   messageId: string,
   message: string,
-  messageTimestamp: Date
+  messageTimestamp: Date,
+  profileImage: string
 ): Message => {
   return {
     index: -1,
     author: author,
     authorId: authorId,
     messageId: messageId,
+    profileImage: profileImage,
     message: signal(message),
     messageTimestamp: messageTimestamp,
   }
@@ -151,6 +153,7 @@ const fetchMessageByRoom = async (index: number, roomId: string, pageNumber: num
         message.messageId,
         message.message,
         message.messageTimestamp,
+        message.profileImage
       )
     )
   }

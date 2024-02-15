@@ -26,9 +26,7 @@ const MessageComponent = ({ message }: { message: Message }) => {
 					alignItems: "center",
 				}}
 			>
-				<Avatar sx={{ bgcolor: "secondary.light", color: "white" }}>
-					{isCurrentUser ? "B" : "U"}
-				</Avatar>
+				<Avatar src={message.profileImage}/>
 				<Paper
 					variant="outlined"
 					sx={{

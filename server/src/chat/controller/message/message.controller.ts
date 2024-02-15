@@ -111,6 +111,7 @@ export class MessageController {
 				message: messageInstance.message,
 				messageId: messageInstance.messageId,
 				messsageTimestamp: messageInstance.timestamp,
+				profileImage: user.profilePicture,
 				authorId: messageInstance.userId,
 				author: user.userName,
 			}
@@ -174,6 +175,7 @@ export class MessageController {
 				messageId: msg.messageId,
 				messageTimestamp: msg.timestamp,
 				authorId: msg.user.userId,
+				profileImage: msg.user.profilePicture,
 				author: msg.user.userName,
 			}
 		});

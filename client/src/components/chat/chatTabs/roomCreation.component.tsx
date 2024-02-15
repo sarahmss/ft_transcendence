@@ -1,55 +1,46 @@
-import * as React from 'react';
-import roomService from '../../../services/chat/room.service';
+import { Box,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField } from '@mui/material';
+
+import { signal } from '@preact/signals-react';
+import { useSignals } from '@preact/signals-react/runtime';
+
 import { DIRECT, GROUP } from '../../../common/constants';
 import authService from '../../../services/auth.service';
-import { Box, FormControl, InputLabel, MenuItem, Select, TextField } from '@mui/material';
+
+const roomType = signal(0);
+const roomName = signal("");
+const password = signal("");
+const members = signal([]);
+const isPrivate = signal(false);
 
 const RoomCreationComponent = () => {
-
-  const [roomName, setRoomName] = React.useState("");
-  const [password, setPassword] = React.useState("");
-  const [roomType, setRoomType] = React.useState(0);
-  const [members, setMember] = React.useState([]);
-  const [isPrivate, setPrivate] = React.useState(false);
-
-  const handleRoomNameChange = (event: any) => {
-    setRoomName(event.target.value);
-  }
-
-  const handlePasswordChange = (event: any) => {
-    setPassword(event.target.value);
-  }
-
-  const handleRoomTypeChange = (event: any) => {
-    setRoomType(event.target.value);
-  }
-
-  const searchUsers = (event: any) => {
-  }
-
-  const handleMemberAddAndRemove = (event: any) => {
-    console.log(event);
-    // setMember([
-    //   ...members,
-    //   event.target.value
-    // ]);
-  }
-
-  const handlePrivateStatus = (event: any) => {
-
-
-  }
+  useSignals();
 
   const sendCreationRequest = () => {
     
-    roomService.createRoom(
-      roomType,
-      members,
-      authService.getIdFromToken(),
-      roomName,
-      isPrivate,
-      password
+    console.log(
+        roomType.value,
+        members.value,
+        authService.getIdFromToken(),
+        roomName.value,
+        isPrivate.value,
+        password.value
     );
+    // roomService.createRoom(
+    //   roomType.value,
+    //   members.value,
+    //   authService.getIdFromToken(),
+    //   roomName.value,
+    //   isPrivate.value,
+    //   password.value
+    // );
   }
 
   
@@ -60,38 +51,136 @@ const RoomCreationComponent = () => {
         '& > :not(style)': { m: 1, width: "80%", label:{ marginTop: 0} },
       }}
       >
+      <RoomNameAndPassFieldComponent/>
+      <SelectComponent/>
+
+      <CheckBoxComponent/>
+      <IconButton onClick={sendCreationRequest}>
+        Send
+      </IconButton>
+    </Box>
+  );
+}
+
+const RoomNameAndPassFieldComponent = () => {
+  useSignals();
+
+  const handleRoomNameChange = (event: any) => {
+    roomName.value = event.target.value;
+  }
+
+  const handlePasswordChange = (event: any) => {
+    password.value = event.target.value
+  }
+
+  return (
+    
+    <Box
+      sx={{
+        '& > :not(style)': { m: 1, width: "100%", label:{ marginTop: 0} },
+      }}
+    >
       <TextField id="RoomName" label="Room name"
         onChange={handleRoomNameChange}
         variant="standard" />
 
-      <TextField id="Password" label="Password"
-        sx={{marginTop: 0}}
-        onChange={handlePasswordChange}
-        variant="standard"
-        type='password' />
-
-      <FormControl sx={{ m: 1, minWidth: 80, label: {marginTop: 0}}} required>
-        <InputLabel id="roomtype-select">Room Type</InputLabel>
+      {
+        roomType.value === DIRECT ?
+          (
+            <TextField id="Password" label="Password"
+              sx={{marginTop: 0}}
+              variant="standard"
+              value=""
+              type='password'
+              disabled />
+          ) :
+          (
+            <TextField id="Password" label="Password"
+              sx={{marginTop: 0}}
+              onChange={handlePasswordChange}
+              variant="standard"
+              value={password.value}
+              type='password' />
+          )
       
-          <Select
-            labelId="roomtype-select"
-            id="roomtype-select"
-            value={roomType === 0 ? '' : roomType}
-            onChange = {handleRoomTypeChange}
-            label="Room Type"
-          >
+      }
+    </Box>
+  )
+  
+}
 
-            <MenuItem key={GROUP} value={GROUP}>
-              Group
-            </MenuItem>
+const SelectComponent = () => {
+  useSignals();
 
-            <MenuItem key={DIRECT} value={DIRECT}>
-              Direct
-            </MenuItem>
+  const handleRoomTypeChange = (event: any) => {
+    roomType.value = event.target.value;
+    password.value = "";
+    isPrivate.value = false;
+  }
+  
+  return (
+    <FormControl sx={{ m: 1, minWidth: 80, label: {marginTop: 0}}} required>
+      <InputLabel id="roomtype-select">Room Type</InputLabel>
+    
+        <Select
+          labelId="roomtype-select"
+          id="roomtype-select"
+          value={roomType.value === 0 ? '' : roomType.value}
+          onChange = {handleRoomTypeChange}
+          label="Room Type"
+        >
 
-          </Select>
+          <MenuItem key={GROUP} value={GROUP}>
+            Group
+          </MenuItem>
+
+          <MenuItem key={DIRECT} value={DIRECT}>
+            Direct
+          </MenuItem>
+
+        </Select>
+    </FormControl>
+  );
+}
+
+const CheckBoxComponent = () => {
+  useSignals();
+
+  const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    isPrivate.value = event.target.checked;
+  }
+
+  return (
+    <Box>
+      <FormControl component="fieldset" variant="standard">
+        {
+          roomType.value === DIRECT ?
+          (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isPrivate.value}
+                  onChange={handleCheckBoxChange}
+                  name="Private-Room" />
+              }
+              label="Private Room"
+              disabled
+              />
+          
+          ) : (
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isPrivate.value}
+                  onChange={handleCheckBoxChange}
+                  name="Private-Room" />
+              }
+              label="Private Room"
+              />
+          )
+        }
       </FormControl>
-     
     </Box>
   );
 }
