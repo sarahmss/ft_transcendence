@@ -20,7 +20,6 @@ class RoomService {
 
     } catch (error) {
       console.log(error);
-      throw error;
     }
   }
 
@@ -28,12 +27,10 @@ class RoomService {
     roomId: string
   ) {
     try {
-      await axios.delete(BackLink + `/room/${roomId}`);
+      await axios.delete(BackLink + `/room/${roomId}`, {headers: authService.getAuthToken()});
 
     } catch (error) {
       console.log(error);
-      throw error;
-
     }
   }
 
@@ -47,7 +44,7 @@ class RoomService {
         userId: userId,
         roomId: roomId
       }
-      await axios.post(BackLink + "/room/leave", packaged);
+      await axios.post(BackLink + "/room/leave", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
       console.log(error);
@@ -74,7 +71,7 @@ class RoomService {
         isPrivate: isPrivate,
         password: password
       }
-      axios.post(BackLink + "/room", packaged);
+      axios.post(BackLink + "/room", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
       console.log(error);
@@ -94,7 +91,8 @@ class RoomService {
         userId: userId,
         password: password,
       }
-      await axios.post(BackLink + "/room/join", packaged);
+      await axios.post(BackLink + "/room/join", packaged, {headers: authService.getAuthToken()});
+
     } catch (error) {
       
       console.log(error);
@@ -114,7 +112,7 @@ class RoomService {
         password: password,
       }
 
-      await axios.patch(BackLink + "/room/set_pass", packaged);
+      await axios.patch(BackLink + "/room/set_pass", packaged, {headers: authService.getAuthToken()});
     } catch (error) {
       console.log(error);
       throw error;
@@ -130,7 +128,7 @@ class RoomService {
         userId: userId,
         roomId: roomId,
       }
-      await axios.patch(BackLink + "/room/unset_pass", packaged);
+      await axios.patch(BackLink + "/room/unset_pass", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
       console.log(error);
@@ -149,10 +147,36 @@ class RoomService {
         roomId: roomId,
       }
 
-      await axios.patch(BackLink + "/room/toggle_private", packaged);
+      await axios.patch(BackLink + "/room/toggle_private", packaged, {headers: authService.getAuthToken()});
     } catch (error) {
       console.log(error);
-      throw error;
+    }
+  }
+
+  async getParticipants(
+    roomId: string
+  ) {
+    try {
+      const resp = await axios.get(BackLink + `/room/${roomId}`, {headers: authService.getAuthToken()});
+      return resp.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async getCurrentUser(
+    roomId: string
+  ) {
+    try {
+      const userId = authService.getIdFromToken();
+
+      return (await axios.get(
+        `${BackLink}/room/curr/${roomId}/${userId}`,
+        {headers: authService.getAuthToken()}
+      )).data;
+
+    } catch (error) {
+      console.log(error);
     }
   }
 }

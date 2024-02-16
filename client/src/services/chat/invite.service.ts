@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BackLink } from "../../common/constants";
+import authService from "../auth.service";
 
 class InviteService {
 
@@ -15,7 +16,7 @@ class InviteService {
         roomId: roomId,
         userId: userId
       }
-      const invite = await axios.post(BackLink + "/invite", packaged);
+      const invite = await axios.post(BackLink + "/invite", packaged, {headers: authService.getAuthToken()});
       return invite;
 
     } catch (error) {
@@ -33,7 +34,7 @@ class InviteService {
         userId: userId,
         inviteId: inviteId
       }
-      return await axios.patch(BackLink + "/invite", packaged);
+      return await axios.patch(BackLink + "/invite", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
       console.log(error);

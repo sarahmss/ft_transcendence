@@ -16,4 +16,8 @@ export class ConnectedUserService {
   getConnection(userId: string): Socket {
     return this.connectedUser.get(userId);
   }
+
+  getQuant(): number {
+    return this.connectedUser.size;
+  }
 }

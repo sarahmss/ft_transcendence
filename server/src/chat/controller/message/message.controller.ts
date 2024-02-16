@@ -4,13 +4,14 @@ import { Body,
 	Get,
 	HttpException,
 	NotFoundException,
+	Param,
 	Patch, 
   Post,
   UnauthorizedException} from '@nestjs/common';
 
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { DeleteMessage,
+import {
 	GetMessage,
 	UpdateMessage,
 	createMessage } from 'src/chat/dto/Message.dto';
@@ -39,9 +40,8 @@ export class MessageController {
 		private readonly roomService: RoomService,
 		private readonly hideMessageService: HideMessageService,
 		private readonly banService: BanService,
-		private readonly emitter: EventEmitter2) {}
+		private readonly eventEmitter: EventEmitter2) {}
 
-	// Test endpoint
 	@Get('all')
 	async getAll() {
 		const messageSelection = await this.messageService.getAllMessage();
@@ -57,50 +57,6 @@ export class MessageController {
 		return sendMessages;
 	}
 
-	// Test endpoint
-	@Post('filter')
-	async getFilter(
-		@Body('roomId') roomId: string,
-		@Body('userId') userId: string,
-	) {
-		const room = await this.roomService.findRoom(roomId);
-		const user = await this.userService.findById(userId);
-		let messageSelection: Message[];
-
-		const messages = await this.messageService.findRoomMessage(room, 1000);
-		const hideMessages = await this.hideMessageService.getHideEntriesByRoomAndUser(room,
-																																										user);
-
-		switch (hideMessages.length > 0) {
-			case true:
-				const filteredMessages = messages.filter(
-					(message: Message) =>
-						!hideMessages.some((hide: HideMessage) =>
-							(message.messageId === hide.messageId))
-				);
-
-				messageSelection = filteredMessages;
-				break;
-
-			default:
-				messageSelection = messages;
-		}
-
-		const sendMessages = messageSelection.map((msg: Message) => {
-			return {
-				message: msg.message,
-				messageId: msg.messageId,
-				messageTimestamp: msg.timestamp,
-				authorId: msg.user.userId,
-				author: msg.user.userName,
-			}
-		});
-
-		console.log("number of messages VVV");
-		console.log(sendMessages.length);
-
-		return sendMessages;
-	}
 
 	@Post()
 	async message(@Body('message') message: createMessage) {
@@ -110,6 +66,10 @@ export class MessageController {
 
 			if (!user || !room)
 				throw new NotFoundException();
+
+			const memberException = await this.checkIfUserIsMember(message.userId, message.roomId)
+			if (memberException)
+				throw memberException;
 
 			const banList = await this.banService.findBanRoomUser(room);
 			const exception = this.banService.checkBanListIfUserBan(banList, user);
@@ -124,35 +84,48 @@ export class MessageController {
 																									.getBlockedUser(user, room);
 
 			const participantList: Membership[] = await this.membershipService
-																												.findParticipants(message.roomId, user.userId);
+																												.findParticipantsNotExclusive(message.roomId);
 
-			if (blackList.length > 0){
+			if (blackList.length > 0 || banList.length > 0){
 				const hideMessageClients =
 					participantList.filter(
 						(participant) =>
 							blackList.some((blocked) =>  
 								(participant.userId === blocked.blockedId ||
-								(participant.userId === blocked.blockerId &&
-								blocked.blockerId !== message.userId))) ||
+								participant.userId === blocked.blockerId) &&
+								participant.userId !== message.userId) ||
 							banList.some((banEntry: Ban) => (
 								(banEntry.banId === participant.userId)
 							))
 					);
 
+
 				this.hideMessageService
 					.createHideEntryBulk(messageInstance,
 																room,
 																hideMessageClients);
+
 			}
 
-			this.emitter.emit('message.create',
-													messageInstance,
-													user.userName,
-													blackList,
-													participantList,
-													banList
+			const messageResp = {
+				message: messageInstance.message,
+				messageId: messageInstance.messageId,
+				messsageTimestamp: messageInstance.timestamp,
+				profileImage: user.profilePicture,
+				authorId: messageInstance.userId,
+				author: user.userName,
+			}
+
+			this.broadcastToUsersWithFilter(
+				messageResp,
+				blackList,
+				participantList,
+				banList,
+				"message-response",
+				"message.create"
 			);
 
+			return messageResp;
 		}
 		catch (error) {
 			throw error;
@@ -166,6 +139,9 @@ export class MessageController {
 
 		if (!user || !room)
 			throw new NotFoundException('User or Room not found');
+		const exception = await this.checkIfUserIsMember(roomAndUser.userId, roomAndUser.roomId)
+		if (exception)
+			throw exception;
 
 		const messages = await this.messageService.findMessageWithPage(
 			room,
@@ -199,6 +175,7 @@ export class MessageController {
 				messageId: msg.messageId,
 				messageTimestamp: msg.timestamp,
 				authorId: msg.user.userId,
+				profileImage: msg.user.profilePicture,
 				author: msg.user.userName,
 			}
 		});
@@ -209,31 +186,118 @@ export class MessageController {
 	@Patch()
 	async updateMessage(@Body() updateMessage: UpdateMessage) {
 
-		let message = await this.messageService.findMessageById(updateMessage.messageId);
+
+		let message = await this.messageService.findMessageByIdJoined(updateMessage.messageId);
 		if (!message)
 			throw new HttpException('Message doesn\'t exist!', 404);
+
+		const exception = await this.checkIfUserIsMember(updateMessage.userId, message.roomId);
+		if (exception)
+			return exception;
+
+		if (message.userId !== updateMessage.userId)
+			throw new UnauthorizedException('The message doesn\'t belong to him');
 
 		const ban = await this.banService.findBanById(message.roomId, message.userId);
 		if (ban)
 			throw new UnauthorizedException("The user is banned for the time being");
 
-		return this.messageService.updateMessage(message.messageId, 
-												 updateMessage.newMessage);
+		await this.messageService.updateMessage(message.messageId, 
+																						 updateMessage.newMessage);
+		
+		const messageResp = {
+			message: updateMessage.newMessage,
+			messageId: message.messageId,
+		}
+
+		const participantList = await this.membershipService.findParticipantsNotExclusive(message.roomId);
+
+		this.broadcastToUsers(
+			messageResp,
+			participantList,
+			"message-update",
+			"broadcast.update"
+		);
+
+
+		return  messageResp;
 	}
 
-	@Delete()
-	async deleteMessage(@Body() deleteMessage: DeleteMessage) {
+	@Delete(':msgId')
+	async deleteMessage(
+		@Param('msgId') messageId: string,
+		@Param('userId') userId: string,
+	) {
 
-		let message = await this.messageService.findMessageById(deleteMessage.messageId);
+		let message = await this.messageService.findMessageById(messageId);
 
 		if (!message)
 			throw new HttpException('Message doesn\'t exist!', 404);
+
+		const exception = await this.checkIfUserIsMember(userId, message.roomId);
+		if (exception)
+			throw exception;
 
 		const ban = await this.banService.findBanById(message.roomId, message.userId);
 		if (ban)
 			throw new UnauthorizedException("The user is banned for the time being");
 
-		this.messageService.deleteMessage(message.messageId);
-		return "The message has been deleted";
+		await this.messageService.deleteMessage(message.messageId);
+
+		const particiapantList = await this.membershipService.findParticipantsNotExclusive(message.roomId);
+
+		const messageResp = {
+			messageId: message.messageId,
+		}
+		
+		this.broadcastToUsers(
+			messageResp,
+			particiapantList,
+			"delete-message",
+			"broadcast.delete"
+		);
+
+		return  messageResp;
+	}
+
+	async checkIfUserIsMember(userId: string, roomId: string) {
+		if (!(await this.membershipService.checkIfUserIsMember(roomId, userId)))
+			return new UnauthorizedException('This user it\'s not a member');
+		return false;
+	}
+
+	private broadcastToUsersWithFilter (
+		messageResp: any,
+		blackList: any[],
+		participantList: any[],
+		banList: any[],
+		event: string = "message-response",
+		emission_event: string
+	) {
+
+		this.eventEmitter.emit(emission_event,
+			messageResp,
+			blackList,
+			participantList,
+			banList,
+			event
+		);
+		
+	}
+
+	private broadcastToUsers ( 
+		messageResp: any,
+		participantList: any[],
+		event: string,
+		emission_event: string
+		) {
+
+		this.eventEmitter.emit(
+			emission_event,
+			messageResp,
+			participantList,
+			event
+		);
+
 	}
 }

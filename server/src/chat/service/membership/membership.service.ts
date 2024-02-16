@@ -87,9 +87,18 @@ export class MembershipService {
 			}
 		});
 	}
-	
+
 	async findParticipantsNotExclusive(roomId: string) {
 		return this.membershipRepository.find({
+			where: {
+				roomId: roomId
+			}
+		});
+	}
+
+	async findParticipantsNotExclusiveLeftJoin(roomId: string) {
+		return this.membershipRepository.find({
+			relations: ['user'],
 			where: {
 				roomId: roomId
 			}
@@ -111,5 +120,13 @@ export class MembershipService {
 
 	async deleteMembershipByRoom(roomId: string) {
 		await this.membershipRepository.delete({roomId: roomId});
+	}
+
+	async checkIfUserIsMember(roomId: string, userId: string) {
+		return !!(await this.membershipRepository.findOne({where: {
+			userId: userId,
+			roomId: roomId
+		}}))
+		
 	}
 }

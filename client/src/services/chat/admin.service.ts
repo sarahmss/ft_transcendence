@@ -1,5 +1,6 @@
 import axios from "axios";
 import { BackLink } from "../../common/constants";
+import authService from "../auth.service";
 
 class AdminService {
 
@@ -14,7 +15,7 @@ class AdminService {
         userId: userId,
         roomId: roomId
       }
-      await axios.patch(BackLink + "/admin", packaged);
+      await axios.patch(BackLink + "/admin", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
       console.log(error);
