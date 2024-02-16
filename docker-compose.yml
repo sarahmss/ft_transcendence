@@ -60,9 +60,6 @@ services:
         - action:
             rebuild
           path: ./client/package.json
-
-
-
 networks:
     transcendence:
         driver: bridge

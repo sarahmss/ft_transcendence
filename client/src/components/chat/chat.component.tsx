@@ -1,4 +1,5 @@
 import * as React from "react";
+
 import {
 	Box,
 	TextField,
@@ -7,22 +8,36 @@ import {
 	Avatar,
 	Grid,
 	Paper,
+	Select,
 	Card
 } from "@mui/material";
+
 import SendIcon from "@mui/icons-material/Send";
 
-const messages = [
-	{ id: 1, text: "Hi there!", sender: "bot" },
-	{ id: 2, text: "Hello!", sender: "user" },
-	{ id: 3, text: "How can I assist you today?", sender: "bot" },
-];
+import authService from "../../services/auth.service";
+import roomService from "../../services/chat/room.service";
+import messageService from "../../services/chat/message.service";
+import { messages } from '../../contexts/ChatContext'
+import { useSignals } from "@preact/signals-react/runtime";
 
 const ChatComponent = () => {
+	useSignals();
 	const [input, setInput] = React.useState("");
 
-	const handleSend = () => {
+	const handleSend = async () => {
 		if (input.trim() !== "") {
-			console.log(input);
+			try {
+
+				messageService.sendMessage(
+					input,
+					authService.getIdFromToken(),
+					"d17283d5-ffbc-4ac7-8d15-4c6d7ba02692"
+				);
+			}
+
+			catch (error) {
+				console.log(error);
+			}
 			setInput("");
 		}
 	};
@@ -32,7 +47,9 @@ const ChatComponent = () => {
 	};
 
 	return (
+
 		<Card sx={{margin:'10px',}}>
+
 			<Box
 				sx={{
 					height: "125vh",
@@ -42,10 +59,11 @@ const ChatComponent = () => {
 				}}
 			>
 				<Box sx={{ flexGrow: 1, overflow: "auto", p: 2, minWidth: 300, maxWidth: 600 }}>
-					{messages.map((message) => (
+					{messages.value.map((message: any) => (
 						<Message key={message.id} message={message} />
 					))}
 				</Box>
+
 				<Box sx={{ p: 2, backgroundColor: "background.default" }}>
 					<Grid container spacing={2}>
 						<Grid item xs={10}>
@@ -58,7 +76,9 @@ const ChatComponent = () => {
 								onChange={handleInputChange}
 							/>
 						</Grid>
+
 						<Grid item xs={1}>
+
 							<Button
 								fullWidth
 								variant="contained"
@@ -69,9 +89,11 @@ const ChatComponent = () => {
 								Send
 							</Button>
 						</Grid>
+
 					</Grid>
 				</Box>
 			</Box>
+
 		</Card>
 	);
 };
