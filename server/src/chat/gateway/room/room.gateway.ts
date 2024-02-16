@@ -118,12 +118,23 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@OnEvent('room.join')
 	@OnEvent('room.leave')
 	@OnEvent('room.admin')
-	@OnEvent('room.create')
 	@OnEvent('room.delete')
 	emitRoomToAllMembers(users: any[], room: any, emission_event: string, cb: any) {
 
 		users.forEach((user: any) => {
 			const conn = this.connectedUserService.getConnection(user.userId);
+			if (conn) {
+				const data = cb(users, room);
+				conn.emit(emission_event, data);
+			}
+		});
+	}
+
+	@OnEvent('room.create')
+	emitRoom(users: any[], room: any, emission_event: string, cb: any) {
+
+		users.forEach((user: any) => {
+			const conn = this.connectedUserService.getConnection(user);
 			if (conn) {
 				const data = cb(users, room);
 				conn.emit(emission_event, data);

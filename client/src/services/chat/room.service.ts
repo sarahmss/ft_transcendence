@@ -92,6 +92,7 @@ class RoomService {
         password: password,
       }
       await axios.post(BackLink + "/room/join", packaged, {headers: authService.getAuthToken()});
+
     } catch (error) {
       
       console.log(error);

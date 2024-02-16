@@ -3,7 +3,7 @@ import { io } from "socket.io-client"
 import { ChatLink } from '../common/constants';
 import { Signal, effect, signal } from "@preact/signals-react";
 import { getToken } from "../common/helper";
-import { fetchMessageByRoom, fetchParticipants, fetchRooms, messageMaker } from "./FetchChatData";
+import { fetchMessageByRoom, fetchParticipants, fetchRooms, messageMaker, roomMaker, userMaker } from "./FetchChatData";
 import authService from "../services/auth.service";
 
 const currentRoom: Signal<number> = signal(-1);
@@ -86,28 +86,43 @@ const adminUpdate = (response: any) => {
     privilegedInRoom.admin.value = response.admin;
 }
 
-// const removeRoom = (roomData: any) => {
-//   chat.value.rooms.value = chat.value.rooms.value.filter((room: any) => {
-//     room.roomId !== roomData.roomId
-//   });
-// }
+const handleRoomCreation = (response: any) => {
+  const room = roomMaker(
+    response.roomId,
+    response.roomName,
+    response.creationDate,
+    response.isProtected
+  );
 
-// const joinRoom = (roomData: any) => {
+  chatData.value = [
+    ...chatData.value,
+    room
+  ]
+}
 
-//   chat.value.rooms.value = [
-//     ...chat.value.rooms.value,
-//     roomData.room
-//   ]
+const handleUserJoin = (response: any) => {
+  const room: Room = chatData.value.find((room: any) => response.roomId === room.roomId);
 
-//   chat.value.rooms.value = [
-//     ...chat.value.participants.value,
-//     roomData.user
-//   ]
-// }
+  if (!room)
+    return;
+
+  room.userList.value = [
+    ...room.userList.value,
+    userMaker(
+      false,
+      false,
+      response.userId,
+      response.userName,
+      response.profileImage
+    ),
+    
+  ]
+}
 
 chatSocket.on('message-response', insertMessage);
 chatSocket.on('admin-toggle', adminUpdate);
-// chatSocket.on('left', removeRoom);
+chatSocket.on('created', handleRoomCreation);
+chatSocket.on('joined', handleUserJoin);
 
 // Effect knows what event is triggered base on the signal
 effect(

@@ -4,8 +4,9 @@ import { RoomCreationData } from 'src/chat/dto/room.dto';
 import { DIRECT, GROUP } from 'src/constants/roomType.constant';
 import { DirectRoom, GroupRoom, Room } from 'src/entity/room.entity';
 import { UsersService } from 'src/users/users.service';
-import { In, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
+import { User } from 'src/entity/user.entity';
 
 @Injectable()
 export class RoomService {
@@ -14,6 +15,7 @@ export class RoomService {
 		@InjectRepository(Room) private readonly roomRepository: Repository<Room>,
 		@InjectRepository(GroupRoom) private readonly groupRepository: Repository<GroupRoom>,
 		@InjectRepository(DirectRoom) private readonly directRepository: Repository<DirectRoom>,
+		@InjectRepository(User) private readonly userRepository: Repository<User>,
 		@Inject(UsersService) private readonly userService: UsersService,
 	) {}
 
@@ -34,9 +36,11 @@ export class RoomService {
 			roomId: room.roomId,
 			room: room,
 			isPrivate: isPrivate,
-			password: password,
-			protected: !!password
+			password: bcrypt.hashSync(password, 10),
 		});
+
+		if (password)
+			groupRoom.protected = true;
 
 		await this.groupRepository.insert(groupRoom);
 	}
@@ -89,10 +93,6 @@ export class RoomService {
 		return this.groupRepository.findOne({where: {roomId: roomId}});
 	}
 
-	async findGroupJoin() {
-		
-	}
-
 	async findRoomWithArray(roomIds: string[]) {
 		return this.roomRepository.find({where: {roomId: In(roomIds)}});
 	}
@@ -138,13 +138,23 @@ export class RoomService {
 	async getRoomByQuery(
 		query: string
 	) {
-		console.log(query);
-		console.log(`%${query}%`);
 		return this.groupRepository
 			.createQueryBuilder('group')
 			.innerJoinAndSelect('group.room', 'room')
 			.where('room.roomName LIKE :pattern', {pattern: `%${query}%`})
 			.andWhere('group.is_private = false')
 			.getMany();
+	}
+
+	async  getUserByQuey(
+		query: string
+	) {
+		return this.userRepository.find(
+			{
+				where: {
+					userName: Like(`%${query}%`)
+				}
+			}
+		);
 	}
 }

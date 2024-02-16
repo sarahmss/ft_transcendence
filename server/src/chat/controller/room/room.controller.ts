@@ -91,9 +91,25 @@ export class RoomController {
 		return roomList;
 	}
 
+	@Get("queryUser")
+	async findUserByQueryString(@Query('q') query: string) {
+
+		const userListRaw: any[] = await this.roomService.getUserByQuey(query);
+
+		const formattedRes = userListRaw.map((user: User) => {
+			return {
+				userName: user.userName,
+				userId: user.userId
+			}
+		});
+
+		return formattedRes;
+		
+	}
+
 	@Get("query")
 	async findRoomByQueryString(@Query('q') query: string) {
-		const roomRaw = await this.roomService.getRoomByQuery(query)
+		const roomRaw: any[] = await this.roomService.getRoomByQuery(query);
 
 		const formattedRes = roomRaw.map((raw: GroupRoom) => {
 			return (
@@ -121,6 +137,44 @@ export class RoomController {
 		await this.roomService.deleteRoom(room);
 		this.eventEmitter.emit('room.delete', members, room, "delete", (__: any, _:any) => {return {}});
 	}
+
+	@Post('kick')
+	async kickRoom(
+		@Body('roomId') roomId: string,
+		@Body('requestorId') requestorId: string,
+		@Body('userId') userId: string,
+	) {
+		if (!roomId || !userId)
+			throw new BadRequestException("Required information not given");
+		let user = await this.userService.findById(userId);
+		let room = await this.roomService.findRoom(roomId);
+		if (!room || !user)
+			throw new NotFoundException("Room not found");
+
+		const req = await this.membershipService.findMemberRoom(requestorId, roomId);
+		if (!req)
+			throw new NotFoundException("Requestor not found");
+
+		if (!req.admin && !req.owner )
+			throw new UnauthorizedException("Not allowed to kick");
+
+		const member = await this.membershipService.findMemberRoom(userId, roomId);
+		if (member)
+			throw new NotFoundException("The user was not found in this room");
+
+
+		await this.membershipService.leaveRoom(userId, roomId);
+		const memberList = await this.membershipService.findParticipantsNotExclusive(roomId);
+
+		this.eventEmitter.emit('room.leave', memberList, room, "left",
+			(_: any, room : Room, user_leave: User = user) => {
+				return {
+					userId: user_leave.userId,
+					roomId: room.roomId
+				}
+			}
+		);
+	}
 	
 	@Post('leave')
 	async leaveRoom(
@@ -140,18 +194,15 @@ export class RoomController {
 
 		await this.membershipService.leaveRoom(userId, roomId);
 		const memberList = await this.membershipService.findParticipantsNotExclusive(roomId);
+
 		this.eventEmitter.emit('room.leave', memberList, room, "left",
 			(_: any, room : Room, user_leave: User = user) => {
 				return {
-					message: `User ${user_leave.userName} left`,
-					userName: user_leave.userName,
 					userId: user_leave.userId,
-					room: room,
 					roomId: room.roomId
 				}
 			}
 		);
-		return "user left";
 	}
 
 	@Post()
@@ -159,13 +210,11 @@ export class RoomController {
 		let exception = await this.checkRoomCreationCondition(roomCreationData);
 		if (exception)
 			throw exception;
-		
 		try {
 			const userList = [];
 
 			for (let i: number = 0; i < roomCreationData.userId.length; i++) {
 				let user = await this.userService.findById(roomCreationData.userId[i]);
-				console.log(user);
 
 				if (user)
 					userList.push(user);
@@ -180,12 +229,19 @@ export class RoomController {
 				roomCreationData.ownerId
 			);
 
-			this.eventEmitter.emit('room.create', roomCreationData.userId, room, "joined",
-				(userId: string, room: Room ) => {
-					return {
-						userId: userId,
-						roomId: room.roomId,
-					}
+			let roomWithPass = false;
+			if (roomCreationData.roomType === GROUP && roomCreationData.password)
+				roomWithPass = true;
+
+			this.eventEmitter.emit('room.create',
+				roomCreationData.userId,
+				room,
+				"created",
+				(_: string, room: Room, roomProtect: boolean = roomWithPass ) => {
+					return ({
+						...room,
+						isProtected: roomProtect,
+					})
 				}
 			);
 			return room;
@@ -196,9 +252,10 @@ export class RoomController {
 	}
 
 	@Post('join')
-	async joinRoom(@Body('userJoin') userJoin: RoomJoinData) {
+	async joinRoom(@Body() userJoin: RoomJoinData) {
 		const room: Room = await this.roomService.findRoom(userJoin.roomId);
 		const user: User = await this.userService.findById(userJoin.userId);
+
 		let exception = await this.checkRoomJoinCondition(userJoin, room, user);
 
 		if (exception)
@@ -207,13 +264,15 @@ export class RoomController {
 		try {
 			this.membershipService.joinSingleUser(user, room, false);
 			const  memberList = await this.membershipService.findParticipantsNotExclusive(room.roomId);
-			this.eventEmitter.emit('room.join', memberList, userJoin.userId, room, "joined",
+			this.eventEmitter.emit('room.join',
+				memberList,
+				room,
+				"joined",
 				(_: any, __: any, member: User = user) => {
 					return {
 						userName: member.userName,
 						userId: member.userId,
-						message: `User: ${member.userName}, joined`,
-						room: room
+						profileImage: member.profilePicture,
 					};
 				}
 			);

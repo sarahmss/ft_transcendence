@@ -16,8 +16,15 @@ class QueryService {
   }
 
   async queryUser(
-    
+    pattern: string
   ) {
+
+    const userList = await axios.get(
+      `${BackLink}/room/queryUser?q=${pattern}`,
+      {headers: authService.getAuthToken()}
+    );
+
+    return userList.data;
     
   }
 }

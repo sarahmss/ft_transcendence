@@ -198,6 +198,7 @@ const findMessage = (room: Room, messageId : string) => {
 export {
   messageMaker,
   roomMaker,
+  userMaker,
   fetchMessageByRoom,
   fetchParticipants,
   fetchRooms

@@ -21,6 +21,8 @@ const RoomSelectionComponent = () => {
 }
 
 const DisabledComponent = () => {
+  useSignals();
+
   return (
     <FormControl sx={{ height: '5%', m: 1, minWidth: 80, width: '75%', label: {marginTop: 0} }} disabled> 
       <InputLabel id="room-selector">Unavailable</InputLabel>
@@ -41,6 +43,8 @@ const DisabledComponent = () => {
 
 const EnabledComponent = () => {
   
+  useSignals();
+
   const handleRoomChange = (event: SelectChangeEvent<number>) => {
     if (typeof event.target.value === 'number')
       currentRoom.value = event.target.value;

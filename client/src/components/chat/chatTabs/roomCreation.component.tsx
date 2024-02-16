@@ -1,46 +1,94 @@
 import { Box,
+  Button,
   Checkbox,
   FormControl,
   FormControlLabel,
+  FormGroup,
+  FormHelperText,
   IconButton,
   InputLabel,
   MenuItem,
   Select,
   TextField } from '@mui/material';
 
-import { signal } from '@preact/signals-react';
+import { Signal, signal } from '@preact/signals-react';
 import { useSignals } from '@preact/signals-react/runtime';
+import SearchIcon from '@mui/icons-material/Search';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 
 import { DIRECT, GROUP } from '../../../common/constants';
 import authService from '../../../services/auth.service';
+import React from 'react';
+import queryService from '../../../services/chat/query.service';
+import roomService from '../../../services/chat/room.service';
 
 const roomType = signal(0);
 const roomName = signal("");
+const members: Signal<string[]> = signal([]);
+
 const password = signal("");
-const members = signal([]);
 const isPrivate = signal(false);
+
+const errorState = {
+                      roomName: signal(false),
+                      roomType: signal(false),
+                      members: signal(false)
+                    };
 
 const RoomCreationComponent = () => {
   useSignals();
 
-  const sendCreationRequest = () => {
+  const checkData = (): boolean => {
+
+    if (roomType.value === 0)
+      errorState.roomType.value = true;
+    if (roomName.value === "")
+      errorState.roomName.value = true;
+    if ((members.value.length !== 1 && roomType.value === DIRECT) ||
+      (members.value.length === 0 && roomType.value === GROUP)
+    )
+      errorState.members.value = true;
+
+    if (errorState.members.value || errorState.roomName.value || errorState.roomType.value)
+      return true;
+    return false;
+  }
+
+  const resetState = () => {
     
-    console.log(
-        roomType.value,
-        members.value,
-        authService.getIdFromToken(),
-        roomName.value,
-        isPrivate.value,
-        password.value
+    roomType.value = 0;
+    members.value = [];
+    roomName.value = "";
+    password.value = "";
+    isPrivate.value = false;
+    
+    errorState.roomType.value = false;
+    errorState.roomName.value = false;
+    errorState.members.value = false;
+  }
+
+  const sendCreationRequest = () => {
+
+    if (checkData())
+      return;
+
+    const ownerId = authService.getIdFromToken();
+
+    members.value = [
+      ...members.value,
+      ownerId
+    ];
+
+    roomService.createRoom(
+      roomType.value,
+      members.value,
+      ownerId,
+      roomName.value,
+      isPrivate.value,
+      password.value
     );
-    // roomService.createRoom(
-    //   roomType.value,
-    //   members.value,
-    //   authService.getIdFromToken(),
-    //   roomName.value,
-    //   isPrivate.value,
-    //   password.value
-    // );
+    resetState();
   }
 
   
@@ -53,11 +101,15 @@ const RoomCreationComponent = () => {
       >
       <RoomNameAndPassFieldComponent/>
       <SelectComponent/>
-
       <CheckBoxComponent/>
-      <IconButton onClick={sendCreationRequest}>
-        Send
-      </IconButton>
+      <AddUserMemberListComponent/>
+  		<Button
+  			variant="contained"
+  			onClick={sendCreationRequest}
+  			sx={{backgroundColor:"#B700cc"}}
+  		>
+  			<b>Create</b>
+  		</Button>
     </Box>
   );
 }
@@ -82,6 +134,7 @@ const RoomNameAndPassFieldComponent = () => {
     >
       <TextField id="RoomName" label="Room name"
         onChange={handleRoomNameChange}
+        value={roomName.value}
         variant="standard" />
 
       {
@@ -114,8 +167,10 @@ const SelectComponent = () => {
 
   const handleRoomTypeChange = (event: any) => {
     roomType.value = event.target.value;
-    password.value = "";
-    isPrivate.value = false;
+    if (roomType.value === DIRECT) {
+      password.value = "";
+      isPrivate.value = false;
+    }
   }
   
   return (
@@ -184,5 +239,135 @@ const CheckBoxComponent = () => {
     </Box>
   );
 }
+
+const queryRes: Signal<any[]> = signal([]);
+
+const AddUserMemberListComponent = () => {
+  useSignals();
+
+  const [query, setQuery] = React.useState("");
+
+  const handleQueryChange = (event: any) => {
+    setQuery(event.target.value);
+  }
+
+
+
+
+  const handleUserQuery = async () => {
+    const currId = authService.getIdFromToken();
+
+    const users: any[] = await queryService.queryUser(query);
+
+
+    queryRes.value = users.filter(
+      (user) => user.userId !== currId);
+  }
+
+  return (
+    <Box>
+      <TextField id="UserQuery"
+        label="User query"
+        onChange={handleQueryChange}
+        value={query}
+        variant="standard" />
+
+      <IconButton sx={{marginTop: "13px"}} onClick={handleUserQuery}>
+        <SearchIcon/>
+      </IconButton>
+      
+      <Box 
+        sx={{
+          backgroundColor: "#dbdbdb",
+          minHeight: 130,
+          overflowY: "auto",
+          maxHeight: 130 }}
+      >
+
+        <FormControl
+          required
+          component="fieldset"
+          id='userQuery'
+          sx={{ m: 3 }}
+          variant="standard"
+        >
+            <FormGroup>
+            {
+              queryRes.value.map((user: any) => {
+                  return (
+                    <FormControlLabel
+                      control={
+                        <MemberAddRemoveComponent user={user}/>
+                      }
+                      key={user.userId}
+                      label={user.userName}
+                    />
+                  );
+              })
+            
+            }
+            </FormGroup>
+        </FormControl>
+      </Box>
+      {
+        errorState.members.value ?
+        (<FormHelperText >You should choose the appropriate amount of members for the room choosen</FormHelperText>) :
+        (<span style={{ visibility: 'hidden' }} />)
+      }
+    </Box>
+  );
+}
+
+const MemberAddRemoveComponent = ({user} : {user: any}) => {
+
+  useSignals();
+  
+  const addMember = (event: any) => {
+    event.preventDefault();
+
+    members.value = [
+      ...members.value,
+      user.userId
+    ]
+  }
+
+  const removeMember = (event: any) => {
+    event.preventDefault();
+
+    members.value = members.value.filter((userId: string) =>
+      userId !== user.userId
+    );
+  }
+
+  return (
+    <Box>
+      {
+        members.value.some((userId) => userId === user.userId ) ? (
+
+          <IconButton
+            onClick={removeMember}
+            name={user.userName}
+            value={user.userId}>
+
+            <PersonRemoveIcon/>
+
+          </IconButton>
+        ) : (
+
+          <IconButton
+            onClick={addMember}
+            name={user.userName}
+            value={user.userId}>
+
+            <PersonAddIcon/>
+
+          </IconButton>
+        )
+      }
+    </Box>
+  );
+}
+
+
 
 export default RoomCreationComponent;

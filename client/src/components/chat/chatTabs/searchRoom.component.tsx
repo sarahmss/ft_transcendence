@@ -84,7 +84,8 @@ const password = signal("");
 
 const RoomResultComponent = ({room} : {room: any}) => {
   useSignals();
-  const [showPrompt, setStatusPrompt] = React.useState(false);
+
+  const [showPrompt, setPrompt] = React.useState(false);
 
   const handleJoin = () => {
     roomService.joinRoom(
@@ -92,10 +93,11 @@ const RoomResultComponent = ({room} : {room: any}) => {
       authService.getIdFromToken(),
       password.value
     );
+    password.value = "";
   }
 
   const togglePrompt = () => {
-    setStatusPrompt(!showPrompt);
+    setPrompt(!showPrompt);
   }
 
 
@@ -128,7 +130,7 @@ const RoomResultComponent = ({room} : {room: any}) => {
 
             <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'flex-end' }}>
               {
-                room.isProtected ?
+                room.protected ?
                   (
                     <IconButton onClick={togglePrompt}>
                       <LoginIcon />
