@@ -1,4 +1,4 @@
-import { Box, Avatar, Icon, IconButton, ListItem, ListItemAvatar, ListItemText } from "@mui/material";
+import { Box, Avatar, Icon, IconButton, ListItem, ListItemAvatar, ListItemText, Select, InputLabel, FormControl } from "@mui/material";
 
 import LogoutIcon from '@mui/icons-material/Logout';
 import StarIcon from '@mui/icons-material/Star';
@@ -6,6 +6,7 @@ import StarIcon from '@mui/icons-material/Star';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
+import PunchClockIcon from '@mui/icons-material/PunchClock';
 
 import { User, chatData, currentRoom, privilegedInRoom } from "../../../contexts/ChatContext";
 import React from "react";
@@ -22,29 +23,12 @@ const UserActionChatComponent = ({user}: {user: User}) => {
   useSignals();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const [showPrompt, setPrompt] = React.useState(false);
   const open = Boolean(anchorEl);
+  const [action, setAction] = React.useState(-1);
 
-  const handleBlock = () => {
-    
-    blackListService.banSingle(
-      authService.getIdFromToken(),
-      user.userId,
-      chatData.value[currentRoom.value].roomId,
-      LOCAL_BLOCK,
-      300000
-    );
-    handleClose();
-  }
-
-  const handleBan = () => {
-    
-    banService.banUser(
-      authService.getIdFromToken(),
-      user.userId,
-      chatData.value[currentRoom.value].roomId,
-      300000
-    );
-    handleClose();
+  const togglePrompt = () => {
+    setPrompt(!showPrompt);
   }
 
   const handleToggleAdmin = () => {
@@ -59,9 +43,10 @@ const UserActionChatComponent = ({user}: {user: User}) => {
 
   const handleKick = () => {
 
-    roomService.leaveRoom (
-      user.userId,
+    roomService.kickUser (
       chatData.value[currentRoom.value].roomId,
+      user.userId,
+      authService.getIdFromToken()
     );
     handleClose();
   }
@@ -77,12 +62,12 @@ const UserActionChatComponent = ({user}: {user: User}) => {
 
   // Unprivileged actions
   const unprivilegedAction = [
-    {action: handleBlock, label: 'Mute'},
+    {action: togglePrompt, label: 'Mute'},
   ];
 
   // With Privilege
   const privilegedAction = [
-    {action: handleBan, label: 'Ban'},
+    {action: togglePrompt, label: 'Ban'},
     {action: handleKick, label: 'Kick'},
     {action: handleToggleAdmin, label: 'Toggle admin'},
   ];
@@ -133,7 +118,91 @@ const UserActionChatComponent = ({user}: {user: User}) => {
         }
         
       </Menu>
+      {
+        showPrompt ? (<TimeSelectComponent user={{ action: action, user: user}} />) : 
+        (<span style={{ visibility: 'hidden' }} />)
+      }
+      
     </Box>
+  );
+}
+
+const TimeSelectComponent = ({user}: {user: any}) => {
+
+  useSignals();
+
+  const [time, setTime] = React.useState(-1);
+
+  const handleTimeChange = (event: any) => {
+    setTime(event.target.value);
+  }
+
+  const handleBlock = () => {
+    
+    blackListService.banSingle(
+      authService.getIdFromToken(),
+      user.userId,
+      chatData.value[currentRoom.value].roomId,
+      LOCAL_BLOCK,
+      time
+    );
+  }
+
+  const handleBan = () => {
+    
+    banService.banUser(
+      authService.getIdFromToken(),
+      user.userId,
+      chatData.value[currentRoom.value].roomId,
+      time
+    );
+  }
+
+  const banOrMuteTarget = () => {
+
+    if (time <= 0)
+      return;
+
+    switch (user.action) {
+      case 1:
+        handleBan();
+        break;
+      case 2:
+        handleBlock();
+        break;
+    }
+    
+  }
+
+  return (
+    <FormControl sx={{ m: 1, minWidth: 80, label: {marginTop: 0}}} required>
+      <InputLabel id="roomtype-select">Room Type</InputLabel>
+    
+        <Select
+          labelId="roomtype-select"
+          id="roomtype-select"
+          value={time === -1 ? '' : time}
+          onChange = {handleTimeChange}
+          label="Room Type"
+        >
+
+          <MenuItem key={"30seg"} value={30000}>
+            30 seg
+          </MenuItem>
+
+          <MenuItem key={"1min"} value={60000}>
+            1 min
+          </MenuItem>
+
+          <MenuItem key={"5min"} value={300000}>
+            5 min
+          </MenuItem>
+        </Select>
+
+        <IconButton onClick={banOrMuteTarget}>
+          <PunchClockIcon/>
+        </IconButton>
+    </FormControl>
   );
 }
 
@@ -146,7 +215,6 @@ const ChatUser = ({user}:{user: User}) => {
       chatData.value[currentRoom.value].roomId,
     );
   }
-
 
   return (
 

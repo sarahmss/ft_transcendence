@@ -21,9 +21,6 @@ const SearchRoomComponent = () => {
 
   const queryChange = (event: any) => {
     setQuery(event.target.value);
-    if (event.key === 'Enter') {
-      console.log(event);
-    }
   }
 
   const handleSearch = async (event: any) => {
@@ -31,7 +28,6 @@ const SearchRoomComponent = () => {
     const room: any[] = await queryService.queryRoom(query);
 
     queryRes.value = room;
-    console.log(queryRes.value);
   }
 
   return (
@@ -114,7 +110,7 @@ const RoomResultComponent = ({room} : {room: any}) => {
 
         {
           room.protected ?
-            (<LockIcon sx={{fontSize: "medium"}}/>) :
+           (<LockIcon sx={{fontSize: "medium"}}/>) :
             (<span style={{ visibility: 'hidden' }} />)
         }
 

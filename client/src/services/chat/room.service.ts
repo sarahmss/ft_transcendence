@@ -179,6 +179,37 @@ class RoomService {
       console.log(error);
     }
   }
+
+  async kickUser(
+    roomId: string,
+    userId: string,
+    requestorId: string,
+  ) {
+    try {
+
+      const packaged = {
+        roomId: roomId,
+        userId: userId,
+        requestorId: requestorId,
+      }
+
+      await axios.post(`${BackLink}/room/kick`, packaged,
+        {headers: authService.getAuthToken()});
+    } catch (error) {
+
+      console.log(error);
+    }
+  }
+
+  async getRoomById(rid: string) {
+    try {
+      const room = await axios.get(`${BackLink}/room/s/${rid}`, {headers: authService.getAuthToken()});
+      return room.data;
+    } catch (error) {
+      console.log(error);
+    }
+    
+  }
 }
 
 const roomService = new RoomService();

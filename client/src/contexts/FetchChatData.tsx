@@ -1,7 +1,8 @@
 import authService from "../services/auth.service";
+import inviteService from "../services/chat/invite.service";
 import messageService from "../services/chat/message.service";
 import roomService from "../services/chat/room.service";
-import { Message, Room, User, chatData } from "./ChatContext";
+import { Message, Room, User, chatData, invitationIdList } from "./ChatContext";
 import { signal } from "@preact/signals-react";
 
 const addRoom = (room: Room) => {
@@ -31,6 +32,13 @@ const addUser = (room: Room, user: User) => {
   
 }
 
+const addInvitation = (inviteId: string) => {
+  invitationIdList.value = [
+    ...invitationIdList.value,
+    inviteId
+  ]
+}
+
 const updateMessageContent = (messageId: string, roomId: string, newMessage: string) => {
 
   const room: Room | undefined = findRoom(roomId);
@@ -56,6 +64,7 @@ const roomMaker = (
   roomId: string,
   roomName: string,
   creationDate: Date,
+  isPrivate: boolean,
   isProtected?: boolean,
 ) : Room => {
   return (
@@ -68,6 +77,7 @@ const roomMaker = (
       messages: signal([]),
       userList: signal([]),
       fetchStatus: false,
+      isPrivate: signal(isPrivate),
     }
   );
 }
@@ -120,6 +130,7 @@ const fetchRooms = async () => {
         room.roomId,
         room.roomName,
         room.creationDate,
+        room.isPrivate,
         room.isProtected,
     ));
 
@@ -131,8 +142,8 @@ const fetchMessageByRoom = async (index: number, roomId: string, pageNumber: num
   const messageRaw: any[] = await messageService.getMessage(
     authService.getIdFromToken(),
     roomId,
-    pageNumber,
-    50
+    -1,
+    -1
   );
 
   if (messageRaw.length <= 0)
@@ -195,11 +206,26 @@ const findMessage = (room: Room, messageId : string) => {
   );
 }
 
+const fetchInvitations = async () => {
+
+  const invites: any[] = await inviteService.getInvitation(authService.getIdFromToken());
+
+  if (!invites)
+    return;
+
+  invites.forEach( (inv) => {
+    addInvitation(inv.inviteId);
+  })
+  
+  
+}
+
 export {
   messageMaker,
   roomMaker,
   userMaker,
   fetchMessageByRoom,
   fetchParticipants,
+  fetchInvitations,
   fetchRooms
 };

@@ -51,7 +51,7 @@ const EnabledComponent = () => {
   };
 
   return (
-    <FormControl sx={{ m: 1, minWidth: 80, width: '90%', label: {marginTop: 0}}} fullWidth required>
+    <FormControl sx={{ m: 1, minWidth: 80, width: '90%', label: {marginTop: 0}, overflow: 'auto' }} fullWidth required>
       <InputLabel id="room-selector">Room</InputLabel>
       
         <Select

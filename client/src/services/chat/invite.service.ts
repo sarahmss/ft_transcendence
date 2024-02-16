@@ -16,8 +16,7 @@ class InviteService {
         roomId: roomId,
         userId: userId
       }
-      const invite = await axios.post(BackLink + "/invite", packaged, {headers: authService.getAuthToken()});
-      return invite;
+      await axios.post(BackLink + "/invite", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
       console.log(error);
@@ -42,6 +41,23 @@ class InviteService {
 
     }
     
+  }
+
+  async getInvitation (
+    userId: string
+  ) {
+    try {
+
+      const res = await axios.post(
+        `${BackLink}/invite/get/getInvitation`,
+        {userId: userId},
+        {headers: authService.getAuthToken()}
+      );
+      return res.data;
+      
+    } catch (error) {
+      console.log(error);
+    }
   }
   
 }
