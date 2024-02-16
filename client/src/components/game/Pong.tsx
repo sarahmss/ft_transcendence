@@ -22,13 +22,13 @@ const Pong: React.FC = () => {
     	<>
     	  {!isConnected && <Box>Connecting...</Box>}
     	  {current_player?.name && !current_player?.state && (
-    	    <Box component="span" className='list-title'>
+    	    <Box className='list-title' sx={{ my:2 }}>
     	      {!current_player?.state && !current_player?.room && (
 				<Button
 					variant="contained"
 					size="large"
 					onClick={addOnQueue}
-					sx={{backgroundColor:"#B700cc", mb:5}}
+					sx={{backgroundColor:"#B700cc", mb:5, margin:'auto'}}
 				>
 					Enter a game
 				</Button>

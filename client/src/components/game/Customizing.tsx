@@ -48,7 +48,7 @@ const Customizing: React.FC<CustomizingProps> = (props) => {
 
   return (
     <>
-    <Stack sx={{ margin: 'auto', gap:'1.5rem', width: '400px', minWIdth: '250px' }}>
+    <Stack sx={{ margin: 'auto', gap:'1.5rem', width: '650px', minWIdth: '250px' }}>
       <Box
         className='flex-center preview'
         sx={{
@@ -57,26 +57,26 @@ const Customizing: React.FC<CustomizingProps> = (props) => {
         }}
       >
         <Box
-          className='paddle paddle-right'
+          className='paddle'
           sx={{
             backgroundColor: colorPaddle,
             borderRadius: roundedMode === 'yes' ? '15px' : '0px',
             width: '10px',
             height: '50px',
-            margin: '285px'
-          }}
-        ></Box>
-        <Box
-          className='paddle paddle-left'
-          sx={{
-            backgroundColor: colorPaddle,
-            borderRadius: roundedMode === 'yes' ? '15px' : '0px',
-            width: '10px',
-            height: '50px',
-            margin: '15px'
+            // margin: '285px'
           }}
         ></Box>
         <Box className='preview-line'></Box>
+        <Box
+          className='paddle'
+          sx={{
+            backgroundColor: colorPaddle,
+            borderRadius: roundedMode === 'yes' ? '15px' : '0px',
+            width: '10px',
+            height: '50px',
+            // margin: '15px'
+          }}
+        ></Box>
       </Box>
       <Box display="flex" sx={{ flexDirection:"column", gap: '0.75rem', my: '2rem' }} >
         <Box display="flex" sx={{ gap:'1rem', width: '25rem', my: '1.5rem' }} >
@@ -107,32 +107,6 @@ const Customizing: React.FC<CustomizingProps> = (props) => {
             onChange={(e) => setColorPaddle(e.target.value)}
           />
         </Box>
-        <Box display="flex" sx={{ gap:'3rem' }}>
-          <Box component="span">Rounded Mode</Box>
-          <FormControlLabel
-            control={
-            <Radio
-              checked={roundedMode === 'yes'}
-              onChange={handleRoundedModeChange}
-              value='yes'
-              name='roundedMode'
-            />
-            }
-            label='Yes'
-          />
-          <FormControlLabel
-            control={
-            <Radio
-              name='roundedMode'
-              value='no'
-              checked={roundedMode === 'no'}
-              onChange={handleRoundedModeChange}
-            />
-            }
-            label='No'
-            />
-        </Box>
-
         <Box display="flex" sx={{ gap:'3rem' }}>
           <Box component="span">Do you prefer to accelerate the ball?</Box>
           <FormControlLabel
