@@ -129,4 +129,9 @@ export class MembershipService {
 		}}))
 		
 	}
+
+	async countPrivileged (roomId: string) {
+		const adminCount = this.membershipRepository.count( {where: {roomId: roomId, admin: true}});
+		return adminCount;
+	}
 }

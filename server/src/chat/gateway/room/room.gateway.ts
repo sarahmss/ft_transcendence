@@ -119,8 +119,10 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@OnEvent('room.leave')
 	@OnEvent('room.admin')
 	@OnEvent('room.delete')
+	@OnEvent('room.private')
 	emitRoomToAllMembers(users: any[], room: any, emission_event: string, cb: any) {
 
+		console.log(users);
 		users.forEach((user: any) => {
 			const conn = this.connectedUserService.getConnection(user.userId);
 			if (conn) {
@@ -140,6 +142,15 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				conn.emit(emission_event, data);
 			}
 		});
+	}
+
+	@OnEvent('invite-send')
+	emitInvite(targetId: string, inviteId: string, emission_event: string) {
+		const conn = this.connectedUserService.getConnection(targetId);
+
+		if (conn)
+			conn.emit(emission_event, { inviteId: inviteId });
+		
 	}
 
 	// Will listen the event emitted by the emitter in the controller

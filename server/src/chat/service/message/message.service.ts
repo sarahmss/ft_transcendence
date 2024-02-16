@@ -59,6 +59,18 @@ export class MessageService {
 		return query.getMany();
 	}
 
+	async findRoomMessageAll(room: Room): Promise<Message[]> {
+
+		const query = this.messageRepository
+			.createQueryBuilder('msg')
+			.innerJoinAndSelect('msg.user', 'user')
+			.where('msg.room_id = :rid', {rid: room.roomId})
+			.orderBy('msg.timestamp', 'DESC');
+
+		return query.getMany();
+	}
+	
+
 	async findMessageWithPage(
 							  room: Room,
 							  page: number,

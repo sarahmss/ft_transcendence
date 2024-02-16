@@ -143,11 +143,21 @@ export class MessageController {
 		if (exception)
 			throw exception;
 
-		const messages = await this.messageService.findMessageWithPage(
-			room,
-			roomAndUser.page,
-			roomAndUser.quant
-		);
+		let messages: Message[];
+
+		if (roomAndUser.page === -1) {
+			messages = await this.messageService.findRoomMessageAll(
+				room
+			);
+		}
+		else {
+			messages = await this.messageService.findMessageWithPage(
+				room,
+				roomAndUser.page,
+				roomAndUser.quant
+			);
+			
+		}
 
 		let messageSelection: Message[];
 

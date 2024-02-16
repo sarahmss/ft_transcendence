@@ -63,6 +63,20 @@ export class RoomController {
 		
 	}
 
+	@Get('s/:rid')
+	async getRoomMember(@Param('rid') roomId: string) {
+		const room = await this.roomService.findRoom(roomId);
+		const groom = await this.roomService.findGroup(roomId);
+
+		return ({
+			roomId: room.roomId,
+			roomName: room.roomName,
+			creationDate: room.creationDate,
+			isPrivate: groom.isPrivate,
+			isProtected: groom.protected
+		});
+	}
+
 	@Post('list_room')
 	async getListRoom(@Body('userId') userId: string) {
 
@@ -84,6 +98,7 @@ export class RoomController {
 				case GROUP:
 					const groupRoom = (await this.roomService.findGroup(room.roomId));
 					room.isProtected = groupRoom.protected;
+					room.isPrivate = groupRoom.isPrivate;
 					break;
 			}
 			roomList.push(room);
@@ -146,10 +161,12 @@ export class RoomController {
 	) {
 		if (!roomId || !userId)
 			throw new BadRequestException("Required information not given");
+
 		let user = await this.userService.findById(userId);
 		let room = await this.roomService.findRoom(roomId);
 		if (!room || !user)
-			throw new NotFoundException("Room not found");
+			throw new NotFoundException();
+
 
 		const req = await this.membershipService.findMemberRoom(requestorId, roomId);
 		if (!req)
@@ -159,14 +176,17 @@ export class RoomController {
 			throw new UnauthorizedException("Not allowed to kick");
 
 		const member = await this.membershipService.findMemberRoom(userId, roomId);
-		if (member)
+		if (!member)
 			throw new NotFoundException("The user was not found in this room");
 
-
 		await this.membershipService.leaveRoom(userId, roomId);
+
 		const memberList = await this.membershipService.findParticipantsNotExclusive(roomId);
 
-		this.eventEmitter.emit('room.leave', memberList, room, "left",
+		this.eventEmitter.emit('room.leave',
+			memberList,
+			room,
+			"left",
 			(_: any, room : Room, user_leave: User = user) => {
 				return {
 					userId: user_leave.userId,
@@ -183,19 +203,30 @@ export class RoomController {
 
 		if (!roomId || !userId)
 			throw new BadRequestException("Required information not given");
+
+
 		let user = await this.userService.findById(userId);
 		let room = await this.roomService.findRoom(roomId);
 		if (!room || !user)
 			throw new NotFoundException("Room not found");
 
 		const member = await this.membershipService.findMemberRoom(userId, roomId);
-		if (member)
+		if (!member)
 			throw new NotFoundException("The user was not found in this room");
+
+		const adminCount = await this.membershipService.countPrivileged(roomId);
+		if (member.admin && adminCount <= 1)
+			throw new UnauthorizedException("There must be at least one admin");
 
 		await this.membershipService.leaveRoom(userId, roomId);
 		const memberList = await this.membershipService.findParticipantsNotExclusive(roomId);
 
-		this.eventEmitter.emit('room.leave', memberList, room, "left",
+		this.eventEmitter.emit('room.leave',
+			[...memberList,
+				{userId: userId}
+			],
+			room,
+			"left",
 			(_: any, room : Room, user_leave: User = user) => {
 				return {
 					userId: user_leave.userId,
@@ -233,14 +264,17 @@ export class RoomController {
 			if (roomCreationData.roomType === GROUP && roomCreationData.password)
 				roomWithPass = true;
 
+			const privStatus = roomCreationData.isPrivate ? true : false;
+
 			this.eventEmitter.emit('room.create',
 				roomCreationData.userId,
 				room,
 				"created",
-				(_: string, room: Room, roomProtect: boolean = roomWithPass ) => {
+				(_: string, room: Room, roomProtect: boolean = roomWithPass, roomPrivate: boolean = privStatus) => {
 					return ({
 						...room,
 						isProtected: roomProtect,
+						isPrivate: roomPrivate
 					})
 				}
 			);
@@ -262,21 +296,21 @@ export class RoomController {
 			throw exception;
 
 		try {
-			this.membershipService.joinSingleUser(user, room, false);
-			const  memberList = await this.membershipService.findParticipantsNotExclusive(room.roomId);
+			await this.membershipService.joinSingleUser(user, room, false);
+			const memberList = await this.membershipService.findParticipantsNotExclusive(room.roomId);
 			this.eventEmitter.emit('room.join',
 				memberList,
 				room,
 				"joined",
-				(_: any, __: any, member: User = user) => {
+				(_: any,room: Room, member: User = user) => {
 					return {
 						userName: member.userName,
 						userId: member.userId,
 						profileImage: member.profilePicture,
+						roomId: room.roomId,
 					};
 				}
 			);
-			return "User Joined"
 		}
 		catch (error) {
 			throw error;
@@ -311,6 +345,7 @@ export class RoomController {
 		const exception = await this.permissionCheck(requestorId, roomId);
 		if (exception)
 			throw exception
+
 
 		await this.roomService.unsetPassRoom(roomId);
 		return "password removed";
@@ -349,9 +384,25 @@ export class RoomController {
 		if (exception)
 			throw exception
 
+		const requestor = await this.membershipService.findMemberRoom(requestorId, roomId);
+		if (!requestor.admin && !requestor.owner)
+			throw new UnauthorizedException();
+
 		const status = await this.roomService.togglePrivate(roomId);
-		return `group chat visibily toggle: ${status ? "private": "public"}`;
-		
+
+		const memberList = await this.membershipService.findParticipantsNotExclusive(roomId);
+
+		this.eventEmitter.emit('room.private',
+			memberList,
+			"",
+			"private-toggle",
+			(_: any, __ : Room, rid: string = roomId, isPrivate: boolean = status) => {
+				return {
+					roomId: rid,
+					isPrivate: isPrivate
+				}
+			}
+		);
 	}
 
 	private async permissionCheck (requestorId: string, roomId: string) {
