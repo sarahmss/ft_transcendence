@@ -58,6 +58,7 @@ export class User {
 
 	@OneToMany(() =>Friends, friendsTable => friendsTable.owner, {
 		cascade: true,
+		onDelete: 'CASCADE',
 	})
 	friends: Friends[];
 
