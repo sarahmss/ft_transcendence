@@ -2,11 +2,12 @@ import React, { Component } from "react";
 import TransPong from '../assets/home.jpeg';
 import "./home.component.css"
 import {FrontLogin, FrontGame} from "./../common/constants";
-import { Grid, Button, Link, Box } from "@mui/material";
+import { Grid, Button, Link, Box, Typography } from "@mui/material";
 import ChatComponent from "./chat/chat.component";
 import authService from "../services/auth.service";
 import { appSocket } from "./../common/constants";
 import { userLogged } from "../contexts/ChatContext";
+import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 
 const Home: React.FC = () => {
 	const [isLogged, setIsLogged] = React.useState(false);
@@ -61,16 +62,39 @@ const Home: React.FC = () => {
 						</Button>
 					</Link>
 				) : (
-					<Link href={FrontLogin}>
-						<Button
-							className="md-primary"
-							variant='contained'
-							size='large'
-							sx={{ backgroundColor: '#B700cc' }}
-							>
-							Please, Log In !
-						</Button>
-					</Link>
+
+					<Grid container spacing={3} sx={{ display: 'flex',
+					 			alignItems: 'center',
+								justifyContent: "center",
+								marginTop:"50%" }}>
+						<Grid item  >
+							<Typography variant="h4" 
+							sx={{
+								mr: 2,
+								display: { xs: 'none', md: 'flex' },
+								fontFamily: 'monospace',
+								fontWeight: 700,
+								letterSpacing: '.3rem',
+								color: '#B700cc',
+								textDecoration: 'none',
+							}}>
+							TRANSCENDENCE
+							<SelfImprovementIcon/>
+							</Typography>
+						</Grid>
+						<Grid item >
+							<Link href={FrontLogin}>
+								<Button
+									className="md-primary"
+									variant='contained'
+									size='large'
+									sx={{ backgroundColor: '#B700cc' }}
+									>
+									Please, Log In !
+								</Button>
+							</Link>
+						</Grid>
+					</Grid>
 				)}
 					</Box>
 				</Grid>

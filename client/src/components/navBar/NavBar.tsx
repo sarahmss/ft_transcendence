@@ -136,7 +136,7 @@ const NavBar: React.FC = () => {
               pagesLogged.map((page) => (
                 <MenuItem key={page.label} onClick={handleCloseNavMenu}>
                   <Link to={page.link} style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <Typography textAlign="center">{page.label}</Typography>
+                    <Typography textAlign="center" sx={{fontFamily: 'monospace'}}>{page.label}</Typography>
                   </Link>
                 </MenuItem>
               ))
@@ -144,7 +144,7 @@ const NavBar: React.FC = () => {
               pagesUnlogged.map((page) => (
                 <MenuItem key={page.label} onClick={handleCloseNavMenu}>
                   <Link to={page.link} style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <Typography textAlign="center">{page.label}</Typography>
+                    <Typography textAlign="center" sx={{fontFamily: 'monospace'}}>{page.label}</Typography>
                   </Link>
                 </MenuItem>
               ))

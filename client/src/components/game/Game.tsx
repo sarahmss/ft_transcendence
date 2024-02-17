@@ -116,7 +116,7 @@ class PongGame extends React.Component<{}, PongGameState> {
 				if (current_player.state !== 'watching')
 					corPhaser2 = parseInt(current_player.customizations.paddleColor.replace("#", "0x"));
 				else
-					corPhaser2 = 0xffffff;
+					corPhaser2 = 0xfff;
 				this.setState({player2: this.state.game.scene.scenes[0].add.rectangle(
 					player2.x,
 					player2.y,
