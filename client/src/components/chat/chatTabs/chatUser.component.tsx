@@ -24,8 +24,8 @@ const UserActionChatComponent = ({user}: {user: User}) => {
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [showPrompt, setPrompt] = React.useState(false);
-  const open = Boolean(anchorEl);
   const [action, setAction] = React.useState(-1);
+  const open = Boolean(anchorEl);
 
   const togglePrompt = (event: any) => {
     setPrompt(!showPrompt);
@@ -100,7 +100,7 @@ const UserActionChatComponent = ({user}: {user: User}) => {
         }}
       >
         {unprivilegedAction.map((action) => (
-          <MenuItem key={action.label} onClick={action.action}>
+          <MenuItem value={action.id} key={action.label} onClick={action.action}>
             {action.label}
           </MenuItem>
         ))}

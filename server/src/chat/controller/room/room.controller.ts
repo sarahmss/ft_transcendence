@@ -443,7 +443,6 @@ export class RoomController {
 				const gRoom: GroupRoom = await this.roomService.findGroup(userJoin.roomId);
 				if (gRoom.isPrivate ||
 						(gRoom.protected &&
-							!userJoin.password &&
 							!bcrypt.compareSync(userJoin.password, gRoom.password)
 				))
 					return new UnauthorizedException('The room is private or the wrong password is given');

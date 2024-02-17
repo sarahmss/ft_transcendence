@@ -23,7 +23,7 @@ const SearchRoomComponent = () => {
     setQuery(event.target.value);
   }
 
-  const handleSearch = async (event: any) => {
+  const handleSearch = async () => {
 
     const room: any[] = await queryService.queryRoom(query);
 
@@ -59,31 +59,34 @@ const ResultComponent = () => {
   useSignals();
 
   return (
-    <Box>
-      <List>
-          {
-            queryRes.value.map( (room: any) => {
-              return (
-                <Box>
-                  <RoomResultComponent room={room}/>
-                  <Divider sx={{width: "80%"}}/>
-                </Box>
-              );
-            })
-          }
-      </List>
-    </Box>
+    <List>
+        {
+          queryRes.value.map( (room: any) => {
+            return (
+              <Box key={room.roomId}>
+                <RoomResultComponent  roomData={{room}}/>
+                <Divider sx={{width: "80%"}}/>
+              </Box>
+            );
+          })
+        }
+    </List>
   );
 }
 
 const password = signal("");
 
-const RoomResultComponent = ({room} : {room: any}) => {
+const RoomResultComponent = ({roomData} : {roomData: any}) => {
   useSignals();
+
+  const room = roomData.room;
 
   const [showPrompt, setPrompt] = React.useState(false);
 
   const handleJoin = () => {
+
+    togglePrompt();
+
     roomService.joinRoom(
       room.roomId,
       authService.getIdFromToken(),
@@ -171,7 +174,6 @@ const PasswordField = ({roomId} : {roomId: string}) => {
   return (
     <Box>
       <TextField
-        id="room-pass-field"
         label="Password"
         variant="outlined"
         value={password.value}
