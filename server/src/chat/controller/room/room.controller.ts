@@ -266,6 +266,12 @@ export class RoomController {
 
 			const privStatus = roomCreationData.isPrivate ? true : false;
 
+			if (roomCreationData.roomType === DIRECT) {
+				const getAnotherUser = userList.filter((user) => user.userName !== roomCreationData.ownerId);
+
+				room.roomName = getAnotherUser[0].userName;
+			}
+
 			this.eventEmitter.emit('room.create',
 				roomCreationData.userId,
 				room,
