@@ -206,6 +206,8 @@ effect(
     switch (userLogged.value) {
       case true:
         chatSocket.connect();
+        fetchRooms();
+        fetchInvitations();
         break;
       default:
         chatSocket.disconnect();
@@ -237,9 +239,6 @@ effect(
     }
   }
 );
-
-fetchRooms();
-fetchInvitations();
 
 export type {
   Message,

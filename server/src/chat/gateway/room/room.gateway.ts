@@ -64,8 +64,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Authentication via jwt token sent by the client
 		try {
 
-			console.log("Connecting chat socket");
-
 			let user: any;
 			let token: string = null;
 
@@ -123,7 +121,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@OnEvent('room.private')
 	emitRoomToAllMembers(users: any[], room: any, emission_event: string, cb: any) {
 
-		console.log(users);
 		users.forEach((user: any) => {
 			const conn = this.connectedUserService.getConnection(user.userId);
 			if (conn) {
@@ -170,13 +167,15 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			// If there is someone blocked => filter and get the allowed users
 			receivingClients = participantList.filter(
 				(participant: Membership) =>
-					(!blackList.some((blocked: BlackList) =>
+					!blackList.some((blocked: BlackList) =>
 						(participant.userId === blocked.blockedId ||
 						participant.userId === blocked.blockerId) &&
 						participant.userId !== messageResp.authorId) &&
+
 					!banList.some((banEntry: Ban) =>
 						(banEntry.banId === participant.userId))
-				));
+				);
+			console.log(receivingClients);
 		}
 		else {
 			// If there is no one blocked

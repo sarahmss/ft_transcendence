@@ -121,7 +121,7 @@ const UserActionChatComponent = ({user}: {user: User}) => {
         
       </Menu>
       {
-        showPrompt ? (<TimeSelectComponent user={{ action: action, user: user}} />) : 
+        showPrompt ? (<TimeSelectComponent userData={{ action: action, user: user}} />) : 
         (<span style={{ visibility: 'hidden' }} />)
       }
       
@@ -129,11 +129,12 @@ const UserActionChatComponent = ({user}: {user: User}) => {
   );
 }
 
-const TimeSelectComponent = ({user}: {user: any}) => {
+const TimeSelectComponent = ({userData}: {userData: any}) => {
 
   useSignals();
 
   const [time, setTime] = React.useState(-1);
+  const {action, user} = userData;
 
   const handleTimeChange = (event: any) => {
     setTime(event.target.value);
@@ -141,8 +142,6 @@ const TimeSelectComponent = ({user}: {user: any}) => {
 
   const handleBlock = () => {
     
-    console.log(authService.getIdFromToken()===user.userId);
-
     blackListService.banSingle(
       authService.getIdFromToken(),
       user.userId,
@@ -154,8 +153,6 @@ const TimeSelectComponent = ({user}: {user: any}) => {
 
   const handleBan = () => {
     
-    console.log(authService.getIdFromToken()===user.userId);
-
     banService.banUser(
       authService.getIdFromToken(),
       user.userId,
@@ -169,7 +166,7 @@ const TimeSelectComponent = ({user}: {user: any}) => {
     if (time <= 0)
       return;
 
-    switch (user.action) {
+    switch (action) {
       case 1:
         handleBlock();
         break;

@@ -14,7 +14,7 @@ const RoomSelectionComponent = () => {
 
   return (
     <Box sx={{bgcolor: 'background.gray'}}>
-      { userLogged.value ?
+      { userLogged.value && chatData.value.length > 0 ?
         (<EnabledComponent />) : (<DisabledComponent />)}
     </Box>
   );
@@ -24,7 +24,7 @@ const DisabledComponent = () => {
   useSignals();
 
   return (
-    <FormControl sx={{ height: '5%', m: 1, minWidth: 80, width: '75%', label: {marginTop: 0} }} disabled> 
+    <FormControl sx={{ height: '5%', m: 1, minWidth: 80, width: '90%', label: {marginTop: 0} }} disabled> 
       <InputLabel id="room-selector">Unavailable</InputLabel>
         <Select
           labelId="room-selector"

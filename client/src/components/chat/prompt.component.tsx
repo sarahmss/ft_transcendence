@@ -61,7 +61,7 @@ const PromptComponent = () => {
 			<Grid container spacing={2}>
 				<Grid item xs={10}>
 
-					{userLogged.value ?
+					{userLogged.value && currentRoom.value > -1 ?
 						(<TextField
 							size="small"
 							fullWidth
@@ -74,6 +74,7 @@ const PromptComponent = () => {
 						(<TextField
 							size="small"
 							fullWidth
+							value={input}
 							placeholder="Please Login first"
 							variant="outlined"
 							disabled
@@ -84,13 +85,28 @@ const PromptComponent = () => {
 
 				<Grid item xs={1}>
 
-					<Button
-						variant="contained"
-						onClick={handleSend}
-						sx={{backgroundColor:"#B700cc"}}
-					>
-						<b>Send</b>
-					</Button>
+					{userLogged.value && currentRoom.value > -1 ?
+						(
+							<Button
+								variant="contained"
+								onClick={handleSend}
+								sx={{backgroundColor:"#B700cc"}}
+							>
+								<b>Send</b>
+							</Button>
+						
+						) :
+						(
+							<Button
+								variant="contained"
+								onClick={handleSend}
+								sx={{backgroundColor:"#B700cc"}}
+								disabled
+							>
+								<b>Send</b>
+							</Button>
+						)
+					}
 				</Grid>
 
 			</Grid>
