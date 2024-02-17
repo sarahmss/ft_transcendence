@@ -121,20 +121,23 @@ const userMaker = (
 }
 
 const fetchRooms = async () => {
-  const roomRaw: any[] = await roomService.getRoom(authService.getIdFromToken());
+  if (authService.getIsLogged()){
+    const roomRaw: any[] = await roomService.getRoom(authService.getIdFromToken());
 
-  roomRaw.forEach((room) => {
+    roomRaw.forEach((room) => {
 
-    addRoom(
-      roomMaker(
-        room.roomId,
-        room.roomName,
-        room.creationDate,
-        room.isPrivate,
-        room.isProtected,
-    ));
+      addRoom(
+        roomMaker(
+          room.roomId,
+          room.roomName,
+          room.creationDate,
+          room.isPrivate,
+          room.isProtected,
+      ));
 
-  });
+    });    
+  }
+
 }
 
 const fetchMessageByRoom = async (index: number, roomId: string, pageNumber: number) => {
@@ -208,16 +211,16 @@ const findMessage = (room: Room, messageId : string) => {
 
 const fetchInvitations = async () => {
 
-  const invites: any[] = await inviteService.getInvitation(authService.getIdFromToken());
+  if (authService.getIsLogged()){
+    const invites: any[] = await inviteService.getInvitation(authService.getIdFromToken());
 
-  if (!invites)
-    return;
+    if (!invites)
+      return;
 
-  invites.forEach( (inv) => {
-    addInvitation(inv.inviteId);
-  })
-  
-  
+    invites.forEach( (inv) => {
+      addInvitation(inv.inviteId);
+    })     
+  }
 }
 
 export {

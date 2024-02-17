@@ -1,7 +1,7 @@
 import axios, { RawAxiosRequestHeaders }	from "axios";
 
 
-import { BackLink, Front2Fa, LocalSigninLink,
+import { BackLink, LocalSigninLink,
 		LocalSignupLink,
 		UserContentLink,
 		tokenData } from "../common/constants";

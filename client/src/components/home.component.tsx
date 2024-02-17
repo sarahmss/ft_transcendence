@@ -17,7 +17,7 @@ const Home: React.FC = () => {
 			if (user) {
 				userLogged.value=true;
 			  setIsLogged(true);
-			  appSocket.connect()
+			  appSocket.connect();
 			} else {
 				userLogged.value=false;
 			  setIsLogged(false);
@@ -43,9 +43,9 @@ const Home: React.FC = () => {
 					/>
 				</div>
 				</Grid>
-				<Grid item xs={12} md={6} lg={4} sx={{ paddingLeft: "0px"}}>
-					<ChatComponent/>
 
+				<Grid item xs={12} md={6} lg={4} sx={{ paddingLeft: "0px"}}>
+					{isLogged ? (<ChatComponent/>):(<></>)}
 					<Box sx={{
 						display: "flex",
 						justifyContent:"center"}}>

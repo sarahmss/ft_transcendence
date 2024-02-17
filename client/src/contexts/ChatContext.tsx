@@ -1,6 +1,3 @@
-
-import { io } from "socket.io-client"
-import { ChatLink } from '../common/constants';
 import { Signal, effect, signal } from "@preact/signals-react";
 import { getToken } from "../common/helper";
 import { fetchInvitations,
@@ -10,8 +7,11 @@ import { fetchInvitations,
   messageMaker,
   roomMaker,
   userMaker } from "./FetchChatData";
+
 import authService from "../services/auth.service";
 import roomService from "../services/chat/room.service";
+import { ChatLink } from "../common/constants";
+import { io } from "socket.io-client";
 
 const currentRoom: Signal<number> = signal(-1);
 const userLogged: Signal<boolean> = signal(false);
@@ -194,6 +194,8 @@ chatSocket.on('left', handleRemoveUser);
 
 chatSocket.on('chat-deleted', handleRemoveRoom);
 chatSocket.on('private-toggle', updatePrivateStatus);
+
+chatSocket.on('invitation-send', addInvitationToList);
 
 chatSocket.on('invitation-send', addInvitationToList);
 

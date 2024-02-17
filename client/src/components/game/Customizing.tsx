@@ -94,7 +94,7 @@ const Customizing: React.FC<CustomizingProps> = (props) => {
 
   return (
     <>
-    <Stack sx={{ margin: 'auto', gap:'1.5rem', width: '400px', minWIdth: '250px' }}>
+    <Stack sx={{ margin: 'auto', gap:'1.5rem', width: '650px', minWIdth: '250px' }}>
       <Box
         className='flex-center preview'
         sx={{
@@ -103,26 +103,26 @@ const Customizing: React.FC<CustomizingProps> = (props) => {
         }}
       >
         <Box
-          className='paddle paddle-right'
+          className='paddle'
           sx={{
             backgroundColor: colorPaddle,
             borderRadius: roundedMode === 'yes' ? '15px' : '0px',
             width: '10px',
             height: '50px',
-            margin: '285px'
-          }}
-        ></Box>
-        <Box
-          className='paddle paddle-left'
-          sx={{
-            backgroundColor: colorPaddle,
-            borderRadius: roundedMode === 'yes' ? '15px' : '0px',
-            width: '10px',
-            height: '50px',
-            margin: '15px'
+            // margin: '285px'
           }}
         ></Box>
         <Box className='preview-line'></Box>
+        <Box
+          className='paddle'
+          sx={{
+            backgroundColor: colorPaddle,
+            borderRadius: roundedMode === 'yes' ? '15px' : '0px',
+            width: '10px',
+            height: '50px',
+            // margin: '15px'
+          }}
+        ></Box>
       </Box>
       <Box display="flex" sx={{ flexDirection:"column", gap: '0.75rem', my: '2rem' }} >
       <Stepper
@@ -178,34 +178,6 @@ const Customizing: React.FC<CustomizingProps> = (props) => {
             </StepContent>
         </Step>
         <Step sx={{ '& .MuiStepIcon-root': { color: "#B700cc", }, }} >
-          <StepLabel>Rounded Mode</StepLabel>
-            <StepContent>
-              <FormControlLabel
-                control={
-                <Radio
-                  checked={roundedMode === 'yes'}
-                  onChange={handleRoundedModeChange}
-                  value='yes'
-                  name='roundedMode'
-                />
-                }
-                label='Yes'
-              />
-              <FormControlLabel
-                control={
-                <Radio
-                  name='roundedMode'
-                  value='no'
-                  checked={roundedMode === 'no'}
-                  onChange={handleRoundedModeChange}
-                />
-                }
-                label='No'
-                />
-                <StepAux setActiveStep={setActiveStep} prevActiveStep={activeStep}/>
-            </StepContent>
-        </Step>
-        <Step sx={{ '& .MuiStepIcon-root': { color: "#B700cc", }, }} >
           <StepLabel>Accelerate the ball?</StepLabel>
         <StepContent>
             <FormControlLabel
@@ -234,7 +206,7 @@ const Customizing: React.FC<CustomizingProps> = (props) => {
             </StepContent>
         </Step>
       </Stepper>
-      {activeStep === 4 && (
+      {activeStep === 3 && (
         <Paper square elevation={0} sx={{ p: 3 }}>
           <Typography>All steps completed - you&apos;re finished</Typography>
         <Box display="flex" sx={{ gap:'1rem', justifyContent: 'center' }}>
