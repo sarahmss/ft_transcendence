@@ -20,6 +20,7 @@ class BanService {
         roomId: roomId,
         duration: duration
       }
+
       return await axios.post(BackLink + "/ban", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
