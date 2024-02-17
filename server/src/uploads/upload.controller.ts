@@ -27,16 +27,21 @@ export class UploadsController {
     private uploadService: UploadsService,
 		) {}
 
-	@Get(':userId/:path')
-		getFile(@Res() res: Response, @Param('userId', ParseUUIDPipe) userId: string): void {
-			const qrCodeLink = `/uploads/${userId}/qrcode.png`;
-			const filePath = join(process.cwd(), qrCodeLink);
-
-			res.setHeader('Content-Type', 'image/png');
-			res.setHeader('Content-Disposition', 'attachment; filename="qrcode.png"');
-
-			res.sendFile(filePath);
-		}
+    @Get(':userId/:path')
+    async getFile(@Res() res: Response, @Param('userId', ParseUUIDPipe) userId: string): Promise<void> {
+      try {
+        const filePath = await this.uploadService.getFile(userId);
+        res.setHeader('Content-Type', 'image/png');
+        res.setHeader('Content-Disposition', 'attachment; filename="qrcode.png"');
+        res.sendFile(filePath);
+      } catch (error) {
+        if (error instanceof NotFoundException) {
+          res.status(404).send('File not found');
+        } else {
+          res.status(500).send('Internal Server Error');
+        }
+      }
+    }
 
 	@Post(':userId/profilePictures/:path')
 		@UseInterceptors(FileInterceptor('file', {
