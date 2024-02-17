@@ -96,7 +96,6 @@ class RoomService {
     } catch (error) {
       
       console.log(error);
-      throw error;
     }
   }
 

@@ -95,10 +95,12 @@ export class MessageController {
 								participant.userId === blocked.blockerId) &&
 								participant.userId !== message.userId) ||
 							banList.some((banEntry: Ban) => (
-								(banEntry.banId === participant.userId)
+								(banEntry.bannedId === participant.userId)
 							))
 					);
 
+				console.log(banList);
+				console.log(participantList);
 
 				this.hideMessageService
 					.createHideEntryBulk(messageInstance,

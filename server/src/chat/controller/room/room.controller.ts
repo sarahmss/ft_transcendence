@@ -266,6 +266,12 @@ export class RoomController {
 
 			const privStatus = roomCreationData.isPrivate ? true : false;
 
+			if (roomCreationData.roomType === DIRECT) {
+				const getAnotherUser = userList.filter((user) => user.userName !== roomCreationData.ownerId);
+
+				room.roomName = getAnotherUser[0].userName;
+			}
+
 			this.eventEmitter.emit('room.create',
 				roomCreationData.userId,
 				room,
@@ -437,7 +443,6 @@ export class RoomController {
 				const gRoom: GroupRoom = await this.roomService.findGroup(userJoin.roomId);
 				if (gRoom.isPrivate ||
 						(gRoom.protected &&
-							!userJoin.password &&
 							!bcrypt.compareSync(userJoin.password, gRoom.password)
 				))
 					return new UnauthorizedException('The room is private or the wrong password is given');

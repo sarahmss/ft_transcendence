@@ -49,7 +49,7 @@ class InviteService {
     try {
 
       const res = await axios.post(
-        `${BackLink}/invite/get/getInvitation`,
+        `${BackLink}/invite/getInvitation`,
         {userId: userId},
         {headers: authService.getAuthToken()}
       );

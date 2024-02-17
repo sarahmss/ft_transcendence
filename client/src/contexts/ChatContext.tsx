@@ -1,9 +1,16 @@
 import { Signal, effect, signal } from "@preact/signals-react";
-import { fetchInvitations, fetchMessageByRoom, fetchParticipants, fetchRooms, messageMaker, roomMaker, userMaker } from "./FetchChatData";
+import { getToken } from "../common/helper";
+import { fetchInvitations,
+  fetchMessageByRoom,
+  fetchParticipants,
+  fetchRooms,
+  messageMaker,
+  roomMaker,
+  userMaker } from "./FetchChatData";
+
 import authService from "../services/auth.service";
 import roomService from "../services/chat/room.service";
 import { ChatLink } from "../common/constants";
-import { getToken } from "../common/helper";
 import { io } from "socket.io-client";
 
 const currentRoom: Signal<number> = signal(-1);
@@ -177,20 +184,18 @@ const addInvitationToList = (response: any) => {
   ]
 }
 
-if (authService.getIsLogged()){
-  chatSocket.on('message-response', insertMessage);
+chatSocket.on('message-response', insertMessage);
 
-  chatSocket.on('admin-toggle', adminUpdate);
-  chatSocket.on('created', handleRoomCreation);
+chatSocket.on('admin-toggle', adminUpdate);
+chatSocket.on('created', handleRoomCreation);
 
-  chatSocket.on('joined', handleUserJoin);
-  chatSocket.on('left', handleRemoveUser);
+chatSocket.on('joined', handleUserJoin);
+chatSocket.on('left', handleRemoveUser);
 
-  chatSocket.on('chat-deleted', handleRemoveRoom);
-  chatSocket.on('private-toggle', updatePrivateStatus);
+chatSocket.on('chat-deleted', handleRemoveRoom);
+chatSocket.on('private-toggle', updatePrivateStatus);
 
-  chatSocket.on('invitation-send', addInvitationToList)  
-}
+chatSocket.on('invitation-send', addInvitationToList);
 
 chatSocket.on('invitation-send', addInvitationToList);
 
@@ -201,6 +206,8 @@ effect(
     switch (userLogged.value) {
       case true:
         chatSocket.connect();
+        fetchRooms();
+        fetchInvitations();
         break;
       default:
         chatSocket.disconnect();
@@ -232,9 +239,6 @@ effect(
     }
   }
 );
-
-fetchRooms();
-fetchInvitations();
 
 export type {
   Message,

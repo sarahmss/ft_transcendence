@@ -1,6 +1,5 @@
 import { Body, ConflictException, Controller, NotFoundException, Patch, Post, UnauthorizedException } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { response } from 'express';
 import { BanService } from 'src/chat/service/ban/ban.service';
 import { InviteService } from 'src/chat/service/invite/invite.service';
 import { MembershipService } from 'src/chat/service/membership/membership.service';
