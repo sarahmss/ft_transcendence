@@ -201,15 +201,21 @@ class PongGame extends React.Component<{}, PongGameState> {
 		const current_player = context.current_player;
         const current_room = context.current_room;
 		const { message } = match;
+
         return (
             <Box display="flex" sx={{ flexDirection:"column", alignItems:"center", margin:'auto', width:'fit-content'}}>
-                <Box id="pong-game-container"></Box>
+                <Stack>
+					<Box id="pong-game-container"></Box>
+					<Box>
+						<Typography variant="h2" color="#B700cc" fontWeight="bold" >{current_room.player1Name} vs {current_room.player2Name}</Typography>
+					</Box>
+				</Stack>
                 { (message && current_player.state === 'in_game') &&
                     <Box className='game-message'>
                         <h4>{message}</h4>
                     </Box>
                 }
-				{(current_player.state && current_player.state === 'watching') &&
+				{(current_player.state && (current_player.state === 'watching' || current_player.state === 'in_game')) &&
 						<>
 							<Box>
 								<Button
@@ -218,39 +224,9 @@ class PongGame extends React.Component<{}, PongGameState> {
 								>
 									Leave Room
 								</Button>
-								{/* <button onClick={leaveRoom}> Leave Room </button> */}
-							</Box>
-							{/* simplificar essa condicao com a de baixo (||) */}
-							{/* as demais informações da tela podem ser deixadas aqui */}
-							{/* em vez de em Pong.tsx */}
-
-							{/* algo como: */}
-							<Box>
-								<Typography variant="body1" color="#B700cc" fontWeight="bold" >{current_room.player1Name} vs {current_room.player2Name}</Typography>
 							</Box>
 						</>
 					}
-				{ (current_player.state && current_player.state === 'in_game') &&
-					<>
-						<Box>
-								<Button
-									onClick={leaveRoom}
-									sx={{ backgroundColor:"#B700cc", color: "#fff" }}
-								>
-									Leave Room
-								</Button>
-								{/* <button onClick={leaveRoom}> Leave Room </button> */}
-							</Box>
-							{/* simplificar essa condicao com a de baixo (||) */}
-							{/* as demais informações da tela podem ser deixadas aqui */}
-							{/* em vez de em Pong.tsx */}
-
-							{/* algo como: */}
-							<Box>
-								<Typography variant="body1" color="#B700cc" fontWeight="bold" >{current_room.player1Name} vs {current_room.player2Name}</Typography>
-							</Box>
-					</>
-				}
 				{ ( current_player.state === 'watching' && match.status !== 'START' && match.status !== 'PLAY' ) &&
 					<Box className='game-message'>
 						<Typography variant="h4">Open room - Waiting for a match... </Typography>
