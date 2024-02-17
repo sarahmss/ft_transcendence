@@ -1,13 +1,11 @@
 import { Component } from "react";
 import { Routes, Route } from "react-router-dom";
-import {useSelector} from "react-redux";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 
 import Login from "./components/login/login.component";
 import Register from "./components/login/register.component";
 import Home from "./components/home.component";
-import Profile from "./components/profile/profile.component";
 import Pong from "./components/game/Pong";
 import NavBar from "./components/navBar/NavBar"
 import Login2Fa from "./components/login/login2fa.component";
@@ -16,6 +14,9 @@ import { GameProvider } from './contexts/GameContext';
 import AccountSettings from "./components/account/AcountSettings";
 import { Provider } from 'react-redux';
 import store from './services/store';
+import Profile from "./components/profile/Profile";
+import Community from "./components/community/Community";
+import Error from "./components/error/Error";
 
 type Props = {};
 
@@ -37,15 +38,19 @@ class App extends Component<Props, State> {
 						<Route path="/logout" element={<Logout />} />
 						<Route path='/2fa' element={<Login2Fa/>} />
 						<Route path="/register" element={<Register />} />
-						<Route path="/profile" element={<Profile />} />
 						<Route path="/settings" element={<AccountSettings />} />
+						<Route path="/profile" element={<Profile />} />
+						<Route path="/community" element={<Community />} />
+						<Route path="/error" element={<Error />} />
 						<Route path="/game" element={
 							<div>
 									<GameProvider>
 										<Pong />
 									</GameProvider>
 									</div>
-								} /> </Routes>
+								} />
+						<Route path="*" element={<Error />} />		
+						</Routes>
 				</Provider>
 			</div>
 

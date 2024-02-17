@@ -13,14 +13,11 @@ import MuiTab, { TabProps } from '@mui/material/Tab'
 // ** Icons Imports
 import AccountOutline from 'mdi-material-ui/AccountOutline'
 import LockOpenOutline from 'mdi-material-ui/LockOpenOutline'
-import InformationOutline from 'mdi-material-ui/InformationOutline'
 import MilitaryTechOutlinedIcon from '@mui/icons-material/MilitaryTechOutlined';
 
 // ** Demo Tabs Imports
-import TabInfo from './account-settings/TabInfo'
 import TabAccount from './account-settings/TabAccount'
 import TabSecurity from './account-settings/TabSecurity'
-import TabStatus from './account-settings/TabStatus'
 
 import authService from '../../services/auth.service'
 import { Navigate } from "react-router-dom";
@@ -54,8 +51,6 @@ const AccountSettings = () => {
     const fetchData = async () => {
       try {
         const user = await authService.getCurrentUser();
-        console.log("user AcountSettings: ", user);
-
         if (user) {
           setCurrentUser(user);
         } else {
@@ -81,7 +76,7 @@ const AccountSettings = () => {
 
 	<div className="settings-content">
 	<div className="md-layout md-gutter container mt-3">
-		<div style={{ margin: '100px 0' }} className="md-layout-item md-layout md-gutter md-alignment-top-center">
+	<div style={{ margin: '100px 0' }} className="md-layout-item md-layout md-gutter md-alignment-top-center">
 
     <Card style={{ minWidth: '300px' }} className="md-layout-item md-size-65">
       <TabContext value={value}>
@@ -109,15 +104,6 @@ const AccountSettings = () => {
             }
           />
           <Tab
-            value='info'
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <InformationOutline />
-                <TabName>Info</TabName>
-              </Box>
-            }
-          />
-          <Tab
             value='status'
             label={
               <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -131,15 +117,11 @@ const AccountSettings = () => {
         <TabPanel sx={{ p: 0 }} value='account'>
           {currentUser && <TabAccount currentUser={currentUser}/>}
         </TabPanel>
+
         <TabPanel sx={{ p: 0 }} value='security'>
-			{currentUser && <TabSecurity currentUser={currentUser} />}
-		</TabPanel>
-        <TabPanel sx={{ p: 0 }} value='info'>
-          { currentUser && <TabInfo currentUser={currentUser}/>}
-        </TabPanel>
-        <TabPanel sx={{ p: 0 }} value='status'>
-            {currentUser && <TabStatus currentUser={currentUser}/>}
-        </TabPanel>
+			    {currentUser && <TabSecurity currentUser={currentUser} />}
+		    </TabPanel>
+        
       </TabContext>
     </Card>
 	</div>

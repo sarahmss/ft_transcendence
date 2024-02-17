@@ -1,32 +1,27 @@
 import axios, { RawAxiosRequestHeaders }	from "axios";
-// import {useSelector, useDispatch} from "react-redux";
-// import {addUser, userLog} from './reduceStore';
 
 
-import { BackLink, LocalSigninLink,
+import { BackLink, Front2Fa, LocalSigninLink,
 		LocalSignupLink,
 		UserContentLink,
 		tokenData } from "../common/constants";
 
-		
-		import "core-js/stable/atob";
-		import { jwtDecode } from "jwt-decode";
-		
+
+import "core-js/stable/atob";
+import { jwtDecode } from "jwt-decode";
+
 class AuthService {
-			
+
 	async LocalLogin(userName: string, password: string) {
 		try {
-			console.log(LocalSigninLink, userName, password);
-
 			const response = await axios.post(LocalSigninLink, {
 				userName,
 				password,
 			});
-			document.cookie = response.data.cookie;
-			sessionStorage.setItem("Logged", "ok");
+			return (response);
 		} catch (error) {
-		console.error("Error during LocalLogin:", error);
-		throw error;
+			console.error("Error during LocalLogin:", error);
+			throw error;
 		}
 	}
 
@@ -37,8 +32,9 @@ class AuthService {
 	async logout() {
 		try {
 			const authToken = this.getAuthToken();
+			const userId = this.getIdFromToken();
 			sessionStorage.clear();
-			await axios.get(BackLink + "/auth/logout", { headers: authToken });
+			await axios.get(BackLink + `/auth/${userId}/logout`, { headers: authToken });
 		} catch (error) {
 			console.error("Error during logout:", error);
 			throw error;
@@ -52,13 +48,12 @@ class AuthService {
 
 	async register(userName: string, email: string, password: string, passwordConfirm: string) {
 		try {
-			const response = await axios.post(LocalSignupLink, {
-			userName,
-			email,
-			password,
-			passwordConfirm: passwordConfirm,
+				const response = await axios.post(LocalSignupLink, {
+				userName,
+				email,
+				password,
+				passwordConfirm: passwordConfirm,
 			});
-			console.log(response)
 			return response;
 		} catch (error) {
 			console.error("Error during register:", error);
@@ -68,7 +63,6 @@ class AuthService {
 
 	async RequestCurrentUser() {
 		try {
-			console.log("Entrou aqui");
 			const userId = this.getIdFromToken();
 			const authToken = this.getAuthToken();
 			const response = await axios.get(UserContentLink + userId, { headers: authToken });
@@ -83,17 +77,15 @@ class AuthService {
 		}
 
 	async getCurrentUser() {
-
 		try {
 			if (this.getIsLogged() != null)
 			{
-				console.log("Entrou no getCurrent user - 7")
 				await this.RequestCurrentUser();
 				const userStr = sessionStorage.getItem("LoggedUser");
 				if (userStr)
 					return JSON.parse(userStr);
-				return null;
 			}
+			return null;
 		} catch (error) {
 			console.error("Error during getCurrentUser:", error);
       		throw error;
@@ -126,26 +118,6 @@ class AuthService {
 		const tokenData: tokenData = jwtDecode(cookie);
 		return tokenData.id;
 	}
-
-	async getProfilePicture(localQr: string) {
-		const authTokenQr = this.getAuthToken();
-		localQr = BackLink + localQr;
-		console.log(localQr);
-		const response = await axios.get(localQr, { headers: authTokenQr, responseType: 'arraybuffer' });
-		if (response.data) {
-			const imageBase64 = btoa(
-				new Uint8Array(response.data)
-				.reduce((data, byte) => data + String.fromCharCode(byte), '')
-			)
-			const imgElement = document.createElement('img');
-			imgElement.src = `data:image/png;base64,${imageBase64}`;
-			console.log(imgElement);
-			return imgElement;
-		}
-		return "";
-	}
-
-
 }
 const authService = new AuthService();
 

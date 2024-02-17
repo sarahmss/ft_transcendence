@@ -6,9 +6,50 @@ import {
   Stack,
   Box,
   Radio,
-  FormControlLabel
-} from '@mui/material';
+  FormControlLabel,
+  Stepper,
+  Step,
+  StepLabel,
+  StepContent,
+  Paper,
+  Grid} from '@mui/material';
 import './css/game_styles.css';
+import CustomIllustration from '../../common/Illustrations/CustomIllustration';
+interface StepAuxProps {
+  setActiveStep: React.Dispatch<React.SetStateAction<number>>;
+  prevActiveStep: number;
+}
+
+const StepAux: React.FC<StepAuxProps> = ({ setActiveStep, prevActiveStep }) => {
+  const handleNext = () => {
+    setActiveStep(prevActiveStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep(prevActiveStep - 1);
+  };
+
+  return (
+    <Box sx={{ mb: 2 }}>
+      <div>
+        <Button
+          variant="contained"
+          onClick={handleNext}
+          sx={{ mt: 1, mr: 1, backgroundColor:"#B700cc", color: "#fff" }}
+        >
+          Next
+        </Button>
+        <Button
+          disabled={prevActiveStep === 0}
+          onClick={handleBack}
+          sx={{ mt: 1, mr: 1, color:"#B700cc"}} 
+        >
+          Back
+        </Button>
+      </div>
+    </Box>
+  );
+};
 
 interface CustomizingProps {}
 
@@ -17,7 +58,8 @@ const Customizing: React.FC<CustomizingProps> = (props) => {
   const [colorPaddle, setColorPaddle] = useState<string>('#111111');
   const [roundedMode, setRoundedMode] = useState<string>('no');
   const [speedMode, setSpeedMode] = useState<string>('no');
-  let [alreadyCustomized, setAlreadyCustomized] = useState<Boolean>(false);
+  const [alreadyCustomized, setAlreadyCustomized] = useState<Boolean>(false);
+  const [activeStep, setActiveStep] = React.useState(0);
 
   const preCustomizeAndPlay = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,6 +86,10 @@ const Customizing: React.FC<CustomizingProps> = (props) => {
 
   const handleColorChange = (event: ChangeEvent<HTMLInputElement>) => {
     setColor(event.target.value);
+  };
+
+  const handleReset = () => {
+    setActiveStep(0);
   };
 
   return (
@@ -79,96 +125,135 @@ const Customizing: React.FC<CustomizingProps> = (props) => {
         <Box className='preview-line'></Box>
       </Box>
       <Box display="flex" sx={{ flexDirection:"column", gap: '0.75rem', my: '2rem' }} >
-        <Box display="flex" sx={{ gap:'1rem', width: '25rem', my: '1.5rem' }} >
-          <Box component="span">Choose the background color:</Box>
-          <input
-            style={{
-              backgroundColor: color,
-              borderRadius: '15px',
-              cursor: 'pointer',
-            }}
-            type='color'
-            id='backgroundColorPicker'
-            value={color}
-            onChange={handleColorChange}
-          />
-        </Box>
-        <Box display="flex" alignItems="center" sx={{ gap:'1rem', width: '25rem' }}>
-          <Box component="span">Choose paddle's color</Box>
-          <input
-            style={{
-              backgroundColor: colorPaddle,
-              borderRadius: '15px',
-              cursor: 'pointer',
-            }}
-            type='color'
-            id='paddleColorPicker'
-            value={colorPaddle}
-            onChange={(e) => setColorPaddle(e.target.value)}
-          />
-        </Box>
-        <Box display="flex" sx={{ gap:'3rem' }}>
-          <Box component="span">Rounded Mode</Box>
-          <FormControlLabel
-            control={
-            <Radio
-              checked={roundedMode === 'yes'}
-              onChange={handleRoundedModeChange}
-              value='yes'
-              name='roundedMode'
-            />
-            }
-            label='Yes'
-          />
-          <FormControlLabel
-            control={
-            <Radio
-              name='roundedMode'
-              value='no'
-              checked={roundedMode === 'no'}
-              onChange={handleRoundedModeChange}
-            />
-            }
-            label='No'
-            />
-        </Box>
+      <Stepper
+        activeStep={activeStep}
+        orientation="vertical" >
+        <Step sx={{ '& .MuiStepIcon-root': { color: "#B700cc", }, }} >
+          <StepLabel> Background </StepLabel>
+          <StepContent>
+          <Grid container spacing={2} direction="row" >
+            <Grid item > 
+              <Typography  variant="subtitle2" gutterBottom >Choose background color</Typography>
+            </Grid>
+            <Grid item> 
+             <input
+                    style={{
+                      backgroundColor: color,
+                      borderRadius: '15px',
+                      cursor: 'pointer',
+                    }}
+                    type='color'
+                    id='backgroundColorPicker'
+                    value={color}
+                    onChange={handleColorChange}
+                  />
+            </Grid>    
+          </Grid>
+              <StepAux setActiveStep={setActiveStep} prevActiveStep={activeStep}/>
+          </StepContent>
 
-        <Box display="flex" sx={{ gap:'3rem' }}>
-          <Box component="span">Do you prefer to accelerate the ball?</Box>
-          <FormControlLabel
-            control={
-            <Radio
-              name='speedMode'
-              value='yes'
-              checked={speedMode === 'yes'}
-              onChange={handleSpeedModeChange}
-            />
-            }
-            label='Yes'
-            />
+        </Step>
+        <Step sx={{ '& .MuiStepIcon-root': { color: "#B700cc", }, }} >
+        <StepLabel> Paddle </StepLabel>
+          <StepContent>
+          <Grid container spacing={2} direction="row" >
+            <Grid item > 
+              <Typography  variant="subtitle2" gutterBottom >Choose paddle's color</Typography>
+            </Grid>
+            <Grid item> 
+              <input
+                style={{
+                  backgroundColor: colorPaddle,
+                  borderRadius: '15px',
+                  cursor: 'pointer',
+                }}
+                type='color'
+                id='paddleColorPicker'
+                value={colorPaddle}
+                onChange={(e) => setColorPaddle(e.target.value)}
+              />
+              </Grid>    
+              </Grid>
+              <StepAux setActiveStep={setActiveStep} prevActiveStep={activeStep}/>
+            </StepContent>
+        </Step>
+        <Step sx={{ '& .MuiStepIcon-root': { color: "#B700cc", }, }} >
+          <StepLabel>Rounded Mode</StepLabel>
+            <StepContent>
+              <FormControlLabel
+                control={
+                <Radio
+                  checked={roundedMode === 'yes'}
+                  onChange={handleRoundedModeChange}
+                  value='yes'
+                  name='roundedMode'
+                />
+                }
+                label='Yes'
+              />
+              <FormControlLabel
+                control={
+                <Radio
+                  name='roundedMode'
+                  value='no'
+                  checked={roundedMode === 'no'}
+                  onChange={handleRoundedModeChange}
+                />
+                }
+                label='No'
+                />
+                <StepAux setActiveStep={setActiveStep} prevActiveStep={activeStep}/>
+            </StepContent>
+        </Step>
+        <Step sx={{ '& .MuiStepIcon-root': { color: "#B700cc", }, }} >
+          <StepLabel>Accelerate the ball?</StepLabel>
+        <StepContent>
             <FormControlLabel
               control={
               <Radio
                 name='speedMode'
-                value='no'
-                checked={speedMode === 'no'}
+                value='yes'
+                checked={speedMode === 'yes'}
                 onChange={handleSpeedModeChange}
               />
               }
-              label='No'
+              label='Yes'
               />
-        </Box>
-        <Box>
-        <Button
-          disabled={alreadyCustomized === true}
-          onClick={preCustomizeAndPlay}
-          sx={{ backgroundColor:"#B700cc", color: "#fff" }}
-          >
-          Customize
-        </Button>
+              <FormControlLabel
+                control={
+                <Radio
+                  name='speedMode'
+                  value='no'
+                  checked={speedMode === 'no'}
+                  onChange={handleSpeedModeChange}
+                />
+                }
+                label='No'
+                />
+                <StepAux setActiveStep={setActiveStep} prevActiveStep={activeStep}/>
+            </StepContent>
+        </Step>
+      </Stepper>
+      {activeStep === 4 && (
+        <Paper square elevation={0} sx={{ p: 3 }}>
+          <Typography>All steps completed - you&apos;re finished</Typography>
+        <Box display="flex" sx={{ gap:'1rem', justifyContent: 'center' }}>
+          <Button
+            disabled={alreadyCustomized === true}
+            onClick={preCustomizeAndPlay}
+            sx={{ backgroundColor:"#B700cc", color: "#fff" }}
+            >
+            Customize
+          </Button>
+          <Button onClick={handleReset} sx={{ mt: 1, mr: 1, color:"#B700cc"}} >
+            Reset
+          </Button>
       </Box>
+        </Paper>
+      )}
       </Box>
     </Stack>
+    <CustomIllustration/>
     </>
   );
 };

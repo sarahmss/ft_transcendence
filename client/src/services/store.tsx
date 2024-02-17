@@ -4,6 +4,7 @@ import userLoggin from './reduce';
 const store = configureStore({
     reducer: {
         user: userLoggin,
+        
     },
 })
 

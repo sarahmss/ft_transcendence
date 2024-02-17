@@ -2,12 +2,13 @@ import { Component, useReducer } from "react";
 import { Navigate } from "react-router-dom";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { Link, Card, CardContent, Box, Button, Divider} from '@mui/material';
+import { Link, Card, CardContent, Box, Button} from '@mui/material';
 import { reducer } from "../../common/helper";
 import { IntraloginLink } from "../../common/constants";
 import './css/login.component.css'
 import AuthService from "../../services/auth.service";
 import * as Yup from "yup";
+import BackgroundIllustration from "../../common/Illustrations/BackgroundIllustration";
 
 type Props = {};
 
@@ -109,27 +110,36 @@ export default class Login extends Component<Props, State> {
 			loading: true
 		});
 
-		await AuthService.LocalLogin(userName, password).then(
-			() => {
-				this.setState({
-				redirect: "/"
-				});
+		await AuthService.LocalLogin(
+			userName,
+			password
+			).then(
+			response => {
+				this.setState({ redirect: "/" });
+				document.cookie = response.data.cookie;
+				sessionStorage.setItem("Logged", "ok");
 			},
 			error => {
-				const resMessage =
-					(error.response &&
-					error.response.data &&
-					error.response.data.message) ||
-					error.message ||
-					error.toString();
+				if (error.response.status === 307)
+				{
+					const userId = error.response.data.userId;
+					console.log(userId);
+					this.setState({ redirect: `/2fa?user=${userId}` });
+				} else {
+					const resMessage =
+						(error.response &&
+						error.response.data &&
+						error.response.data.message) ||
+						error.message ||
+						error.toString();
 
-				this.setState({
-					loading: false,
-					message: resMessage
-				});
+					this.setState({
+						loading: false,
+						message: resMessage });
+					}
 				}
 			);
-			}
+		}
 
 	render() {
 		if (this.state.redirect) {
@@ -144,76 +154,88 @@ export default class Login extends Component<Props, State> {
 		};
 
 		return (
-			<Card className="col-md-12" sx={{backgroundColor:'#B700cc'}}>
-				<Card className="card-container">
-					<img
-						src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-						alt="profile-img"
-						className="profile-img-card"
-					/>
-					<Formik
-						initialValues={initialValues}
-						onSubmit={this.handleLogin}
-					>
-						<Form>
-							<div className="form-group">
-								<Field name="userName" type="text" className="form-control" placeholder="User" />
-								<ErrorMessage
-									name="userName"
-									component="div"
-									className="alert alert-danger"
-								/>
-							</div>
-
-							<div className="form-group">
-								<Field name="password" type="password" className="form-control" placeholder="Password" />
-								<ErrorMessage
-									name="password"
-									component="div"
-									className="alert alert-danger"
-								/>
-							</div>
-
-							<Box className="form-group"
-								sx={{margin:'10px',
-								display: 'flex',
-								justifyContent:'center'}}>
-
-								<Button
-									type="submit"
-									className="btn btn-primary btn-block"
-									disabled={loading}
-									sx={{backgroundColor:'#B700cc', color:'white'}}>
-									Login
-									{loading && (
-										<span className="spinner-border spinner-border-sm"></span>
-									)}
-								</Button>
-
-							</Box>
-							<Box className="form-group"
-								sx={{margin:'15px',
-								display: 'flex',
-								justifyContent:'center'}}>
-
-								<IntraLoginButton/>
-							</Box>
-
-							{message && (
+			<Box>
+				<Card className="col-md-12" sx={{backgroundColor:'#B700cc'}}>
+					<Card className="card-container">
+						<img
+							src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
+							alt="profile-img"
+							className="profile-img-card"
+						/>
+						<Formik
+							initialValues={initialValues}
+							onSubmit={this.handleLogin}
+						>
+							<Form>
 								<div className="form-group">
-									<div className="alert alert-danger" role="alert">
-										{message}
-									</div>
+									<Field name="userName" type="text" className="form-control" placeholder="User" />
+									<ErrorMessage
+										name="userName"
+										component="div"
+										className="alert alert-danger"
+									/>
 								</div>
-							)}
 
-						</Form>
-					</Formik>
+								<div className="form-group">
+									<Field name="password" type="password" className="form-control" placeholder="Password" />
+									<ErrorMessage
+										name="password"
+										component="div"
+										className="alert alert-danger"
+									/>
+								</div>
+
+								<Box className="form-group"
+									sx={{margin:'10px',
+									display: 'flex',
+									justifyContent:'center'}}>
+
+									<Button
+										type="submit"
+										className="btn btn-primary btn-block"
+										disabled={loading}
+										sx={{backgroundColor:'#B700cc', color:'white'}}>
+										Login
+										{loading && (
+											<span className="spinner-border spinner-border-sm"></span>
+										)}
+									</Button>
+
+								</Box>
+								<Box className="form-group"
+									sx={{margin:'15px',
+									display: 'flex',
+									justifyContent:'center'}}>
+
+									<IntraLoginButton/>
+								</Box>
+
+								{message && (
+									<div className="form-group">
+										<div className="alert alert-danger" role="alert">
+											{message}
+										</div>
+									</div>
+								)}
+
+							</Form>
+						</Formik>
+					</Card>
+					<CardContent style={{ paddingLeft: 35, paddingTop: 25 }}>
+						<p className="lorem">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi laborum ad commodi quos voluptate perspiciatis consectetur a, sapiente nam ab necessitatibus, ipsa quidem? Id aliquam, eligendi quidem dolor perferendis error.</p>
+					</CardContent>
 				</Card>
-				<CardContent style={{ paddingLeft: 35, paddingTop: 25 }}>
-					<p className="lorem">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi laborum ad commodi quos voluptate perspiciatis consectetur a, sapiente nam ab necessitatibus, ipsa quidem? Id aliquam, eligendi quidem dolor perferendis error.</p>
-				</CardContent>
-			</Card>
+				<Box
+                  className="form-group"
+                  sx={{
+                    margin: '15px',
+                    display: 'flex',
+                    justifyContent: 'left'
+                  }}
+                >
+                  <BackgroundIllustration />
+                </Box>
+			</Box>
 		);
 	}
 }

@@ -1,11 +1,10 @@
 import { Component } from "react";
 import { Formik, Field, Form, ErrorMessage } from "formik";
-// import axios from "axios";
-// import { LocalSignupLink } from "../../common/constants";
 import * as Yup from "yup";
 import AuthService from "../../services/auth.service";
-import { Link, Button, Card, CardContent, Box} from '@mui/material';
+import {Button, Card, CardContent, Box} from '@mui/material';
 import './css/login.component.css'
+import BackgroundIllustration from "../../common/Illustrations/BackgroundIllustration";
 
 type Props = {};
 
@@ -118,99 +117,102 @@ export default class Register extends Component<Props, State> {
 		};
 
 		return (
-			<Card className="col-md-12" sx={{backgroundColor:'#B700cc'}}>
-				<Card className="card-container">
-					<img
-						src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-						alt="profile-img"
-						className="profile-img-card"
-					/>
+			<Box>
+					
+				<Card className="col-md-12" sx={{backgroundColor:'#B700cc'}}>
+					<Card className="card-container">
+						<img
+							src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
+							alt="profile-img"
+							className="profile-img-card"
+						/>
 
-					<Formik
-						initialValues={initialValues}
-						validationSchema={this.validationSchema}
-						onSubmit={this.handleRegister}
-					>
-						<Form>
-							{!successful && (
-								<div>
-									<div className="form-group">
-										<Field name="userName" type="text" className="form-control" placeholder="User" />
-										<ErrorMessage
-											name="userName"
-											component="div"
-											className="alert alert-danger"
-										/>
-									</div>
-
-									<div className="form-group">
-										<Field name="email" type="email" className="form-control" placeholder="e-mail"/>
-										<ErrorMessage
-											name="email"
-											component="div"
-											className="alert alert-danger"
-										/>
-									</div>
-
-									<div className="form-group">
-										<Field
-											name="password"
-											type="password"
-											className="form-control"
-											placeholder="password"
-										/>
-										<ErrorMessage
-											name="password"
-											component="div"
-											className="alert alert-danger"
-										/>
-									</div>
-
-									<div className="form-group">
-										<Field
-											name="passwordConfirm"
-											type="password"
-											className="form-control"
-											placeholder="password confirm"
-										/>
-										<ErrorMessage
-											name="passwordConfirm"
-											component="div"
-											className="alert alert-danger"
-										/>
-									</div>
+						<Formik
+							initialValues={initialValues}
+							validationSchema={this.validationSchema}
+							onSubmit={this.handleRegister}
+						>
+							<Form>
+								{!successful && (
+									<div>
 										<div className="form-group">
-										<Button
-											type="submit"
-											className="btn btn-primary btn-block"
-											sx={{backgroundColor:'#B700cc', color:'white'}}>
-											Signup
-										</Button>
+											<Field name="userName" type="text" className="form-control" placeholder="User" />
+											<ErrorMessage
+												name="userName"
+												component="div"
+												className="alert alert-danger"
+											/>
 										</div>
-								</div>
-							)}
 
-							{message && (
-								<div className="form-group">
-									<div
-										className={
-											successful ? "alert alert-success" : "alert alert-danger"
-										}
-										role="alert"
-									>
-										{message}
+										<div className="form-group">
+											<Field name="email" type="email" className="form-control" placeholder="e-mail"/>
+											<ErrorMessage
+												name="email"
+												component="div"
+												className="alert alert-danger"
+											/>
+										</div>
+
+										<div className="form-group">
+											<Field
+												name="password"
+												type="password"
+												className="form-control"
+												placeholder="password"
+											/>
+											<ErrorMessage
+												name="password"
+												component="div"
+												className="alert alert-danger"
+											/>
+										</div>
+
+										<div className="form-group">
+											<Field
+												name="passwordConfirm"
+												type="password"
+												className="form-control"
+												placeholder="password confirm"
+											/>
+											<ErrorMessage
+												name="passwordConfirm"
+												component="div"
+												className="alert alert-danger"
+											/>
+										</div>
+											<div className="form-group">
+											<Button
+												type="submit"
+												className="btn btn-primary btn-block"
+												sx={{backgroundColor:'#B700cc', color:'white'}}>
+												Signup
+											</Button>
+											</div>
 									</div>
-								</div>
-							)}
-						</Form>
-					</Formik>
-			</Card>
+								)}
 
-				<CardContent style={{ paddingLeft: 35, paddingTop: 25 }}>
-					<p className="lorem">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi laborum ad commodi quos voluptate perspiciatis consectetur a, sapiente nam ab necessitatibus, ipsa quidem? Id aliquam, eligendi quidem dolor perferendis error.</p>
-				</CardContent>
-			</Card>
+								{message && (
+									<div className="form-group">
+										<div
+											className={
+												successful ? "alert alert-success" : "alert alert-danger"
+											}
+											role="alert"
+										>
+											{message}
+										</div>
+									</div>
+								)}
+							</Form>
+						</Formik>
+				</Card>
 
+					<CardContent style={{ paddingLeft: 35, paddingTop: 25 }}>
+						<p className="lorem">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi laborum ad commodi quos voluptate perspiciatis consectetur a, sapiente nam ab necessitatibus, ipsa quidem? Id aliquam, eligendi quidem dolor perferendis error.</p>
+					</CardContent>
+				</Card>
+                <BackgroundIllustration />
+			</Box>
 		);
 	}
 }

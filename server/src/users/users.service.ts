@@ -1,6 +1,7 @@
 import { Injectable,
 	NotFoundException,
-	UnprocessableEntityException} from '@nestjs/common';
+	UnprocessableEntityException,
+	BadRequestException} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
@@ -19,9 +20,7 @@ export class UsersService {
 
 	/********************************* FIND ******************************/
 	async findAll(): Promise<User[]> {
-		return this.usersRepository.find({
-		select: ["userId", "userName", "email", "profilePicture"]
-	});
+		return this.usersRepository.find({ select: ["userId", "userName", "email", "profilePicture"] });
 	}
 
 	async findById(userId: string): Promise<User> {
@@ -69,7 +68,85 @@ export class UsersService {
 			status: user.status,
 		};
 	}
-
+	
+	async getUserStats(userId: string) {
+		await this.checkUser(userId);
+		const user = await this.usersRepository.findOne({ 
+			where: { userId:  userId},
+			relations: ['losingGames',
+						'winningGames',
+						'winningGames.winner',
+						'winningGames.loser',
+						'losingGames.winner',
+						'losingGames.loser'],
+		});
+	
+		return {
+			userName: user.userName,
+			level: user.level,
+			gamesWonToLevelUp: user.gamesWonToLevelUp,
+			totalGamesWon: user.totalGamesWon,
+			totalGamesLost: user.totalGamesLost,
+			victories: user.winningGames.map(game => ({
+				gameId: game.gameId,
+				winnerScore: game.winnerScore,
+				loserScore: game.loserScore,			
+				gameTime: game.gameTime,
+				winner: {
+					userId: game.winner.userId,
+					userName: game.winner.userName,
+					profilePicture: game.winner.profilePicture
+				},
+				loser: {
+					userId: game.loser.userId,
+					userName: game.loser.userName,
+					profilePicture: game.loser.profilePicture
+				}
+			})),
+			defeats: user.losingGames.map(game => ({
+				gameId: game.gameId,
+				winnerScore: game.winnerScore,
+				loserScore: game.loserScore,			
+				gameTime: game.gameTime,
+				winner: {
+					userId: game.winner.userId,
+					userName: game.winner.userName,
+					profilePicture: game.winner.profilePicture
+				},
+				loser: {
+					userId: game.loser.userId,
+					userName: game.loser.userName,
+					profilePicture: game.loser.profilePicture
+				}
+			})),
+			matches: user.totalGamesWon + user.totalGamesLost
+		};
+	}
+	
+	async getAllUserStats() {
+		const allUsers = await this.usersRepository.find();
+	
+		const allUserStats = [];
+	
+		for (const user of allUsers) {
+			const userStats = {
+				userName: user.userName,
+				userId: user.userId,
+				profilePicture: user.profilePicture,
+				email: user.email,
+				level: user.level,
+				totalGamesWon: user.totalGamesWon,
+				totalGamesLost: user.totalGamesLost,
+				matches: user.totalGamesWon + user.totalGamesLost,
+				status: user.status
+			};
+			
+			allUserStats.push(userStats);
+		}
+	
+		return allUserStats;
+	}
+	
 	async getUserStatus(userId: string): Promise<status>
 	{
 		const user = await this.checkUser(userId);
@@ -83,7 +160,7 @@ export class UsersService {
 	}
 
 	/********************************* SET ******************************/
-
+	
 	private async setStatus(userId:string, status: status): Promise<User> {
 		const user = await this.checkUser(userId);
 		user.status = status;
@@ -121,7 +198,7 @@ export class UsersService {
 	}
 	/********************************* VALIDATE ******************************/
 
-	private async checkUser(userId: string) {
+	async checkUser(userId: string) {
 		const user = await this.findById(userId);
 		if (!user) {
 			throw new NotFoundException();
@@ -209,4 +286,5 @@ export class UsersService {
 			const user = await this.checkUser(userId);
 			await this.usersRepository.delete(user.userId);
 		}
+
 }

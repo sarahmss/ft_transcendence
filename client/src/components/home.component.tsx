@@ -1,27 +1,33 @@
-import { Component } from "react";
+import React, { Component } from "react";
 import TransPong from '../assets/home.jpeg';
 import "./home.component.css"
 import {FrontLogin, FrontGame} from "./../common/constants";
-import { Grid, Card, Button, Link, Box } from "@mui/material";
+import { Grid, Button, Link, Box } from "@mui/material";
 import ChatComponent from "./chat/chat.component";
-type Props = {};
+import authService from "../services/auth.service";
+import { appSocket } from "./../common/constants";
 
-type State = {
-	content: string;
-	isLogged: boolean;
-}
+const Home: React.FC = () => {
+	const [isLogged, setIsLogged] = React.useState(false);
 
-export default class Home extends Component<Props, State> {
-	constructor(props: Props) {
-		super(props);
+	const fetchData = async () => {
+		try {
+		  const user = await authService.getCurrentUser();
+			if (user) {
+			  setIsLogged(true);
+			  appSocket.connect()
+			} else {
+			  setIsLogged(false);
+			}
+		  } catch (error) {
+			console.error("Error fetching user data:", error);
+		  }
+	  };
+	
+	  React.useEffect(() => {
+		fetchData();
+	  }, );	
 
-		this.state = {
-			content: "Chat",
-			isLogged: false,
-		};
-	}
-
-	render() {
 		return (
 			<div >
 			<Grid container spacing={3}>
@@ -40,8 +46,7 @@ export default class Home extends Component<Props, State> {
 					<Box sx={{
 						display: "flex",
 						justifyContent:"center"}}>
-
-					{this.state.isLogged ? (
+					{isLogged ? (
 						<Link href={FrontGame}>
 						<Button
 							className="md-primary"
@@ -69,5 +74,5 @@ export default class Home extends Component<Props, State> {
 			</Grid>
 			</div>
 		);
-		}
 }
+export default Home;

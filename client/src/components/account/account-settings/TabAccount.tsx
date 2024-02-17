@@ -1,5 +1,5 @@
 // ** React Imports
-import React, { useState, ChangeEvent, InputHTMLAttributes, SyntheticEvent, useReducer } from 'react'
+import React, { useState, ChangeEvent, useReducer } from 'react'
 
 // ** MUI Imports
 import Box from '@mui/material/Box'
@@ -8,7 +8,6 @@ import { styled } from '@mui/material/styles'
 import TextField from '@mui/material/TextField'
 import IconButton from '@mui/material/IconButton'
 import CardContent from '@mui/material/CardContent'
-import FormControl from '@mui/material/FormControl'
 import Button, { ButtonProps } from '@mui/material/Button'
 import CloudUploadOutlinedIcon from '@mui/icons-material/CloudUploadOutlined'
 import AddAPhotoOutlinedIcon from '@mui/icons-material/AddAPhotoOutlined'
@@ -22,7 +21,7 @@ import {useSelector, useDispatch} from "react-redux";
 import {addUser, userLog} from "../../../services/reduce";
 
 // ** Icons Imports
-import { DefaultPic, pictureStarter } from '../../../common/constants'
+import { DefaultPic } from '../../../common/constants'
 import { reducer } from '../../../common/helper'
 
 const ImgStyled = styled('img')(({ theme }) => ({
@@ -181,7 +180,7 @@ interface TabAccountProps {
 }
 
 const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
-	
+
 	let users = useSelector(userLog);
 	const dispatch = useDispatch();
 	const [state, setState] = useReducer(reducer, {
@@ -189,35 +188,22 @@ const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
 		name: (currentUser?.userName || "name"),
 		email: (currentUser?.email || "email"),
 	});
-
 	const [profilePic, setProfilePic] = React.useState('');
-	const [isLogged, setIsLogged] = React.useState(false);
-	
+
 	const fetchData = async () => {
 		try {
-		  const user = await authService.getCurrentUser();
-			console.log(user);
-			if (user) {
-			  setIsLogged(true);
-			  if (user.profilePicture != pictureStarter)
-			  {
-				const photoProfile = await authService.getProfilePicture(user.profilePicture);
-				const teste = photoProfile instanceof HTMLImageElement ? photoProfile.src : '';
-				setProfilePic(teste);
-			  }
-			} else {
-			  setIsLogged(false);
-			  setProfilePic(DefaultPic);
-			}
+		  	const user = await authService.getCurrentUser();
+			const picture = await userService.getProfilePicture(user.profilePicture, user.userId);
+			setProfilePic(picture);
 		  } catch (error) {
 			console.error("Error fetching user data:", error);
 		  }
 	  };
-	
+
 	  React.useEffect(() => {
 		fetchData();
 	  }, [users]);
-	  
+
 	const saveChangesAction = () => {
 		dispatch(addUser("logOut"));
 	}

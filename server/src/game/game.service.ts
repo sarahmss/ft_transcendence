@@ -326,32 +326,41 @@ export class GameService {
 	}
 
 	async storeMatchHistory(match: MatchModel, roomId: string) {
-		const user1 = await this.usersService.findById(this.game.players[match.player1SocketID].userIdDataBase);
-		const user2 = await this.usersService.findById(this.game.players[match.player2SocketID].userIdDataBase);
-		const matchHist = new MatchHistory();
-		const timeEndMatch = new Date();
-		const durationInSeconds = Math.floor((timeEndMatch.getTime() - match.timeStartMatch.getTime()) / 1000);
-		matchHist.gameTime = durationInSeconds;
-		if (match.score1 > match.score2) {
-			matchHist.winner = user1;
-			matchHist.loser = user2;
-			matchHist.loserScore = match.score2;
-			matchHist.winnerScore = match.score1;
-			user1.winningGames.push(matchHist);
-			user2.losingGames.push(matchHist);
+		const user1 = await this.usersRepository.findOne({ where: { userId: this.game.players[match.player1SocketID].userIdDataBase }, relations: ['losingGames', 'winningGames'] });
+		const user2 = await this.usersRepository.findOne({ where: { userId: this.game.players[match.player2SocketID].userIdDataBase }, relations: ['losingGames', 'winningGames'] });
+
+		// const user1 = await this.usersService.findById(this.game.players[match.player1SocketID].userIdDataBase);
+		// const user2 = await this.usersService.findById(this.game.players[match.player2SocketID].userIdDataBase);
+		console.log('User1: ', user1);
+		console.log('User2: ', user2);
+		if (user1 && user2) {
+			const matchHist = new MatchHistory();
+			const timeEndMatch = new Date();
+			const durationInSeconds = Math.floor((timeEndMatch.getTime() - match.timeStartMatch.getTime()) / 1000);
+			matchHist.gameTime = durationInSeconds;
+			if (match.score1 > match.score2) {
+				matchHist.winner = user1;
+				matchHist.loser = user2;
+				matchHist.loserScore = match.score2;
+				matchHist.winnerScore = match.score1;
+				user1.winningGames.push(matchHist);
+				user2.losingGames.push(matchHist);
+			}
+			else if (match.score2 > match.score1) {
+				matchHist.winner = user2;
+				matchHist.loser = user1;
+				matchHist.loserScore = match.score1;
+				matchHist.winnerScore = match.score2;
+				user2.winningGames.push(matchHist);
+				user1.losingGames.push(matchHist);
+			}
+			// await this.matchRepository.save(matchHist);
+			await this.usersRepository.save(user1);
+			await this.usersRepository.save(user2);
+			delete this.game.match[roomId];
 		}
-		else if (match.score2 > match.score1) {
-			matchHist.winner = user2;
-			matchHist.loser = user1;
-			matchHist.loserScore = match.score1;
-			matchHist.winnerScore = match.score2;
-			user2.winningGames.push(matchHist);
-			user1.losingGames.push(matchHist);
-		}
-		// await this.matchRepository.save(matchHist);
-		await this.usersRepository.save(user1);
-		await this.usersRepository.save(user2);
-		delete this.game.match[roomId];
+		else
+			console.log('User1 e User2 ainda não chegaram....');
 	}
 
 	isCurrentUserTheWinner(match: MatchModel, playerNumbers: string): boolean {

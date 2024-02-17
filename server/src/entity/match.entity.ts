@@ -14,11 +14,11 @@ export class MatchHistory {
     @PrimaryGeneratedColumn("uuid")
     gameId: string;
 
-    @ManyToOne(() => User, { nullable: false })
+    @ManyToOne(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: "winnerId" })
     winner: User;
 
-    @ManyToOne(() => User, { nullable: false })
+    @ManyToOne(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     @JoinColumn({ name: "loserId" })
     loser: User;
 

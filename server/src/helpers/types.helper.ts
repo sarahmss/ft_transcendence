@@ -2,9 +2,18 @@ import * as session from 'express-session';
 import { Request } from 'express';
 
 export enum status {
-	ON = 'online',
-	OFF = 'offline',
-	PLAYING = 'playing',
+	ON = 'Online',
+	OFF = 'Offline',
+	PLAYING = 'Playing',
+}
+
+export enum FriendshipStatus {
+	FRIENDS = "Friends",
+	SENT = "RequestSent",
+	RECEIVED = "RequestReceived",
+	DENIED = "RequestDenied",
+	REMOVED = "FriendRemoved",
+	NOREALATION = "NoRelationship"
 }
 
 export type IntraUserData = {

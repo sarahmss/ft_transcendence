@@ -4,11 +4,12 @@ import { GameService } from './game.service';
 import { PlayerModel } from './game.service';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
+import { AppGateway } from 'src/app/app.gateway';
 
 @WebSocketGateway ({
 	namespace: '/game',
 	cors: {
-		origin: [process.env.FRONT_URL, process.env.BACK_URL],
+		origin: '*',
 		credentials: true,
 		methods: 'GET',
 	},
@@ -20,7 +21,8 @@ export class GameGateway
 		@WebSocketServer() server: Server;
 		constructor( private readonly gameService: GameService,
 					private readonly authService: AuthService,
-				) {}
+					private readonly appGateway: AppGateway,
+					) {}
 
 		async handleConnection(client: Socket) {
 			try {
@@ -109,6 +111,7 @@ export class GameGateway
 	@SubscribeMessage('customizeAndPlay')
 		handleCustomizeAndPlay(client: Socket, customChoices: any) : void {
 			this.gameService.customizeAndPlay(client, customChoices, this.server);
+			this.appGateway.setStatusPlaying(client.data.user);
 		}
 
 		@SubscribeMessage('createRoom')

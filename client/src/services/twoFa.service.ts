@@ -1,13 +1,12 @@
 import axios from 'axios';
+import { AxiosError } from 'axios';
 import AuthService from './auth.service';
-import { DefaultPic,
-		TwoFaLink,
+import { TwoFaLink,
 		TwoFaDisableLink,
 		TwoFaEnableLink,
 		TwoFaGenerateLink,
 		TwoFaLoginLink } from '../common/constants';
-
-import fetchData from '../components/navBar/NavBar';
+import { truncate } from 'fs';
 
 class TwoFaService {
 
@@ -41,34 +40,35 @@ class TwoFaService {
 	async redirectToEnable2FA(code: string) {
 		try {
 			const authToken = AuthService.getAuthToken();
-			await axios.post(TwoFaEnableLink, { code: code }, { headers: authToken });
+			const response = await axios.post(TwoFaEnableLink,
+				 							{ code: code },
+											{ headers: authToken });
+			return response;
 		} catch (error) {
-			console.error(error);
+			console.error("Error while enable 2fa:", error);
+			throw error;
 		}
 	}
 
 	async redirectToDisable2FA(code: string) {
 		try {
 			const authToken = AuthService.getAuthToken();
-			await axios.post(TwoFaDisableLink, { code: code }, { headers: authToken });
+			const response = await axios.post(TwoFaDisableLink, { code: code }, { headers: authToken });
+			return (response);
 		} catch (error) {
-			console.error(error);
+			console.error("Error while disable 2fa:", error);
+			throw error;
 		}
 	}
 
-	async login2Fa(code: string, userId: string): Promise<boolean> {
+	async login2Fa(code: string, userId: string) {
 		try {
 			const response = await axios.post(`${TwoFaLoginLink}?user=${userId}`,
-			{ code: code })
-			.then((response) => {
-				document.cookie = response.data.cookie;
-				sessionStorage.setItem("Logged", "ok");
-			});
-			
-			return true;
+			{ code: code });
+			return response;
 		} catch (error) {
-			console.error(error);
-			return false;
+			console.error("Error while login 2fa:", error);
+			throw error;
 		}
 	}
 }
