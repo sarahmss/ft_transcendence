@@ -1,17 +1,11 @@
-// ** React Imports
-import React, { useEffect, useState  } from 'react';
-import { Navigate, useSearchParams} from 'react-router-dom';
-
-// ** MUI Imports
+import React, { useEffect, useState } from 'react';
+import { Navigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, Grid } from '@mui/material';
-
 import IUserStats from '../../types/userStats.type';
-
 import Trophy from './dashboard/Trophy';
 import StatisticsCard from './dashboard/StatisticsCard';
 import DashboardTable from './dashboard/Table';
 import MatchHistoryComponent from './dashboard/MatchHistory';
-
 import userService from '../../services/user.service';
 import authService from '../../services/auth.service';
 import { DefaultPic, appSocket } from '../../common/constants';
@@ -20,11 +14,9 @@ const Profile = () => {
   const [userStats, setUserStats] = useState<IUserStats | null>(null);
   const [FriendsList, setFriendsList] = useState<IUserStats[] | null>(null);
   const [redirect, setRedirect] = useState<string>('');
-  const [ownerId, SetOwnerId] = useState<string>('');
-
+  const [ownerId, setOwnerId] = useState<string>('');
   const [profilePic, setProfilePic] = useState(DefaultPic);
   const [searchParams] = useSearchParams();
-
 
   const loadProfilePic = async (profilePic: string, userId: string) => {
     try {
@@ -35,68 +27,26 @@ const Profile = () => {
     }
   };
 
-  const SetUserStats = async (userId: string, profilePic:string) => {
+  const SetUserStats = async (userId: string, profilePic: string) => {
     try {
       const userStats = await userService.RequestUserStats(userId);
-        const FriendsList = await userService.getFriends(userId);
-        
-        loadProfilePic(profilePic, userId);
-        if (userStats) {
-          setUserStats(userStats);
-        }
-        if (FriendsList) {
-          setFriendsList(FriendsList);
-        }
+      const FriendsList = await userService.getFriends(userId);
+      
+      loadProfilePic(profilePic, userId);
+      setUserStats(userStats);
+      setFriendsList(FriendsList);
     } catch (error) {
-      console.error('Error seting user stats:', error); }
+      console.error('Error setting user stats:', error);
+    }
   }
-
-  const SetUserProfile = async (userId: string) => {
-    try {
-      await userService.RequestUserProfile(userId).then(
-        response =>{
-          const userProfile = response.data;
-          SetUserStats(userId, userProfile.profilePicture);
-        },
-        error => {
-          setRedirect('error');
-        }
-      );
-
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
-
-  
-  const updateFriendsList = async (userId: string) => {
-    try {
-      if (userId) {
-        appSocket.off('refreshFriends').on('refreshFriends', async () => {
-          const FriendsList = await userService.getFriends(userId);
-          if (FriendsList) {
-            setFriendsList(FriendsList);
-          }
-      });
-      }
-    } catch (error) {
-      console.error('Error fetching user stats:', error);
-    }
-  };
 
   const fetchData = async () => {
     try {
       const user = await authService.getCurrentUser();
-      
       if (user) {
-        const userId = searchParams.get('user');
-        if (userId){
-          SetUserProfile(userId)
-          SetOwnerId(userId)
-        } else {
-          SetUserProfile(user.userId)
-          SetOwnerId(user.userId)
-        }       
+        const userId = searchParams.get('user') || user.userId;
+        setOwnerId(userId);
+        SetUserStats(userId, user.profilePicture);
       } else {
         setRedirect('error');
       }
@@ -104,14 +54,32 @@ const Profile = () => {
       console.error('Error fetching user stats:', error);
     }
   };
+
   useEffect(() => {
     fetchData();
-    updateFriendsList(ownerId); 
-  }, );
+  }, [ownerId]);
+
+  useEffect(() => {
+    const updateFriendsList = async (userId: string) => {
+      try {
+        if (userId) {
+          appSocket.off('refreshFriends').on('refreshFriends', async () => {
+            const FriendsList = await userService.getFriends(userId);
+            setFriendsList(FriendsList);
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching user stats:', error);
+      }
+    };
+
+    updateFriendsList(ownerId);
+  }, [ownerId]);
 
   if (redirect === 'error') {
     return <Navigate to={'/error'} />;
   }
+
 
   return (
     <Card>

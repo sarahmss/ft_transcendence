@@ -16,13 +16,14 @@ const Img1 = styled('img')(({ theme }) => ({
   left: '0rem',
   bottom: '0rem',
   position: 'absolute',
-
+  zIndex: -1,
 }))
 
 const Img2 = styled('img')(() => ({
   right: 0,
   top: '5%',
   position: 'absolute',
+  zIndex: -1,
 }))
 
 const LoadingIllustration = (props: LoadingIllustrationsProp) => {
