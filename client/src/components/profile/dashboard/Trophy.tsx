@@ -32,7 +32,7 @@ const Trophy: React.FC<TrophyProps> = ({ userStats }) => {
   return (
     <Card sx={{ position: 'relative', height: "100%" }}>
       <CardContent>
-        <Typography variant='h6'>Welcome {userStats?.userName}! 🥳</Typography>
+        <Typography variant='h6'>Welcome to {userStats?.userName} profile! 🥳</Typography>
         <Typography variant='body2' sx={{ letterSpacing: '0.25px' }}>
           Play {userStats?.gamesWonToLevelUp} matches to Level Up !!
         </Typography>
