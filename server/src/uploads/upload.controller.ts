@@ -61,19 +61,15 @@ export class UploadsController {
 			}),
 		}))
 		async uploadFile(
-			@UploadedFile(
-			new ParseFilePipe({
-				validators: [
+			@UploadedFile( new ParseFilePipe({ validators: [
 					new MaxFileSizeValidator({ maxSize: 1000000 }),
 					new FileTypeValidator({ fileType: '(jpeg|jpg|png)$' }),
-				],
-				}),
-			)
-	file: Express.Multer.File,
-	@Param('userId') userId: string): Promise<any> {
-		const url = `/uploads/${userId}/profilePictures/${file.filename}`
-		return {url:url};
-	}
+				  ], }),)
+      file: Express.Multer.File,
+      @Param('userId') userId: string): Promise<any> {
+        const url = `/uploads/${userId}/profilePictures/${file.filename}`
+        return {url:url};
+      }
 
   @Get('/:userId/profilePictures/:filename')
   async getProfilePicture(
