@@ -184,14 +184,14 @@ const TimeSelectComponent = ({user}: {user: any}) => {
 
   return (
     <FormControl sx={{ m: 1, minWidth: 80, label: {marginTop: 0}}} required>
-      <InputLabel id="roomtype-select">Room Type</InputLabel>
+      <InputLabel id="roomtype-select">Time</InputLabel>
     
         <Select
           labelId="roomtype-select"
           id="roomtype-select"
           value={time === -1 ? '' : time}
           onChange = {handleTimeChange}
-          label="Room Type"
+          label="Interval"
         >
 
           <MenuItem key={"30seg"} value={30000}>
