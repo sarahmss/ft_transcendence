@@ -2,12 +2,15 @@ import { Signal, effect, signal } from "@preact/signals-react";
 import { fetchInvitations, fetchMessageByRoom, fetchParticipants, fetchRooms, messageMaker, roomMaker, userMaker } from "./FetchChatData";
 import authService from "../services/auth.service";
 import roomService from "../services/chat/room.service";
-import { chatSocket } from "../common/constants";
+import { ChatLink } from "../common/constants";
+import { getToken } from "../common/helper";
+import { io } from "socket.io-client";
 
 const currentRoom: Signal<number> = signal(-1);
 const userLogged: Signal<boolean> = signal(false);
 const page: Signal<number> = signal(0);
 const invitationIdList: Signal<string[]> = signal([]);
+
 const privilegedInRoom: {owner: Signal<boolean>, admin: Signal<boolean>} = {
   owner: signal(false),
   admin: signal(false)
@@ -46,7 +49,14 @@ type Room = {
 
 const chatData: Signal<Room[]> = signal([]);
 
-
+const chatSocket = io(ChatLink, {
+  auth: {
+    token: getToken(),
+  },
+  withCredentials: true,
+  autoConnect: false,
+  
+});
 
 const insertMessage = (response: any) => {
 
@@ -182,12 +192,23 @@ if (authService.getIsLogged()){
   chatSocket.on('invitation-send', addInvitationToList)  
 }
 
+<<<<<<< HEAD
+=======
+chatSocket.on('invitation-send', addInvitationToList);
+>>>>>>> origin/feature/chat
 
 // Effect knows what event is triggered base on the signal
 effect(
   () => {
-    if (userLogged.value === false)
-      currentRoom.value = -1;
+
+    switch (userLogged.value) {
+      case true:
+        chatSocket.connect();
+        break;
+      default:
+        chatSocket.disconnect();
+        currentRoom.value = -1;
+    }
   }
 );
 

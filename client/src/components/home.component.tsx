@@ -5,7 +5,8 @@ import {FrontLogin, FrontGame} from "./../common/constants";
 import { Grid, Button, Link, Box } from "@mui/material";
 import ChatComponent from "./chat/chat.component";
 import authService from "../services/auth.service";
-import { appSocket, chatSocket } from "./../common/constants";
+import { appSocket } from "./../common/constants";
+import { userLogged } from "../contexts/ChatContext";
 
 const Home: React.FC = () => {
 	const [isLogged, setIsLogged] = React.useState(false);
@@ -14,10 +15,11 @@ const Home: React.FC = () => {
 		try {
 		  const user = await authService.getCurrentUser();
 			if (user) {
+				userLogged.value=true;
 			  setIsLogged(true);
 			  appSocket.connect();
-			  chatSocket.connect();
 			} else {
+				userLogged.value=false;
 			  setIsLogged(false);
 			}
 		  } catch (error) {

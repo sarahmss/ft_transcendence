@@ -6,13 +6,6 @@ export const FrontLink = process.env.REACT_APP_FRONT_HOST
 export const ChatLink = BackLink + "/room"
 
 export const appSocket = io(`${BackLink}/app`, { withCredentials: true });
-export const chatSocket = io(ChatLink, {
-	autoConnect:false,
-	auth: {
-	  token: getToken(),
-	},
-	withCredentials: true,
-});
 export const IntraloginLink = BackLink + "/auth/login"
 export const LocalSignupLink = BackLink + "/auth/signup"
 export const LocalSigninLink = BackLink + "/auth/signin"

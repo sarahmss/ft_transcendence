@@ -27,8 +27,10 @@ const UserActionChatComponent = ({user}: {user: User}) => {
   const open = Boolean(anchorEl);
   const [action, setAction] = React.useState(-1);
 
-  const togglePrompt = () => {
+  const togglePrompt = (event: any) => {
     setPrompt(!showPrompt);
+    setAction(event.target.value);
+    handleClose();
   }
 
   const handleToggleAdmin = () => {
@@ -62,14 +64,14 @@ const UserActionChatComponent = ({user}: {user: User}) => {
 
   // Unprivileged actions
   const unprivilegedAction = [
-    {action: togglePrompt, label: 'Mute'},
+    {id: 1, action: togglePrompt, label: 'Mute'},
   ];
 
   // With Privilege
   const privilegedAction = [
-    {action: togglePrompt, label: 'Ban'},
-    {action: handleKick, label: 'Kick'},
-    {action: handleToggleAdmin, label: 'Toggle admin'},
+    {id: 2, action: togglePrompt, label: 'Ban'},
+    {id: 3, action: handleKick, label: 'Kick'},
+    {id: 4, action: handleToggleAdmin, label: 'Toggle admin'},
   ];
   
   return (
@@ -107,7 +109,7 @@ const UserActionChatComponent = ({user}: {user: User}) => {
           privilegedInRoom.admin.value || privilegedInRoom.owner.value ?
             (
               privilegedAction.map((action) => (
-                <MenuItem key={action.label} onClick={action.action}>
+                <MenuItem value={action.id} key={action.label} onClick={action.action}>
                   {action.label}
                 </MenuItem>
               ))
@@ -139,6 +141,8 @@ const TimeSelectComponent = ({user}: {user: any}) => {
 
   const handleBlock = () => {
     
+    console.log(authService.getIdFromToken()===user.userId);
+
     blackListService.banSingle(
       authService.getIdFromToken(),
       user.userId,
@@ -150,6 +154,8 @@ const TimeSelectComponent = ({user}: {user: any}) => {
 
   const handleBan = () => {
     
+    console.log(authService.getIdFromToken()===user.userId);
+
     banService.banUser(
       authService.getIdFromToken(),
       user.userId,
@@ -165,11 +171,13 @@ const TimeSelectComponent = ({user}: {user: any}) => {
 
     switch (user.action) {
       case 1:
-        handleBan();
-        break;
-      case 2:
         handleBlock();
         break;
+      case 2:
+        handleBan();
+        break;
+      default:
+        console.log("unknown action");
     }
     
   }

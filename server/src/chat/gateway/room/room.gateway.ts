@@ -85,7 +85,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		catch (error) {
 			console.log("User auth failure");
-			console.log(error);
 			this.handleDisconnect(client);
 		}
 	}
