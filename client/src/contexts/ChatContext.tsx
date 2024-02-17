@@ -11,6 +11,7 @@ const currentRoom: Signal<number> = signal(-1);
 const userLogged: Signal<boolean> = signal(false);
 const page: Signal<number> = signal(0);
 const invitationIdList: Signal<string[]> = signal([]);
+
 const privilegedInRoom: {owner: Signal<boolean>, admin: Signal<boolean>} = {
   owner: signal(false),
   admin: signal(false)
@@ -53,7 +54,9 @@ const chatSocket = io(ChatLink, {
   auth: {
     token: getToken(),
   },
-  withCredentials: true
+  withCredentials: true,
+  autoConnect: false,
+  
 });
 
 const insertMessage = (response: any) => {
@@ -191,8 +194,15 @@ chatSocket.on('invitation-send', addInvitationToList);
 // Effect knows what event is triggered base on the signal
 effect(
   () => {
-    if (userLogged.value === false)
-      currentRoom.value = -1;
+
+    switch (userLogged.value) {
+      case true:
+        chatSocket.connect();
+        break;
+      default:
+        chatSocket.disconnect();
+        currentRoom.value = -1;
+    }
   }
 );
 

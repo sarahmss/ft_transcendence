@@ -64,7 +64,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// Authentication via jwt token sent by the client
 		try {
 
-			console.log(client);
 			let user: any;
 			let token: string = null;
 
