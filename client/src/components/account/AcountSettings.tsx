@@ -103,15 +103,6 @@ const AccountSettings = () => {
               </Box>
             }
           />
-          <Tab
-            value='status'
-            label={
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <MilitaryTechOutlinedIcon />
-                <TabName>Status</TabName>
-              </Box>
-            }
-          />
         </TabList>
 
         <TabPanel sx={{ p: 0 }} value='account'>

@@ -73,13 +73,31 @@ const ProfilePicComponent: React.FC<ProfilePicProps> = ({ setImgSrc, setUrl }) =
 
 	const UploadFile = async () => {
 		if (file) {
-			const formData = new FormData()
-			formData.append('file', file)
-			const newProfilePic = await userService.uploadProfilePic(file.name, formData)
-			setUrl({imgUrl: newProfilePic});
-			setSelectedFile(false);
+			const fileExtension = file.name.split('.').pop()?.toLowerCase();
+			
+			if (fileExtension && !['png', 'jpeg', 'jpg'].includes(fileExtension)) {
+				alert('Only PNG and JPEG files are allowed');
+				return;
+			}
+	
+			if (file.size > ((1024 * 1024))) {
+				alert('File size exceeds the maximum limit of 1MB');
+				return;
+			}
+	
+			const formData = new FormData();
+			formData.append('file', file);
+	
+			try {
+				const newProfilePic = await userService.uploadProfilePic(file.name, formData);
+				setUrl({ imgUrl: newProfilePic });
+				setSelectedFile(false);
+			} catch (error) {
+				console.error('Error uploading file:', error);
+			}
 		}
 	}
+	
 
 	return (
 		<Box display="flex" flexDirection="column" alignItems="right">

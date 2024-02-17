@@ -63,10 +63,11 @@ const NavBar: React.FC = () => {
       const user = await authService.getCurrentUser();
         if (user) {
           setIsLogged(true);
-          setUserName(user.userName)
+          setUserName(user.userName);
           const picture = await userService.getProfilePicture(user.profilePicture, user.userId);
 			    setProfilePic(picture);
         } else {
+          setUserName("");
           setIsLogged(false);
           userLogged.value = false;
           setProfilePic(DefaultPic);
