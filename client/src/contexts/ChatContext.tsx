@@ -186,7 +186,7 @@ chatSocket.on('left', handleRemoveUser);
 chatSocket.on('chat-deleted', handleRemoveRoom);
 chatSocket.on('private-toggle', updatePrivateStatus);
 
-chatSocket.on('invitation-send', addInvitationToList)
+chatSocket.on('invitation-send', addInvitationToList);
 
 // Effect knows what event is triggered base on the signal
 effect(
