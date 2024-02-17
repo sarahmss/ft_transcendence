@@ -192,10 +192,7 @@ if (authService.getIsLogged()){
   chatSocket.on('invitation-send', addInvitationToList)  
 }
 
-<<<<<<< HEAD
-=======
 chatSocket.on('invitation-send', addInvitationToList);
->>>>>>> origin/feature/chat
 
 // Effect knows what event is triggered base on the signal
 effect(

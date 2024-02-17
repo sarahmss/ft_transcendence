@@ -109,10 +109,8 @@ class AuthService {
 	}
 
 	getAuthToken() {
-		if (this.getIsLogged()){
-			const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
-			return authToken;			
-		}
+		const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
+		return authToken;
 	}
 
 	getIdFromToken() {
