@@ -85,8 +85,6 @@ const RoomResultComponent = ({roomData} : {roomData: any}) => {
 
   const handleJoin = () => {
 
-    togglePrompt();
-
     roomService.joinRoom(
       room.roomId,
       authService.getIdFromToken(),
