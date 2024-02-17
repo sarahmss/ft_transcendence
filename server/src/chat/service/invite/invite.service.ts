@@ -36,10 +36,21 @@ export class InviteService {
     return instance;
   }
 
-  async useInvitation(inviteId: string) {
+  async useInvitation(inviteId: string, response: boolean) {
     await this.inviteRepository.update(
       {inviteId: inviteId},
-      {valid: false}
+      {valid: response}
     );
   }
+
+  async getInvitation(userId: string) {
+    return this.inviteRepository.find(
+      {where: {
+        userId: userId,
+        valid: true,
+        timeLimit: MoreThan(new Date())
+      }}
+    );
+  }
+  
 }

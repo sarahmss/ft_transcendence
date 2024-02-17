@@ -15,6 +15,9 @@ back:
 local: db front back
 	@echo "Running Local..."
 
+watch:
+	@docker-compose -f ./docker-compose.yml watch
+
 down:
 	@docker-compose -f ./docker-compose.yml down
 

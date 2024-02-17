@@ -1,4 +1,6 @@
 import { Body, ConflictException, Controller, NotFoundException, Patch, Post, UnauthorizedException } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { response } from 'express';
 import { BanService } from 'src/chat/service/ban/ban.service';
 import { InviteService } from 'src/chat/service/invite/invite.service';
 import { MembershipService } from 'src/chat/service/membership/membership.service';
@@ -14,6 +16,7 @@ export class InviteController {
     private readonly userService: UsersService,
     private readonly memberService: MembershipService,
     private readonly banService: BanService,
+    private readonly eventEmitter: EventEmitter2
   ) {}
 
   @Post()
@@ -42,6 +45,12 @@ export class InviteController {
 
     const rawInvitation = await this.inviteService.createInvitation(room, user);
 
+    this.eventEmitter.emit('invite-send',
+      userId,
+      rawInvitation.inviteId,
+      "invitation-send"
+    );
+
     return {
       inviteId: rawInvitation.inviteId
     };
@@ -50,7 +59,8 @@ export class InviteController {
   @Patch()
   async useInvitation (
     @Body('userId') userId: string,
-    @Body('inviteId') inviteId: string
+    @Body('inviteId') inviteId: string,
+    @Body('response') response: boolean
   ) {
 
     const invitation = await this.inviteService.findValid(inviteId);
@@ -61,7 +71,32 @@ export class InviteController {
       throw new UnauthorizedException('Invition not meant for this user');
 
     await this.memberService.joinSingleUser(invitation.user, invitation.room, false);
-    await this.inviteService.useInvitation(inviteId);
+    await this.inviteService.useInvitation(inviteId, response);
+
+    const memberList = this.memberService.findParticipantsNotExclusive(invitation.roomId);
+    const roomId = invitation.roomId;
+    const usr = this.userService.findById(invitation.userId);
+
+    this.eventEmitter.emit("room.join",
+      memberList,
+      "",
+      "joined",
+      (_: any[], __: any, rid: string = roomId, user: any = usr) => {
+        return ({
+          userId: user.userId,
+          userName: user.userName,
+          profileImage: user.profilePicture,
+          roomId: rid
+        })
+      }
+    );
     return "invitation used";
+  }
+
+  @Post('getInvitation')
+  async getInvitation (
+    @Body('userId') userId: string,
+  ) {
+    return await this.inviteService.getInvitation(userId);
   }
 }

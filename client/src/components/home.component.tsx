@@ -5,7 +5,7 @@ import {FrontLogin, FrontGame} from "./../common/constants";
 import { Grid, Button, Link, Box } from "@mui/material";
 import ChatComponent from "./chat/chat.component";
 import authService from "../services/auth.service";
-import { appSocket } from "./../common/constants";
+import { appSocket, chatSocket } from "./../common/constants";
 
 const Home: React.FC = () => {
 	const [isLogged, setIsLogged] = React.useState(false);
@@ -15,7 +15,8 @@ const Home: React.FC = () => {
 		  const user = await authService.getCurrentUser();
 			if (user) {
 			  setIsLogged(true);
-			  appSocket.connect()
+			  appSocket.connect();
+			  chatSocket.connect();
 			} else {
 			  setIsLogged(false);
 			}
@@ -40,9 +41,9 @@ const Home: React.FC = () => {
 					/>
 				</div>
 				</Grid>
-				<Grid item xs={12} md={6} lg={4}>
-					<ChatComponent/>
 
+				<Grid item xs={12} md={6} lg={4} sx={{ paddingLeft: "0px"}}>
+					{isLogged ? (<ChatComponent/>):(<></>)}
 					<Box sx={{
 						display: "flex",
 						justifyContent:"center"}}>

@@ -32,7 +32,17 @@ export class MessageService {
 	}
 
 	async findMessageById(messageId: string) {
-		return await this.messageRepository.findOne({where: {messageId: messageId}});
+		return this.messageRepository.findOne({where: {messageId: messageId}});
+	}
+
+	async findMessageByIdJoined(messageId: string) {
+		return this.messageRepository.findOne(
+			{
+				relations: ['user', 'room'],
+				where: {messageId: messageId}
+			}
+		);
+		
 	}
 
 	async findRoomMessage(room: Room,
@@ -48,6 +58,18 @@ export class MessageService {
 
 		return query.getMany();
 	}
+
+	async findRoomMessageAll(room: Room): Promise<Message[]> {
+
+		const query = this.messageRepository
+			.createQueryBuilder('msg')
+			.innerJoinAndSelect('msg.user', 'user')
+			.where('msg.room_id = :rid', {rid: room.roomId})
+			.orderBy('msg.timestamp', 'DESC');
+
+		return query.getMany();
+	}
+	
 
 	async findMessageWithPage(
 							  room: Room,
@@ -72,9 +94,11 @@ export class MessageService {
 					   newMessage: string) {
 
 		const sanitizedMessage = xssFilters.inHTMLData(newMessage);
+
 		return this.messageRepository.update(
 																	{messageId: messageId},
-																   {message: sanitizedMessage});
+																	{message: sanitizedMessage}
+						);
 	}
 
 	async deleteMessage(messageId: string) {

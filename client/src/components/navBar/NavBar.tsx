@@ -13,15 +13,11 @@ import authService from '../../services/auth.service';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import { Link} from 'react-router-dom';
-
-
 import { DefaultPic } from '../../common/constants';
-
-import {useSelector} from "react-redux";
 import {userLog} from "../../services/reduce";
 import userService from '../../services/user.service';
-
-
+import {useSelector} from "react-redux";
+import { userLogged } from '../../contexts/ChatContext';
 
 const pagesLogged = [
   { label: 'Logout', link: '/logout' },
@@ -72,6 +68,7 @@ const NavBar: React.FC = () => {
 			    setProfilePic(picture);
         } else {
           setIsLogged(false);
+          userLogged.value = false;
           setProfilePic(DefaultPic);
         }
       } catch (error) {

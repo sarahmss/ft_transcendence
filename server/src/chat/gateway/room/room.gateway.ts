@@ -16,15 +16,11 @@ import { OnEvent } from '@nestjs/event-emitter';
 
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
-import { MembershipService } from 'src/chat/service/membership/membership.service';
 
 import { Membership } from 'src/entity/membership.entity';
 
-import { Room } from 'src/entity/room.entity';
 import { ForbiddenException } from '@nestjs/common';
 import { ConnectedUserService } from 'src/chat/service/connected-user/connected-user.service';
-import { RoomService } from 'src/chat/service/room/room.service';
-import { Message } from 'src/entity/message.entity';
 import { BlackList } from 'src/entity/blacklist.entity';
 import { Ban } from 'src/entity/ban.entity';
 
@@ -67,21 +63,38 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		// Authentication via jwt token sent by the client
 		try {
-			const user = await this.checkUser(<string> client.handshake.headers.jwt);
 
-			client.data.userId = user.userId;
+			console.log("Connecting chat socket");
+
+			let user: any;
+			let token: string = null;
+
+			if (client.handshake.auth.token)
+				token = client.handshake.auth.token;
+
+			else if (client.handshake.headers.cookie)
+				token = client.handshake.headers.cookie.split('=')[1];
+
+			else if (client.handshake.headers.jwt)
+				token = <string> client.handshake.headers.jwt; 
+
+			user = await this.checkUser(token); 
+
+			client.data.user = user;
 			this.connectedUserService.addConnection(user.userId, client);
 		}
-		catch {
+		catch (error) {
 			console.log("User auth failure");
+			console.log(error);
 			this.handleDisconnect(client);
 		}
 	}
 
 	handleDisconnect(client: Socket) {
 
-		this.connectedUserService
-			.removeConnection(client.data.userId);
+		if (client.data.user && client.data.user.userId)
+			this.connectedUserService
+				.removeConnection(client.data.user.userId);
 
 		client.disconnect();
 		console.log("User disconnected");
@@ -91,8 +104,12 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('message')
 	handleMessage(client: Socket, payload: any) {
 		
-		client.emit("client-response", payload);
-		this.connectedUserService.getConnection(client.data.userId).emit("client-response", "service working");
+		// client.emit("client-response", payload);
+		const socket = this.connectedUserService
+													.getConnection(client.data.user.userId);
+
+		socket.emit("client-response", "service working");
+
 		this.server.emit("message-response", payload);
 	}
 
@@ -103,10 +120,11 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@OnEvent('room.join')
 	@OnEvent('room.leave')
 	@OnEvent('room.admin')
-	@OnEvent('room.create')
 	@OnEvent('room.delete')
+	@OnEvent('room.private')
 	emitRoomToAllMembers(users: any[], room: any, emission_event: string, cb: any) {
 
+		console.log(users);
 		users.forEach((user: any) => {
 			const conn = this.connectedUserService.getConnection(user.userId);
 			if (conn) {
@@ -116,13 +134,35 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 	}
 
+	@OnEvent('room.create')
+	emitRoom(users: any[], room: any, emission_event: string, cb: any) {
+
+		users.forEach((user: any) => {
+			const conn = this.connectedUserService.getConnection(user);
+			if (conn) {
+				const data = cb(users, room);
+				conn.emit(emission_event, data);
+			}
+		});
+	}
+
+	@OnEvent('invite-send')
+	emitInvite(targetId: string, inviteId: string, emission_event: string) {
+		const conn = this.connectedUserService.getConnection(targetId);
+
+		if (conn)
+			conn.emit(emission_event, { inviteId: inviteId });
+		
+	}
+
 	// Will listen the event emitted by the emitter in the controller
 	@OnEvent('message.create')
-	async handleMessageEmission(message: Message,
-		author: string,
+	async handleMessageEmission(
+		messageResp: any,
 		blackList: any[],
 		participantList: any[],
-		banList: any[]
+		banList: any[],
+		event: string = "message-response"
 	) {
 
 		let receivingClients: any;
@@ -133,7 +173,8 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				(participant: Membership) =>
 					(!blackList.some((blocked: BlackList) =>
 						(participant.userId === blocked.blockedId ||
-						participant.userId === blocked.blockerId)) &&
+						participant.userId === blocked.blockerId) &&
+						participant.userId !== messageResp.authorId) &&
 					!banList.some((banEntry: Ban) =>
 						(banEntry.banId === participant.userId))
 				));
@@ -143,19 +184,24 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			receivingClients = participantList;
 		}
 
+		await this.sendToMembers(messageResp, receivingClients, event);
+
+	}
+
+	@OnEvent('broadcast.delete')
+	@OnEvent('broadcast.update')
+	async sendToMembers (
+		messageResp: any,
+		receivingClients: any[],
+		event: string
+	) {
 		// Emit the message to the user
 		receivingClients.forEach((membershipData: Membership) => {
 			let targetSocket: Socket = this.connectedUserService
 																				.getConnection(membershipData.userId);
-			if (targetSocket)
-				targetSocket.emit("message-response",
-													{
-														message: message.message,
-														messageId: message.messageId,
-														messageTimestamp: message.timestamp,
-														authorId: message.userId,
-														author: author,
-													});
+			if (targetSocket) {
+				targetSocket.emit(event, messageResp);
+			}
 		});
 	}
 }

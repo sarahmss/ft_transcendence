@@ -1,7 +1,7 @@
 import axios, { RawAxiosRequestHeaders }	from "axios";
 
 
-import { BackLink, Front2Fa, LocalSigninLink,
+import { BackLink, LocalSigninLink,
 		LocalSignupLink,
 		UserContentLink,
 		tokenData } from "../common/constants";
@@ -109,8 +109,10 @@ class AuthService {
 	}
 
 	getAuthToken() {
-		const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
-		return authToken;
+		if (this.getIsLogged()){
+			const authToken: RawAxiosRequestHeaders = {'Authorization': 'Bearer ' + document.cookie.substring('accessToken='.length)};
+			return authToken;			
+		}
 	}
 
 	getIdFromToken() {
