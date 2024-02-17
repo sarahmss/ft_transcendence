@@ -17,12 +17,14 @@ import { join } from 'path';
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from 'multer';
 import { UsersService } from "src/users/users.service";
+import { UploadsService } from "./upload.service";
 const fs = require('fs');
 
 @Controller('uploads')
 export class UploadsController {
 	constructor(
 		private usersService: UsersService,
+    private uploadService: UploadsService,
 		) {}
 
 	@Get(':userId/:path')
@@ -68,19 +70,22 @@ export class UploadsController {
 		return {url:url};
 	}
 
-	@Get('/:userId/profilePictures/:filename')
-	async getProfilePicture(
-			@Param('userId') userId: string,
-			@Param('filename') filename: string,
-			@Res() res: Response): Promise<void>
-	{
-		const filePath = join(process.cwd(), `uploads/${userId}/profilePictures/${filename}`);
-
-		if (fs.existsSync(filePath)) {
-			res.sendFile(filePath);
-		} else {
-			throw new NotFoundException();
-		}
-	}
+  @Get('/:userId/profilePictures/:filename')
+  async getProfilePicture(
+    @Param('userId') userId: string,
+    @Param('filename') filename: string,
+    @Res() res: Response
+  ): Promise<void> {
+    try {
+      const filePath = await this.uploadService.getProfilePicture(userId, filename);
+      res.sendFile(filePath);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        res.status(404).send('File not found');
+      } else {
+        res.status(500).send('Internal Server Error');
+      }
+    }
+  }
 
 }
