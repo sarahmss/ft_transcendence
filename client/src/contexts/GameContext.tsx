@@ -4,6 +4,7 @@ import React, { useEffect,
 import socketClient from 'socket.io-client';
 import AuthService from "../services/auth.service";
 import { GameLink } from "../common/constants"
+import authService from "../services/auth.service";
 
 interface Player {
 	name: string;
@@ -235,48 +236,54 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
 		// }
 	});
 
-	gameSocket.on('disconnect', () => {
-		dispatch({ type: 'CONNECTED', payload: false });
-	});
+    gameSocket.on('disconnect', () => {
+      dispatch({ type: 'CONNECTED', payload: false });
+    });
 
-	gameSocket.on('PlayersRefresh', (players) => {
-		const player = players[gameSocket.id];
-    console.log('Players: ', players);
-		if (player)
-		{
-			const storedPlayer = AuthService.getCurrentUserPlay();
-			if (!storedPlayer){
-				dispatch({ type: 'LOGGED', payload: false });
-				return;
-			}
-			sessionStorage.setItem(storedPlayer.userId, JSON.stringify(player));
-			dispatch({type: 'PLAYER', payload: players[gameSocket.id]});
-		}
-		else {
-			dispatch({type: 'RESET_STATE'});
-		}
-		dispatch({type: 'PLAYERS', payload: players});
-	});
-	gameSocket.on('ReceiveMessage', (receiveMessage) => {
-		dispatch({type: 'MESSAGE', payload: receiveMessage });
-	});
-	gameSocket.on('RoomsRefresh', (rooms) => {
-		dispatch({type: 'ROOMS', payload: rooms});
-		dispatch({type: 'ROOM', payload: gameSocket.id});
-	});
-	gameSocket.on('MatchRefresh', (match) => {
-		dispatch({type: 'MATCH', payload: match});
-	});
+    gameSocket.on('PlayersRefresh', (players) => {
+      if (!authService.getIsLogged()){
+        return ;
+      }
+      const player = gameSocket.id ? players[gameSocket.id] : undefined; // ATENÇÃO
+      console.log('Players: ', players);
+      if (player)
+      {
+        const storedPlayer = AuthService.getCurrentUserPlay();
+        if (!storedPlayer){
+          dispatch({ type: 'LOGGED', payload: false });
+          return;
+        }
+        sessionStorage.setItem(storedPlayer.userId, JSON.stringify(player));
+        dispatch({type: 'PLAYER', payload: player});
+      }
+      else {
+        dispatch({type: 'RESET_STATE'});
+      }
+      dispatch({type: 'PLAYERS', payload: players});
+    });
+    gameSocket.on('ReceiveMessage', (receiveMessage) => {
+      dispatch({type: 'MESSAGE', payload: receiveMessage });
+    });
+    gameSocket.on('RoomsRefresh', (rooms) => {
+      if (!authService.getIsLogged()){
+        return ;
+      }
+      dispatch({type: 'ROOMS', payload: rooms});
+      dispatch({type: 'ROOM', payload: gameSocket.id ? gameSocket.id : ""}); // ATENÇÃO
+    });
+    gameSocket.on('MatchRefresh', (match) => {
+      dispatch({type: 'MATCH', payload: match});
+    });
 
-	gameSocket.on('WaitingRefresh', (waitingLength) => {
-		dispatch({type: 'WAITING_QUEUE', payload: waitingLength});
-	});
+    gameSocket.on('WaitingRefresh', (waitingLength) => {
+      dispatch({type: 'WAITING_QUEUE', payload: waitingLength});
+    });
 
-	gameSocket.on('RemoveMatch', () => {
-		dispatch({type: 'MATCH', payload: {}});
-	})
-
-	gameSocket.open();
+    gameSocket.on('RemoveMatch', () => {
+      dispatch({type: 'MATCH', payload: {}});
+    })
+    gameSocket.open();
+  
   }, []);
 
   return (
