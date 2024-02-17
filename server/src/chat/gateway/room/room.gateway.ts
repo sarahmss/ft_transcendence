@@ -163,17 +163,17 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		let receivingClients: any;
 
-		if (blackList.length > 0) {
+		if (blackList.length > 0 || banList.length > 0) {
 			// If there is someone blocked => filter and get the allowed users
 			receivingClients = participantList.filter(
 				(participant: Membership) =>
 					!blackList.some((blocked: BlackList) =>
 						(participant.userId === blocked.blockedId ||
 						participant.userId === blocked.blockerId) &&
-						participant.userId !== messageResp.authorId) &&
-
+						participant.userId !== messageResp.authorId)
+					&&
 					!banList.some((banEntry: Ban) =>
-						(banEntry.banId === participant.userId))
+						(banEntry.bannedId === participant.userId))
 				);
 			console.log(receivingClients);
 		}
