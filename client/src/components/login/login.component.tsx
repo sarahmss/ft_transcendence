@@ -227,7 +227,7 @@ export default class Login extends Component<Props, State> {
 						</Formik>
 					</Card>
 					<CardContent style={{ paddingLeft: 35, paddingTop: 25 }}>
-						<p className="lorem">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Excepturi laborum ad commodi quos voluptate perspiciatis consectetur a, sapiente nam ab necessitatibus, ipsa quidem? Id aliquam, eligendi quidem dolor perferendis error.</p>
+						<p className="lorem">Reflecting on these two and a half years in university feels like unraveling the mystery of life’s number 42. Each challenge, every laugh, and each unanswered question has been a piece of this intriguing puzzle. To family, friends, and ourselves, who sought meaning in every class and experience. May this chapter be remembered as a constant quest, and may the next reveal more answers than questions.</p>
 					</CardContent>
 				</Card>
 				<Box
