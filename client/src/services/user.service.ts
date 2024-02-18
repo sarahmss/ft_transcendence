@@ -44,7 +44,7 @@ class UserService {
 
 	async RequestUserStats(userId: string){
 		try {
-			if (AuthService.getIsLogged() != null)
+			if (AuthService.getIsLogged())
 			{
 				const response = await axios.get((UserContentLink + userId + '/stats'),
 					{ headers: AuthService.getAuthToken() });
@@ -69,7 +69,7 @@ class UserService {
 	
 	async RequestAllUserStats(){
 		try {
-			if (AuthService.getIsLogged() != null)
+			if (AuthService.getIsLogged())
 			{
 				const response = await axios.get((UserContentLink + 'AllStats'),
 					{ headers: AuthService.getAuthToken() });
@@ -137,7 +137,7 @@ class UserService {
 	
 	async sendFriendshipRequest(friendId: string) {
 		try {
-			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
+			if (AuthService.getIsLogged() && AuthService.getIdFromToken() !== friendId) {
 				const ownerId = AuthService.getIdFromToken();
 				const authTokenQr = AuthService.getAuthToken();
 				const response = await axios.get(`${FriendsLink}${ownerId}/${friendId}/send-request`, { headers: authTokenQr });
@@ -151,7 +151,7 @@ class UserService {
 	
 	async acceptFriendshipRequest(friendId: string) {
 		try {
-			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
+			if (AuthService.getIsLogged() && AuthService.getIdFromToken() !== friendId) {
 				const ownerId = AuthService.getIdFromToken();
 				const authTokenQr = AuthService.getAuthToken();
 				const response = await axios.get(`${FriendsLink}${ownerId}/${friendId}/accept-request`, { headers: authTokenQr });
@@ -165,7 +165,7 @@ class UserService {
 	
 	async denyFriendshipRequest(friendId: string) {
 		try {
-			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
+			if (AuthService.getIsLogged() && AuthService.getIdFromToken() !== friendId) {
 				const ownerId = AuthService.getIdFromToken();
 				const authTokenQr = AuthService.getAuthToken();
 				const response = await axios.get(`${FriendsLink}${ownerId}/${friendId}/deny-request`, { headers: authTokenQr });
@@ -179,7 +179,7 @@ class UserService {
 	
 	async removeFriend(friendId: string) {
 		try {
-			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
+			if (AuthService.getIsLogged() && AuthService.getIdFromToken() !== friendId) {
 				const ownerId = AuthService.getIdFromToken();
 				const authTokenQr = AuthService.getAuthToken();
 				const response = await axios.get(`${FriendsLink}${ownerId}/${friendId}/remove`, { headers: authTokenQr });
@@ -193,7 +193,7 @@ class UserService {
 	
 	async getFriendshipStatus(friendId: string) {
 		try {
-			if (AuthService.getIsLogged() != null && AuthService.getIdFromToken() !== friendId) {
+			if (AuthService.getIsLogged() && AuthService.getIdFromToken() !== friendId) {
 				const ownerId = AuthService.getIdFromToken();
 				const authTokenQr = AuthService.getAuthToken();
 				const response = await axios.get(`${FriendsLink}${ownerId}/${friendId}/status`, { headers: authTokenQr });
