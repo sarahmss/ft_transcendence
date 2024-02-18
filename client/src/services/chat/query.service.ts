@@ -27,6 +27,17 @@ class QueryService {
     return userList.data;
     
   }
+
+  queryUserSync(
+    pattern: string,
+    setData: any
+  ) {
+    axios.get(`${BackLink}/room/queryUser?q=${pattern}`,
+              {headers: authService.getAuthToken()}).then( (response: any) => {
+        setData(response.data);
+      }
+    );
+  }
 }
 
 const queryService = new QueryService();

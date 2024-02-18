@@ -4,9 +4,10 @@ import inviteService from "../../../services/chat/invite.service";
 import authService from "../../../services/auth.service";
 import { chatData, currentRoom } from "../../../contexts/ChatContext";
 import roomService from "../../../services/chat/room.service";
-import React from "react";
+import React, { useCallback } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import queryService from "../../../services/chat/query.service";
+import * as _ from 'lodash';
 
 
 const InviteComponent = () => {
@@ -39,42 +40,43 @@ const InviteComponent = () => {
   
 }
 
-
 const UserInviteComponent = () => {
 
   const [userList, setUserList] = React.useState([{userName: "", userId: ""}]);
   const [value, setValue] = React.useState<any | null>(null);
   const [input, setInput] = React.useState("");
 
+
   const handleChange = (event: any, value: any) => {
 
     setValue(value);
-    setInput(value.userName);
   }
 
+  const getUsers = () => {
+    if (input.trim().length > 0) {
+
+      queryService.queryUserSync(input, setUserList);
+
+      if (userList.length === 0)
+        setUserList([{userName: "", userId: ""}]);
+    }
+  }
+
+  // const debounceGetUsers = _.debounce(getUsers, 300);
+  const debounceFn = _.debounce(getUsers, 300, {leading: true, trailing: true});
+  const me = _.debounce(() => {console.log("here!")}, 1000, {leading: true, trailing: true});
+  
+
   const handleInputChange = (event: any, value: any) => {
-    let timeout: NodeJS.Timeout | undefined = undefined;
 
     if (event) {
       console.log(`input: ${value}`);
       setInput(value);
-
-      clearTimeout(timeout);
-      setTimeout(async () => {
-        if (input.trim().length > 0) {
-
-          const users = await queryService.queryUser(input);
-
-          if (users.length === 0)
-            setUserList([{userName: "", userId: ""}]);
-
-          else
-            setUserList(users);
-      
-        }
-      }, 300);
     }
+    debounceFn();
+    me();
   }
+
 
   return (
     <Box sx={{label: {marginTop: 0}, witdth: '100%'}}>

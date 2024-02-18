@@ -3,24 +3,28 @@ import Box from '@mui/material/Box';
 import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
-import { useSignals } from '@preact/signals-react/runtime';
 import { Typography, Grid, List, Tabs } from '@mui/material';
+import { Message, User, chatData, currentRoom, userLogged } from '../../contexts/ChatContext';
+import { useSignals } from '@preact/signals-react/runtime';
+
+import ChatUser from './chatTabs/chatUser.component';
+import MessageComponent from './chatTabs/message.component';
+import RoomCreationComponent from './chatTabs/roomCreation.component';
+import SearchRoomComponent from './chatTabs/searchRoom.component';
+import RoomActionComponent from './chatTabs/roomAction.component';
+
+import MailIcon from '@mui/icons-material/Mail';
 import SearchIcon from '@mui/icons-material/Search';
 import MessageIcon from '@mui/icons-material/Message';
 import Groups2Icon from '@mui/icons-material/Groups2';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
-import { Message, User, chatData, currentRoom, userLogged } from '../../contexts/ChatContext';
-import MessageComponent from './chatTabs/message.component';
-import ChatUser from './chatTabs/chatUser.component';
-import RoomCreationComponent from './chatTabs/roomCreation.component';
-import SearchRoomComponent from './chatTabs/searchRoom.component';
-import RoomActionComponent from './chatTabs/roomAction.component';
 
 const label = [
   {k: 1, id: "1", name: "", icon: SearchIcon},
   {k: 2, id: "2", name: "Messsages", icon: MessageIcon},
   {k: 3, id: "3", name: "Users", icon: Groups2Icon},
   {k: 4, id: "4", name: "Create Room", icon: MeetingRoomIcon},
+  {k: 5, id: "5", name: "Invitation", icon: MailIcon},
 ]
 
 const MessageStyle = ({ message }: { message: string }) => {
