@@ -6,7 +6,8 @@ import {
 
 import { chatData, currentRoom, userLogged } from "../../contexts/ChatContext";
 
-
+import {useSelector, useDispatch} from "react-redux";
+import {addUser, userLog} from "../../services/reduce";
 
 
 const RoomSelectionComponent = () => {
@@ -42,12 +43,17 @@ const DisabledComponent = () => {
 }
 
 const EnabledComponent = () => {
+
+  let users = useSelector(userLog);
+  const dispatch = useDispatch();
+  
   
   useSignals();
 
   const handleRoomChange = (event: SelectChangeEvent<number>) => {
     if (typeof event.target.value === 'number')
       currentRoom.value = event.target.value;
+    dispatch(addUser("HandleRoom"));
   };
 
   return (
