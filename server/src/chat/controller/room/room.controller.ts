@@ -140,17 +140,29 @@ export class RoomController {
 	}
 	
 
-	@Delete()
-	async deleteRoom(@Body('roomId') roomId: string) {
-		if (!roomId)
+	@Delete(':rid/:uid')
+	async deleteRoom(@Param('rid') roomId: string, @Param('uid') userId: string) {
+		if (!roomId || !userId)
 			throw new BadRequestException("Required information not given");
-		
+
 		let room = await this.roomService.findRoom(roomId);
 		if (!room)
 			throw new NotFoundException("Room not found");
+
+		let exception = await this.permissionCheck(userId, roomId);
+		if (exception)
+			throw exception;
+
 		const members = await this.membershipService.findParticipantsNotExclusive(roomId); 
 		await this.roomService.deleteRoom(room);
-		this.eventEmitter.emit('room.delete', members, room, "delete", (__: any, _:any) => {return {}});
+
+		this.eventEmitter.emit('room.delete',
+			members,
+			room,
+			"chat-deleted",
+			(__: any, _:any) => {return {
+				roomId: roomId
+			}});
 	}
 
 	@Post('kick')
@@ -337,6 +349,23 @@ export class RoomController {
 			throw exception;
 
 		await this.roomService.setPassRoom(password, roomId);
+
+		const memberList = await this.membershipService.findParticipantsNotExclusive(roomId);
+
+		this.eventEmitter.emit(
+			'room.pass',
+			memberList,
+			"",
+			"password-update",
+			(_: any, __: any, rid: string = roomId ) => {
+				return (
+					{
+						roomId: rid,
+						isProtected: true,
+					}
+				)
+			}
+		);
 		return "Password set";
 	}
 
@@ -354,6 +383,22 @@ export class RoomController {
 
 
 		await this.roomService.unsetPassRoom(roomId);
+		const memberList = await this.membershipService.findParticipantsNotExclusive(roomId);
+
+		this.eventEmitter.emit(
+			'room.pass',
+			memberList,
+			"",
+			"password-update",
+			(_: any, __: any, rid: string = roomId ) => {
+				return (
+					{
+						roomId: rid,
+						isProtected: false,
+					}
+				)
+			}
+		);
 		return "password removed";
 	}
 

@@ -27,8 +27,12 @@ const UserActionChatComponent = ({user}: {user: User}) => {
   const [action, setAction] = React.useState(-1);
   const open = Boolean(anchorEl);
 
-  const togglePrompt = (event: any) => {
+  const togglePrompt = () => {
     setPrompt(!showPrompt);
+  }
+
+  const togglePromptAndSet = (event: any) => {
+    togglePrompt();
     setAction(event.target.value);
     handleClose();
   }
@@ -64,12 +68,12 @@ const UserActionChatComponent = ({user}: {user: User}) => {
 
   // Unprivileged actions
   const unprivilegedAction = [
-    {id: 1, action: togglePrompt, label: 'Mute'},
+    {id: 1, action: togglePromptAndSet, label: 'Mute'},
   ];
 
   // With Privilege
   const privilegedAction = [
-    {id: 2, action: togglePrompt, label: 'Ban'},
+    {id: 2, action: togglePromptAndSet, label: 'Ban'},
     {id: 3, action: handleKick, label: 'Kick'},
     {id: 4, action: handleToggleAdmin, label: 'Toggle admin'},
   ];
@@ -121,7 +125,7 @@ const UserActionChatComponent = ({user}: {user: User}) => {
         
       </Menu>
       {
-        showPrompt ? (<TimeSelectComponent userData={{ action: action, user: user}} />) : 
+        showPrompt ? (<TimeSelectComponent userData={{ action: action, user: user, togglePrompt: togglePrompt}} />) : 
         (<span style={{ visibility: 'hidden' }} />)
       }
       
@@ -134,7 +138,7 @@ const TimeSelectComponent = ({userData}: {userData: any}) => {
   useSignals();
 
   const [time, setTime] = React.useState(-1);
-  const {action, user} = userData;
+  const {action, user, togglePrompt} = userData;
 
   const handleTimeChange = (event: any) => {
     setTime(event.target.value);
@@ -142,6 +146,8 @@ const TimeSelectComponent = ({userData}: {userData: any}) => {
 
   const handleBlock = () => {
     
+    togglePrompt();
+
     blackListService.banSingle(
       authService.getIdFromToken(),
       user.userId,
@@ -153,6 +159,8 @@ const TimeSelectComponent = ({userData}: {userData: any}) => {
 
   const handleBan = () => {
     
+    togglePrompt();
+
     banService.banUser(
       authService.getIdFromToken(),
       user.userId,

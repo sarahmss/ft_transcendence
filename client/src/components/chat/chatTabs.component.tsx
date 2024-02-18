@@ -4,7 +4,7 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
 import { useSignals } from '@preact/signals-react/runtime';
-import { Button, Typography, Grid, IconButton, List, ListItem, Tabs } from '@mui/material';
+import { Typography, Grid, List, Tabs } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 import MessageIcon from '@mui/icons-material/Message';
 import Groups2Icon from '@mui/icons-material/Groups2';
@@ -14,9 +14,7 @@ import MessageComponent from './chatTabs/message.component';
 import ChatUser from './chatTabs/chatUser.component';
 import RoomCreationComponent from './chatTabs/roomCreation.component';
 import SearchRoomComponent from './chatTabs/searchRoom.component';
-import roomService from '../../services/chat/room.service';
-import authService from '../../services/auth.service';
-import inviteService from '../../services/chat/invite.service';
+import RoomActionComponent from './chatTabs/roomAction.component';
 
 const label = [
   {k: 1, id: "1", name: "", icon: SearchIcon},
@@ -58,7 +56,12 @@ const ChatTabComponent = () => {
   return (
     <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
       <TabContext value={tabs}>
-        <Tabs value={tabs} onChange={handleChange} centered>
+        <Tabs
+          value={tabs}
+          onChange={handleChange}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
           {
             userLogged.value ? 
             (
@@ -133,6 +136,17 @@ const ChatTabComponent = () => {
         >
           <RoomCreationForm />
         </TabPanel>
+        <TabPanel
+          sx={{
+            backgroundColor:"gray.200",
+            height: '90vh',
+            overflowY: 'auto'
+          }}
+          key="Invitation"
+          value="5"
+        >
+          <Invitation/>
+        </TabPanel>
       </TabContext>
     </Box>
   );
@@ -161,88 +175,26 @@ const MessageTabComponent = () => {
 
 const ParticipantTabComponent = () => {
 
-  // Invite people
-  const sendInvitation = () => {
-    inviteService.createInvite(
-      authService.getIdFromToken(),
-      chatData.value[currentRoom.value].roomId,
-      "someone"
-    );
-  }
-
-  const useInvitation = () => {
-    inviteService.useInvite(
-      authService.getIdFromToken(),
-      "invitationId"
-    );
-  }
-
-  // Toggle room visibility
-  const togglePrivate = () => {
-    roomService.togglePrivate(
-      authService.getIdFromToken(),
-      chatData.value[currentRoom.value].roomId
-    );
-  }
-
-  // Password
-  const [pass, setPass] = React.useState("");
-
-  const handleChange = (event: any) => {
-    setPass(event.target.value);
-  }
-
-  const sendSetPassword = () => {
-    roomService.setPassword(
-      authService.getIdFromToken(),
-      chatData.value[currentRoom.value].roomId,
-      pass
-    );
-  }
-
-  const sendUnsetPassword = () => {
-    roomService.unsetPassword(
-      authService.getIdFromToken(),
-      chatData.value[currentRoom.value].roomId,
-    );
-  }
-
   return (
     <Box sx={{ flexGrow: 1, maxWidth: 752 }}>
-      {
-        currentRoom.value !== -1 ? 
-        (
-          <Grid item xs={12} md={6}>             
+            {
+              currentRoom.value !== -1 ?
+                (
+                  <Grid item xs={12} md={6}>
                     <List>
-                      <ListItem>
-                        <Box sx={{ display: 'grid', placeItems: 'center' }}>
-                          <Button>
-                            Invite User
-                          </Button>
-                        </Box>
-                      </ListItem>
-
-                      <ListItem>
-                        <IconButton onClick={togglePrivate}>
-                          Toggle Private
-                        </IconButton>
-
-                        <IconButton>
-                          Set/Unset password
-                        </IconButton>
-                      </ListItem>
-
+                      <RoomActionComponent/>
                       {
                         chatData.value[currentRoom.value].userList.value.map( (userData: User) => {
                           return (<ChatUser key={userData.userId} user={userData} />);
                         })
                       }
                     </List>
-          </Grid>
-        ) :
-        ( <MessageStyle message="Please, select a Room!" /> )
-      }
-        
+                  </Grid>
+                ) :
+                (
+                  <MessageStyle message="Please, select a Room!" />
+                )
+            }
     </Box>
   );
 }
@@ -258,6 +210,14 @@ const RoomCreationForm = () => {
 const SearchRoom = () => {
   return (
     <SearchRoomComponent/>
+  );
+}
+
+const Invitation = () => {
+  return (
+    <Box>
+      This section will show invitations
+    </Box>
   );
 }
 

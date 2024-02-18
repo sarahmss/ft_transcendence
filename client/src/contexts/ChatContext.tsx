@@ -16,7 +16,7 @@ import { io } from "socket.io-client";
 const currentRoom: Signal<number> = signal(-1);
 const userLogged: Signal<boolean> = signal(false);
 const page: Signal<number> = signal(0);
-const invitationIdList: Signal<string[]> = signal([]);
+const invitationIdList: Signal<{invitationId: string, roomName: string, roomId: string}[]> = signal([]);
 
 const privilegedInRoom: {owner: Signal<boolean>, admin: Signal<boolean>} = {
   owner: signal(false),
@@ -50,7 +50,7 @@ type Room = {
   userList: Signal<User[]>
   fetchStatus: boolean,
   creationDate: Date,
-  isProtected?: boolean,
+  isProtected: Signal<boolean | undefined>,
   isPrivate: Signal<boolean>
 };
 
@@ -66,23 +66,27 @@ const chatSocket = io(ChatLink, {
 });
 
 const insertMessage = (response: any) => {
+  try {
+      if (currentRoom.value > chatData.value.length)
+      return;
 
-  if (currentRoom.value > chatData.value.length)
-    return;
+    const room = chatData.value[currentRoom.value];
 
-  const room = chatData.value[currentRoom.value];
-
-  room.messages.value = [
-    ...room.messages.value,
-   messageMaker(
-     response.author,
-     response.authorId,
-     response.messageId,
-     response.message,
-     response.messageTimestamp,
-     response.profileImage
-   )
-  ]
+    room.messages.value = [
+      ...room.messages.value,
+    messageMaker(
+      response.author,
+      response.authorId,
+      response.messageId,
+      response.message,
+      response.messageTimestamp,
+      response.profileImage
+    )
+    ]  
+  } catch (error){
+    console.error(error);
+  }
+  
 }
 
 const adminUpdate = (response: any) => {
@@ -145,8 +149,11 @@ const handleRemoveRoom = (response: any) => {
   const index = chatData.value.findIndex((room) => room.roomId !== response.roomId);
   chatData.value = chatData.value.filter((room) => room.roomId !== response.roomId);
 
-  for (let k: number = index; k < chatData.value.length; k++) {
-    chatData.value[k].index = k;
+  // Index again after a room delete
+  if (chatData.value.length > 0) {
+    for (let k: number = index; k < chatData.value.length; k++) {
+      chatData.value[k].index = k;
+    }
   }
 }
 
@@ -173,31 +180,48 @@ const updatePrivateStatus = (response: any) => {
   if (!room)
     return;
 
-  room.isPrivate.value = response.status;
+  room.isPrivate.value = response.isPrivate;
   
 }
 
 const addInvitationToList = (response: any) => {
   invitationIdList.value = [
     ...invitationIdList.value,
-    response.inviteId
+    response
   ]
+}
+
+const updateProtectionStatus = (response: any) => {
+  const room = chatData.value.find((room) => room.roomId === response.roomId);
+
+  if (!room)
+    return;
+  
+  room.isProtected.value = response.isProtected;
+}
+
+const filterOutEveryRequest = (response: any) => {
+  if (invitationIdList.value.length < 0)
+    return;
+
+  invitationIdList.value = invitationIdList.value.filter(
+    (invite) => (response !== invite.roomId)
+  );
 }
 
 chatSocket.on('message-response', insertMessage);
 
-chatSocket.on('admin-toggle', adminUpdate);
 chatSocket.on('created', handleRoomCreation);
-
 chatSocket.on('joined', handleUserJoin);
 chatSocket.on('left', handleRemoveUser);
-
 chatSocket.on('chat-deleted', handleRemoveRoom);
+
+chatSocket.on('admin-toggle', adminUpdate);
 chatSocket.on('private-toggle', updatePrivateStatus);
+chatSocket.on('password-update', updateProtectionStatus);
 
 chatSocket.on('invitation-send', addInvitationToList);
-
-chatSocket.on('invitation-send', addInvitationToList);
+chatSocket.on('invitation-used', filterOutEveryRequest);
 
 // Effect knows what event is triggered base on the signal
 effect(

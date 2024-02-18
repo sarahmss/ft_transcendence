@@ -32,7 +32,7 @@ const addUser = (room: Room, user: User) => {
   
 }
 
-const addInvitation = (inviteId: string) => {
+const addInvitation = (inviteId: any) => {
   invitationIdList.value = [
     ...invitationIdList.value,
     inviteId
@@ -73,7 +73,7 @@ const roomMaker = (
       roomId: roomId,
       roomName: signal(roomName),
       creationDate: creationDate,
-      isProtected: isProtected,
+      isProtected: signal(isProtected),
       messages: signal([]),
       userList: signal([]),
       fetchStatus: false,

@@ -43,9 +43,18 @@ export class InviteService {
     );
   }
 
+  async invalidate(userId: string, roomId: string) {
+    return this.inviteRepository.update(
+      {userId: userId, roomId: roomId},
+      {valid: false}
+    );
+    
+  }
+
   async getInvitation(userId: string) {
     return this.inviteRepository.find(
-      {where: {
+      {relations: ['room'],
+        where: {
         userId: userId,
         valid: true,
         timeLimit: MoreThan(new Date())

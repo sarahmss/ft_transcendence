@@ -24,10 +24,11 @@ class RoomService {
   }
 
   async deleteRoom (
-    roomId: string
+    roomId: string,
+    userId: string
   ) {
     try {
-      await axios.delete(BackLink + `/room/${roomId}`, {headers: authService.getAuthToken()});
+      await axios.delete(BackLink + `/room/${roomId}/${userId}`, {headers: authService.getAuthToken()});
 
     } catch (error) {
       console.log(error);
