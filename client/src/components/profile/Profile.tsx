@@ -27,26 +27,45 @@ const Profile = () => {
     }
   };
 
-  const SetUserStats = async (userId: string, profilePic: string) => {
+  const SetUserStats = async (userId: string, profilePic:string) => {
     try {
-      const userStats = await userService.RequestUserStats(userId);
-      const FriendsList = await userService.getFriends(userId);
-      
-      loadProfilePic(profilePic, userId);
-      setUserStats(userStats);
-      setFriendsList(FriendsList);
+        const userStats = await userService.RequestUserStats(userId);
+        const FriendsList = await userService.getFriends(userId);
+        
+        loadProfilePic(profilePic, userId);
+        if (userStats) {
+          setUserStats(userStats);
+        }
+        if (FriendsList) {
+          setFriendsList(FriendsList);
+        }
     } catch (error) {
-      console.error('Error setting user stats:', error);
-    }
+      console.error('Error seting user stats:', error); }
   }
+
+  const SetUserProfile = async (userId: string) => {
+    try {
+      await userService.RequestUserProfile(userId).then(
+        response =>{
+          const userProfile = response.data;
+          SetUserStats(userId, userProfile.profilePicture);
+        },
+        error => {
+          setRedirect('error');
+        }
+      );
+
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
 
   const fetchData = async () => {
     try {
-      const user = await authService.getCurrentUser();
+      const user = await authService.getCurrentUser();     
       if (user) {
         const userId = searchParams.get('user') || user.userId;
-        setOwnerId(userId);
-        SetUserStats(userId, user.profilePicture);
+        SetUserProfile(userId)  
       } else {
         setRedirect('error');
       }
@@ -63,8 +82,9 @@ const Profile = () => {
     const updateFriendsList = async (userId: string) => {
       try {
         if (userId) {
-          appSocket.off('refreshFriends').on('refreshFriends', async () => {
+            appSocket.off('refreshFriends').on('refreshFriends', async () => {
             const FriendsList = await userService.getFriends(userId);
+            console.log("RefreshFriends");
             setFriendsList(FriendsList);
           });
         }
@@ -79,7 +99,6 @@ const Profile = () => {
   if (redirect === 'error') {
     return <Navigate to={'/error'} />;
   }
-
 
   return (
     <Card>
@@ -105,9 +124,15 @@ const Profile = () => {
             <Grid item xs={12}>
               <MatchHistoryComponent userStats={userStats}/>
             </Grid>
-            <Grid item xs={12}>
-              <DashboardTable FriendsList={FriendsList} />
-            </Grid>
+            {FriendsList ? (
+              <Grid item xs={12}>
+                <DashboardTable FriendsList={FriendsList} />
+              </Grid>
+            ):
+            (
+              <></>
+            )
+          }
           </Grid>
         </Grid>
       </Grid>

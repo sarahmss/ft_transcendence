@@ -40,6 +40,7 @@ export class FriendshipService {
         if (friend.status === FriendshipStatus.FRIENDS){
           const friendUser = await this.usersService.findById(friend.friendId);
           friendsList.push({
+            userId: friendUser.userId,
             userName: friendUser.userName,
             profilePicture: friendUser.profilePicture,
             email: friendUser.email,

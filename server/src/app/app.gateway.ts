@@ -60,7 +60,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	async UpdateFriendshipStatus(ownerId: string, friendId: string, status: string) {
 		this.server.emit(`friendshipStatusUpdate_${ownerId}_${friendId}`, { status });
 		this.logger.log(`friendshipStatusUpdate${ownerId}_${friendId}: ${status}`);
-	  }
+		this.server.emit('refreshFriends');
+	}
 
 	private disconnect(client: Socket) {
 		this.logger.log(`Client disconnected: ${client.id}`);
