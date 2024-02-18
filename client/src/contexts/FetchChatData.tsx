@@ -174,25 +174,30 @@ const fetchMessageByRoom = async (index: number, roomId: string, pageNumber: num
 }
 
 const fetchParticipants = async (index: number, roomId: string) => {
-  const participants: any[] = await roomService.getParticipants(roomId);
-  const currentMember: any = await roomService.getCurrentUser(roomId);
+  try {
+    const participants: any[] = await roomService.getParticipants(roomId);
+    const currentMember: any = await roomService.getCurrentUser(roomId);
 
-  if (!participants || participants.length === 0)
-    return ;
+    if (!participants || participants.length === 0)
+      return ;
 
-  const room = chatData.value[index];
+    const room = chatData.value[index];
 
-  participants.forEach((user: any) => {
-    addUser(room, userMaker(
-      user.admin,
-      user.owner,
-      user.userId,
-      user.userName,
-      user.profileImage
-    ));
-  });
+    participants.forEach((user: any) => {
+      addUser(room, userMaker(
+        user.admin,
+        user.owner,
+        user.userId,
+        user.userName,
+        user.profileImage
+      ));
+    });
 
-  return currentMember;
+    return currentMember;    
+  } catch(error) {
+    console.error(error);
+  }
+
 }
 
 const findRoom = (roomId: string) => {

@@ -84,11 +84,16 @@ export default class Login extends Component<Props, State> {
 	}
 
 	async componentDidMount() {
-		const currentUser = await AuthService.getCurrentUser();
+		try {
+			const currentUser = await AuthService.getCurrentUser();
 
-		if (currentUser) {
-			this.setState({ redirect: "/" });
-		};
+			if (currentUser) {
+				this.setState({ redirect: "/" });
+			};			
+		} catch (error) {
+			console.error(error);
+		}
+
 	}
 
 	componentWillUnmount() {
