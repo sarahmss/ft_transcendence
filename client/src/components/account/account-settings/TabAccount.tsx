@@ -92,6 +92,7 @@ const ProfilePicComponent: React.FC<ProfilePicProps> = ({ setImgSrc, setUrl }) =
 				const newProfilePic = await userService.uploadProfilePic(file.name, formData);
 				setUrl({ imgUrl: newProfilePic });
 				setSelectedFile(false);
+				alert('File Uploaded');
 			} catch (error) {
 				console.error('Error uploading file:', error);
 			}
@@ -206,13 +207,11 @@ const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
 		name: (currentUser?.userName || "name"),
 		email: (currentUser?.email || "email"),
 	});
-	const [profilePic, setProfilePic] = React.useState('');
-
 	const fetchData = async () => {
 		try {
 		  	const user = await authService.getCurrentUser();
 			const picture = await userService.getProfilePicture(user.profilePicture, user.userId);
-			setProfilePic(picture);
+			setState({imgSrc: picture});
 		  } catch (error) {
 			console.error("Error fetching user data:", error);
 		  }
@@ -232,7 +231,7 @@ const TabAccount: React.FC<TabAccountProps> = ({ currentUser }) => {
 				<Grid container spacing={7}>
 					<Grid item xs={12} sx={{ marginTop: 4.8, marginBottom: 3 }}>
 						<Box sx={{ display: 'flex', alignItems: 'center' }}>
-							<ImgStyled src={profilePic} alt='Profile Pic' />
+							<ImgStyled src={state.imgSrc} alt='Profile Pic' />
 							<ProfilePicComponent
 								setImgSrc={setState}
 								setUrl={setState} />
