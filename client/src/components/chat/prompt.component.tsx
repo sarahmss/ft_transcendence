@@ -1,13 +1,12 @@
 
 import * as React from "react";
-
+import SendIcon from '@mui/icons-material/Send';
 import {
 	Box,
 	TextField,
 	Button,
-	Grid,
+	Grid
 } from "@mui/material";
-
 import authService from "../../services/auth.service";
 import messageService from "../../services/chat/message.service";
 import { useSignals } from "@preact/signals-react/runtime";
@@ -75,38 +74,40 @@ const PromptComponent = () => {
 							size="small"
 							fullWidth
 							value={input}
-							placeholder="Please Login first"
+							placeholder="Please Select a room first"
 							variant="outlined"
-							disabled
+							disabled							
 						/>)
 					}
 
 				</Grid>
 
-				<Grid item xs={1}>
-
-					{userLogged.value && currentRoom.value > -1 ?
-						(
-							<Button
-								variant="contained"
-								onClick={handleSend}
-								sx={{backgroundColor:"#B700cc"}}
-							>
-								<b>Send</b>
-							</Button>
-						
-						) :
-						(
-							<Button
-								variant="contained"
-								onClick={handleSend}
-								sx={{backgroundColor:"#B700cc"}}
-								disabled
-							>
-								<b>Send</b>
-							</Button>
-						)
-					}
+				<Grid item xs={1} >
+					<Box sx={{marginRight:"10px"}}>
+						{userLogged.value && currentRoom.value > -1 ?
+							(
+								<Button
+									variant="contained"
+									onClick={handleSend}
+									sx={{backgroundColor:"#B700cc"}}
+								>
+									<SendIcon/>
+								</Button>
+							
+							) :
+							(
+								<Button
+									variant="contained"
+									onClick={handleSend}
+									sx={{backgroundColor:"#B700cc"}}
+									disabled
+								>
+									<SendIcon/>
+								</Button>
+							)
+						}
+					</Box>
+					
 				</Grid>
 
 			</Grid>

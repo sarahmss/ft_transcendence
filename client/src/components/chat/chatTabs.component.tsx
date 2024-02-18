@@ -4,9 +4,11 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
 import { useSignals } from '@preact/signals-react/runtime';
-import { Button, FormControl, Grid, IconButton, List, ListItem, Tabs } from '@mui/material';
+import { Button, Typography, Grid, IconButton, List, ListItem, Tabs } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-
+import MessageIcon from '@mui/icons-material/Message';
+import Groups2Icon from '@mui/icons-material/Groups2';
+import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import { Message, User, chatData, currentRoom, userLogged } from '../../contexts/ChatContext';
 import MessageComponent from './chatTabs/message.component';
 import ChatUser from './chatTabs/chatUser.component';
@@ -18,10 +20,31 @@ import inviteService from '../../services/chat/invite.service';
 
 const label = [
   {k: 1, id: "1", name: "", icon: SearchIcon},
-  {k: 2, id: "2", name: "Messsages", icon: ""},
-  {k: 3, id: "3", name: "Users", icon: ""},
-  {k: 4, id: "4", name: "Create Room", icon: ""},
+  {k: 2, id: "2", name: "Messsages", icon: MessageIcon},
+  {k: 3, id: "3", name: "Users", icon: Groups2Icon},
+  {k: 4, id: "4", name: "Create Room", icon: MeetingRoomIcon},
 ]
+
+const MessageStyle = ({ message }: { message: string }) => {
+  return(
+		<Box sx={{ display: 'flex',
+                marginTop: "50%" }}>
+        <Typography variant="h4" align="center" 
+        sx={{
+          mr: 2,
+          display:  'flex' ,
+          fontFamily: 'monospace',
+          fontWeight: 700,
+          letterSpacing: '.3rem',
+          color: '#B700cc',
+          textDecoration: 'none',
+          
+        }}>
+        {message}
+        </Typography>
+    </Box>
+  );
+}
 
 const ChatTabComponent = () => {
   useSignals();
@@ -43,7 +66,7 @@ const ChatTabComponent = () => {
                 return (<Tab key={tab.k}
                   label={tab.name}
                   value={tab.id}
-                  icon={tab.icon === "" ? ("") : (<tab.icon/>) }/>);
+                  icon={(<tab.icon/>) }/>);
               })
             ) :
             (
@@ -51,7 +74,7 @@ const ChatTabComponent = () => {
                 return (<Tab key={tab.k}
                   label={tab.name}
                   value={tab.id}
-                  icon={tab.icon === "" ? ("") : (<tab.icon/>) } disabled/>);
+                  icon={(<tab.icon/>) } disabled/>);
               })
             )
           }
@@ -129,9 +152,7 @@ const MessageTabComponent = () => {
   				</Box>
         ) :
         (
-          <div>
-            Please select a room!
-          </div>
+          <MessageStyle message="Please, select a Room!" />
         )
       }
     </Box>
@@ -188,43 +209,40 @@ const ParticipantTabComponent = () => {
 
   return (
     <Box sx={{ flexGrow: 1, maxWidth: 752 }}>
-        <Grid item xs={12} md={6}>
-            {
-              currentRoom.value !== -1 ?
-                (
-                  <List>
-                    <ListItem>
-                      <Box sx={{ display: 'grid', placeItems: 'center' }}>
-                        <Button>
-                          Invite User
-                        </Button>
-                      </Box>
-                    </ListItem>
+      {
+        currentRoom.value !== -1 ? 
+        (
+          <Grid item xs={12} md={6}>             
+                    <List>
+                      <ListItem>
+                        <Box sx={{ display: 'grid', placeItems: 'center' }}>
+                          <Button>
+                            Invite User
+                          </Button>
+                        </Box>
+                      </ListItem>
 
-                    <ListItem>
-                      <IconButton onClick={togglePrivate}>
-                        Toggle Private
-                      </IconButton>
+                      <ListItem>
+                        <IconButton onClick={togglePrivate}>
+                          Toggle Private
+                        </IconButton>
 
-                      <IconButton>
-                        Set/Unset password
-                      </IconButton>
-                    </ListItem>
+                        <IconButton>
+                          Set/Unset password
+                        </IconButton>
+                      </ListItem>
 
-                    {
-                      chatData.value[currentRoom.value].userList.value.map( (userData: User) => {
-                        return (<ChatUser key={userData.userId} user={userData} />);
-                      })
-                    }
-                  </List>
-                ) :
-                (
-                  <div>
-                    Please select a room!
-                  </div>
-                )
-            }
-        </Grid>
+                      {
+                        chatData.value[currentRoom.value].userList.value.map( (userData: User) => {
+                          return (<ChatUser key={userData.userId} user={userData} />);
+                        })
+                      }
+                    </List>
+          </Grid>
+        ) :
+        ( <MessageStyle message="Please, select a Room!" /> )
+      }
+        
     </Box>
   );
 }

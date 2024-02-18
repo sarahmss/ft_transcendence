@@ -25,7 +25,7 @@ const DisabledComponent = () => {
 
   return (
     <FormControl sx={{ height: '5%', m: 1, minWidth: 80, width: '90%', label: {marginTop: 0} }} disabled> 
-      <InputLabel id="room-selector">Unavailable</InputLabel>
+      <InputLabel id="room-selector">Please, create a room</InputLabel>
         <Select
           labelId="room-selector"
           id="room-selector"

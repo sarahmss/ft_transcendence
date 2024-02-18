@@ -14,7 +14,7 @@ const ChatComponent = () => {
 
 	return (
 
-		<Card sx={{margin:'10px',}}>
+		<Card sx={{marginTop:'15px', marginBottom: "15px", marginRight:"15px"}}>
 
 			<Box
 				sx={{
@@ -25,9 +25,8 @@ const ChatComponent = () => {
 					paddingLeft: "0px"
 				}}
 			>
-				<ChatTabComponent/>
-
 				<RoomSelectionComponent/>
+				<ChatTabComponent/>
 				<PromptComponent/>
 			</Box>
 
