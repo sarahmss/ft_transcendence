@@ -45,7 +45,7 @@ export class InviteService {
 
   async invalidate(userId: string, roomId: string) {
     return this.inviteRepository.update(
-      {userId: userId, roomId: roomId},
+      {userId: userId, roomId: roomId, valid: true},
       {valid: false}
     );
     

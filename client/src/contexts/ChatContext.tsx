@@ -185,9 +185,14 @@ const updatePrivateStatus = (response: any) => {
 }
 
 const addInvitationToList = (response: any) => {
+
   invitationIdList.value = [
     ...invitationIdList.value,
-    response
+    {
+      invitationId: response.data.invitationId,
+      roomId: response.data.roomId,
+      roomName: response.data.roomName
+    }
   ]
 }
 
@@ -201,11 +206,12 @@ const updateProtectionStatus = (response: any) => {
 }
 
 const filterOutEveryRequest = (response: any) => {
+
   if (invitationIdList.value.length < 0)
     return;
 
   invitationIdList.value = invitationIdList.value.filter(
-    (invite) => (response !== invite.roomId)
+    (invite) => (response.data !== invite.roomId)
   );
 }
 

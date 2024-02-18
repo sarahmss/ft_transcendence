@@ -18,6 +18,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import MessageIcon from '@mui/icons-material/Message';
 import Groups2Icon from '@mui/icons-material/Groups2';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
+import InvitationComponent from './chatTabs/invite.component';
 
 const label = [
   {k: 1, id: "1", name: "", icon: SearchIcon},
@@ -220,7 +221,7 @@ const SearchRoom = () => {
 const Invitation = () => {
   return (
     <Box>
-      This section will show invitations
+      <InvitationComponent/>
     </Box>
   );
 }

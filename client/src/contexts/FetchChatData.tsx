@@ -211,16 +211,14 @@ const findMessage = (room: Room, messageId : string) => {
 
 const fetchInvitations = async () => {
 
-  if (authService.getIsLogged()){
-    const invites: any[] = await inviteService.getInvitation(authService.getIdFromToken());
+  const invites: any[] = await inviteService.getInvitation(authService.getIdFromToken());
 
-    if (!invites)
-      return;
+  if (!invites)
+    return;
 
-    invites.forEach( (inv) => {
-      addInvitation(inv.inviteId);
-    })     
-  }
+  invites.forEach( (inv) => {
+    addInvitation(inv);
+  })     
 }
 
 export {

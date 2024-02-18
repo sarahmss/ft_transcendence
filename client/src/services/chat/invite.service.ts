@@ -20,25 +20,24 @@ class InviteService {
 
     } catch (error) {
       console.log(error);
-      throw error;
     }
   }
 
   async useInvite (
     userId: string,
-    inviteId: string
+    inviteId: string,
+    status: boolean
   ) {
     try {
       const packaged = {
         userId: userId,
-        inviteId: inviteId
+        inviteId: inviteId,
+        response: status,
       }
       return await axios.patch(BackLink + "/invite", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
       console.log(error);
-      throw error;
-
     }
     
   }

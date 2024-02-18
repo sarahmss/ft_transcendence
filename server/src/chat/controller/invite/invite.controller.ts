@@ -49,7 +49,11 @@ export class InviteController {
 
     this.eventEmitter.emit('invite-send',
       userId,
-      rawInvitation,
+      {
+        invitationId: rawInvitation.inviteId,
+        roomId: rawInvitation.roomId,
+        roomName: rawInvitation.room.roomName
+      },
       "invitation-send"
     );
   }
@@ -78,16 +82,9 @@ export class InviteController {
 
       this.inviteService.invalidate(invitation.userId, invitation.roomId);
       await this.memberService.joinSingleUser(invitation.user, invitation.room, false);
-      const memberList = this.memberService.findParticipantsNotExclusive(invitation.roomId);
+      const memberList = await this.memberService.findParticipantsNotExclusive(invitation.roomId);
       const roomId = invitation.roomId;
-      const usr = this.userService.findById(invitation.userId);
-
-      
-      this.eventEmitter.emit('invitation-used',
-        invitation.userId,
-        invitation.roomId,
-        "invitation-used"
-      );
+      const usr = await this.userService.findById(invitation.userId);
 
       this.eventEmitter.emit("room.join",
         memberList,
@@ -103,6 +100,12 @@ export class InviteController {
         }
       );
     }
+
+    this.eventEmitter.emit('invitation-used',
+      invitation.userId,
+      invitation.roomId,
+      "invitation-used"
+    );
     return "invitation used";
   }
 

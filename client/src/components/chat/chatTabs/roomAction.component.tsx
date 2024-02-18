@@ -8,6 +8,8 @@ import React, { useCallback } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import queryService from "../../../services/chat/query.service";
 import * as _ from 'lodash';
+import { SupervisedUserCircle } from "@mui/icons-material";
+import { signal } from "@preact/signals-react";
 
 
 const InviteComponent = () => {
@@ -18,14 +20,6 @@ const InviteComponent = () => {
     setShowSelect(!selectShow);
   }
   
-  // Invite people
-  const sendInvitation = () => {
-    inviteService.createInvite(
-      authService.getIdFromToken(),
-      chatData.value[currentRoom.value].roomId,
-      "someone"
-    );
-  }
 
   return (
     <Box>
@@ -40,64 +34,85 @@ const InviteComponent = () => {
   
 }
 
+function debounceFunction (func: any, delay: number = 1000) {
+
+  let timeout: NodeJS.Timeout;
+
+  return (...args: any[]) => {
+    clearTimeout(timeout);
+    timeout = setTimeout(
+      () => {
+        func(...args)
+    }, delay)
+  }
+  
+}
+
+const userList = signal([{userName: "", userId: ""}]);
+const input = signal("");
+
 const UserInviteComponent = () => {
 
-  const [userList, setUserList] = React.useState([{userName: "", userId: ""}]);
+  useSignals();
   const [value, setValue] = React.useState<any | null>(null);
-  const [input, setInput] = React.useState("");
-
 
   const handleChange = (event: any, value: any) => {
 
     setValue(value);
   }
 
-  const getUsers = () => {
+  const getUsers = (input: string) => {
+
     if (input.trim().length > 0) {
 
-      queryService.queryUserSync(input, setUserList);
+      queryService.queryUserSync(input, userList);
 
-      if (userList.length === 0)
-        setUserList([{userName: "", userId: ""}]);
+      if (userList.value.length === 0)
+        userList.value = [{userName: "", userId: ""}]
     }
   }
 
-  // const debounceGetUsers = _.debounce(getUsers, 300);
-  const debounceFn = _.debounce(getUsers, 300, {leading: true, trailing: true});
-  const me = _.debounce(() => {console.log("here!")}, 1000, {leading: true, trailing: true});
-  
+  const debounceFn = React.useCallback(_.debounce(getUsers, 300, {trailing: true, leading: false}), []);
 
   const handleInputChange = (event: any, value: any) => {
 
-    if (event) {
-      console.log(`input: ${value}`);
-      setInput(value);
-    }
-    debounceFn();
-    me();
+    input.value = value;
+    debounceFn(input.value);
+  }
+
+  const sendInvitation = () => {
+    
+    if (!value)
+      return;
+
+    inviteService.createInvite(
+      authService.getIdFromToken(),
+      currentRoom.value === -1 ?  "" : chatData.value[currentRoom.value].roomId,
+      value.userId
+    );
   }
 
 
   return (
     <Box sx={{label: {marginTop: 0}, witdth: '100%'}}>
-      <Button>
-        wow
-      </Button>
       <Autocomplete
         id="User-invite-search"
 
         value={value}
         onChange={handleChange}
 
-        inputValue={input}
+        inputValue={input.value}
         onInputChange={handleInputChange}
 
-        options={userList}
+        options={userList.value}
         getOptionLabel={(option: any) => option.userName}
         isOptionEqualToValue={(option: any, value: any) => option.userId === value.userId}
         sx={{ minWidth: 300 }}
         renderInput={(params) => <TextField {...params} label="Users" />}
       />
+      <Button onClick={sendInvitation}>
+        Send invitation
+      </Button>
     </Box>
   );
 }
