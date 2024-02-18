@@ -34,7 +34,7 @@ const Trophy: React.FC<TrophyProps> = ({ userStats }) => {
       <CardContent>
         <Typography variant='h6'>Welcome to {userStats?.userName} profile! 🥳</Typography>
         <Typography variant='body2' sx={{ letterSpacing: '0.25px' }}>
-          Play {userStats?.gamesWonToLevelUp} matches to Level Up !!
+          Play {userStats?.gamesWonToLevelUp || 1} matches to Level Up !!
         </Typography>
         <Typography variant='h5' sx={{ my: 4 }}>
           Level {userStats?.level}

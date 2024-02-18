@@ -2,14 +2,13 @@ import { Autocomplete, Button, IconButton, ListItem, TextField } from "@mui/mate
 import { Box } from "@mui/system";
 import inviteService from "../../../services/chat/invite.service";
 import authService from "../../../services/auth.service";
-import { chatData, currentRoom } from "../../../contexts/ChatContext";
+import { chatData, currentRoom, privilegedInRoom } from "../../../contexts/ChatContext";
 import roomService from "../../../services/chat/room.service";
-import React, { useCallback } from "react";
 import { useSignals } from "@preact/signals-react/runtime";
 import queryService from "../../../services/chat/query.service";
 import * as _ from 'lodash';
-import { SupervisedUserCircle } from "@mui/icons-material";
 import { signal } from "@preact/signals-react";
+import React from "react";
 
 
 const InviteComponent = () => {
@@ -31,20 +30,6 @@ const InviteComponent = () => {
       </ListItem>
     </Box>
   );
-  
-}
-
-function debounceFunction (func: any, delay: number = 1000) {
-
-  let timeout: NodeJS.Timeout;
-
-  return (...args: any[]) => {
-    clearTimeout(timeout);
-    timeout = setTimeout(
-      () => {
-        func(...args)
-    }, delay)
-  }
   
 }
 
@@ -236,7 +221,12 @@ const RoomActionComponent = () => {
 
       <InviteComponent/>
 
-      <PassAndVisibilityComponent/>
+
+      {
+        privilegedInRoom.admin.value || privilegedInRoom.owner.value ?
+          (<PassAndVisibilityComponent/>) : 
+          (<span style={{visibility: 'hidden'}}/>)
+      }
 
     </Box>
   );

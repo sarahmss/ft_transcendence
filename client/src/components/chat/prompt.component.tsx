@@ -12,9 +12,14 @@ import messageService from "../../services/chat/message.service";
 import { useSignals } from "@preact/signals-react/runtime";
 import { chatData, currentRoom, userLogged } from "../../contexts/ChatContext";
 
+import {useSelector, useDispatch} from "react-redux";
+import {addUser, userLog} from "../../services/reduce";
+
 const PromptComponent = () => {
 
 	useSignals();
+	let users = useSelector(userLog);
+	const dispatch = useDispatch();
 
 	const [input, setInput] = React.useState("");
 
@@ -41,6 +46,7 @@ const PromptComponent = () => {
 		switch (event.key) {
 			case "Enter":
 				send();
+				dispatch(addUser("Sendmessage"));
 				break;
 			default:
 				setInput(event.target.value);

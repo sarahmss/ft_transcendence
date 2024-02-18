@@ -20,6 +20,10 @@ import Groups2Icon from '@mui/icons-material/Groups2';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
 import InvitationComponent from './chatTabs/invite.component';
 
+
+import {useSelector, useDispatch} from "react-redux";
+import {addUser, userLog} from "../../services/reduce";
+
 const label = [
   {k: 1, id: "1", name: "", icon: SearchIcon},
   {k: 2, id: "2", name: "Messsages", icon: MessageIcon},
@@ -158,6 +162,21 @@ const ChatTabComponent = () => {
 }
 
 const MessageTabComponent = () => {
+  const users = useSelector(userLog);
+	const dispatch = useDispatch();
+  let ref = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    const scrollToBottom = () =>{
+      ref.current?.scrollIntoView({behavior:'smooth'})
+    }
+
+    const timerId = setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+
+    return () => clearTimeout(timerId);
+  }, [users]);
 
   return (
     <Box sx={{ flexGrow: 1, maxWidth: 752 }}>
@@ -168,6 +187,7 @@ const MessageTabComponent = () => {
   					{chatData.value[currentRoom.value].messages.value.map((message: Message) => (
   						<MessageComponent key={message.messageId} message={message} />
   					))}
+            <div ref={ref}></div>
   				</Box>
         ) :
         (

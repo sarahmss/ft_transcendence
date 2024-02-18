@@ -9,14 +9,16 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PunchClockIcon from '@mui/icons-material/PunchClock';
 
 import { User, chatData, currentRoom, privilegedInRoom } from "../../../contexts/ChatContext";
-import React from "react";
-import blackListService from "../../../services/chat/blacklist.service";
-import banService from "../../../services/chat/ban.service";
-import adminService from "../../../services/chat/admin.service";
-import authService from "../../../services/auth.service";
+import React, {useState, useEffect} from "react";
 import { LOCAL_BLOCK } from "../../../common/constants";
-import roomService from "../../../services/chat/room.service";
 import { useSignals } from "@preact/signals-react/runtime";
+
+import userService from "../../../services/user.service";
+import roomService from "../../../services/chat/room.service";
+import authService from "../../../services/auth.service";
+import adminService from "../../../services/chat/admin.service";
+import banService from "../../../services/chat/ban.service";
+import blackListService from "../../../services/chat/blacklist.service";
 
 const UserActionChatComponent = ({user}: {user: User}) => {
 
@@ -221,6 +223,20 @@ const TimeSelectComponent = ({userData}: {userData: any}) => {
 
 const ChatUser = ({user}:{user: User}) => {
   useSignals();
+	const [profilePic, setProfilePic] = useState('');
+
+	const fetchData = async () => {
+		try {
+			const picture = await userService.getProfilePicture(user.profileImage.value, user.userId);
+			setProfilePic(picture);
+		  } catch (error) {
+			console.error("Error fetching user data:", error);
+		  }
+	  };
+	
+	  useEffect(() => {
+		fetchData();
+	  }, );
 
   const handleLeave = () => {
     roomService.leaveRoom (
@@ -251,7 +267,7 @@ const ChatUser = ({user}:{user: User}) => {
       }
 
       <ListItemAvatar>
-        <Avatar src={user.profileImage.value}/>
+        <Avatar src={profilePic}/>
       </ListItemAvatar>
 
       <ListItemText

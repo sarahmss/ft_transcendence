@@ -7,9 +7,26 @@ import {
 } from "@mui/material";
 import { Message } from "../../../contexts/ChatContext";
 import authService from "../../../services/auth.service";
+import { useEffect, useState } from "react";
+import userService from "../../../services/user.service";
 
 const MessageComponent = ({ message }: { message: Message }) => {
 	const isCurrentUser = message.authorId === authService.getIdFromToken();
+	const [profilePic, setProfilePic] = useState('');
+
+	const fetchData = async () => {
+		try {
+			const picture = await userService.getProfilePicture(message.profileImage, message.authorId);
+			setProfilePic(picture);
+		  } catch (error) {
+			console.error("Error fetching user data:", error);
+		  }
+	  };
+	
+	  useEffect(() => {
+		fetchData();
+	  }, );
+
 
 	return (
 		<Box
@@ -26,7 +43,7 @@ const MessageComponent = ({ message }: { message: Message }) => {
 					alignItems: "center",
 				}}
 			>
-				<Avatar src={message.profileImage}/>
+				<Avatar src={profilePic}/>
 				<Paper
 					variant="outlined"
 					sx={{

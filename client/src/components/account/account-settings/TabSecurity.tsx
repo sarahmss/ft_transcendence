@@ -58,9 +58,9 @@ const SendButton: React.FC<SendButtonProps> =({ code,
 			);
 	};
 
-	const handleRedirectToDisable2Fa = () => {
+	const handleRedirectToDisable2Fa = async () => {
 
-		TwoFaService.redirectToDisable2FA(code).then(
+		await TwoFaService.redirectToDisable2FA(code).then(
 			response => {
 				setTwoFaEnabled({TwoFaEnabled: false});
 				setQrCodeImgAvailable({ QrCodeImgAvailable: false });

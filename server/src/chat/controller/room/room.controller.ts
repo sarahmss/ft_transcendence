@@ -191,9 +191,9 @@ export class RoomController {
 		if (!member)
 			throw new NotFoundException("The user was not found in this room");
 
-		await this.membershipService.leaveRoom(userId, roomId);
-
 		const memberList = await this.membershipService.findParticipantsNotExclusive(roomId);
+
+		await this.membershipService.leaveRoom(userId, roomId);
 
 		this.eventEmitter.emit('room.leave',
 			memberList,

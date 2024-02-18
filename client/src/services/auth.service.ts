@@ -42,8 +42,8 @@ class AuthService {
 	}
 
 	getIsLogged() {
-		const isLogged = sessionStorage.getItem("Logged");
-		return isLogged || null;
+		const isLogged = (sessionStorage.getItem("Logged") && document.cookie) ? true : false;
+		return isLogged;
 	}
 
 	async register(userName: string, email: string, password: string, passwordConfirm: string) {
@@ -78,7 +78,7 @@ class AuthService {
 
 	async getCurrentUser() {
 		try {
-			if (this.getIsLogged() != null)
+			if (this.getIsLogged())
 			{
 				await this.RequestCurrentUser();
 				const userStr = sessionStorage.getItem("LoggedUser");
@@ -94,7 +94,7 @@ class AuthService {
 
 	getCurrentUserPlay() {
 		try {
-			if (this.getIsLogged() != null)
+			if (this.getIsLogged())
 			{
 				this.RequestCurrentUser();
 				const userStr = sessionStorage.getItem("LoggedUser");
