@@ -140,17 +140,29 @@ export class RoomController {
 	}
 	
 
-	@Delete()
-	async deleteRoom(@Body('roomId') roomId: string) {
-		if (!roomId)
+	@Delete(':rid/:uid')
+	async deleteRoom(@Param('rid') roomId: string, @Param('uid') userId: string) {
+		if (!roomId || !userId)
 			throw new BadRequestException("Required information not given");
-		
+
 		let room = await this.roomService.findRoom(roomId);
 		if (!room)
 			throw new NotFoundException("Room not found");
+
+		let exception = await this.permissionCheck(userId, roomId);
+		if (exception)
+			throw exception;
+
 		const members = await this.membershipService.findParticipantsNotExclusive(roomId); 
 		await this.roomService.deleteRoom(room);
-		this.eventEmitter.emit('room.delete', members, room, "delete", (__: any, _:any) => {return {}});
+
+		this.eventEmitter.emit('room.delete',
+			members,
+			room,
+			"chat-deleted",
+			(__: any, _:any) => {return {
+				roomId: roomId
+			}});
 	}
 
 	@Post('kick')

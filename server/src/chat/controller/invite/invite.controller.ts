@@ -4,6 +4,7 @@ import { BanService } from 'src/chat/service/ban/ban.service';
 import { InviteService } from 'src/chat/service/invite/invite.service';
 import { MembershipService } from 'src/chat/service/membership/membership.service';
 import { RoomService } from 'src/chat/service/room/room.service';
+import { Invite } from 'src/entity/invite.entity';
 import { UsersService } from 'src/users/users.service';
 
 @Controller('invite')
@@ -48,13 +49,9 @@ export class InviteController {
 
     this.eventEmitter.emit('invite-send',
       userId,
-      rawInvitation.inviteId,
+      rawInvitation,
       "invitation-send"
     );
-
-    return {
-      inviteId: rawInvitation.inviteId
-    };
   }
 
   @Patch()
@@ -113,6 +110,17 @@ export class InviteController {
   async getInvitation (
     @Body('userId') userId: string,
   ) {
-    return await this.inviteService.getInvitation(userId);
+    const invitationRaw: Invite[] = await this.inviteService.getInvitation(userId);
+
+    const inviteFormatted = invitationRaw.map((invite) => {
+      return {
+        roomName: invite.room.roomName,
+        roomId: invite.roomId,
+        invitationId: invite.inviteId
+      };
+    });
+
+    return inviteFormatted;
+    
   }
 }

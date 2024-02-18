@@ -7,7 +7,7 @@ import { useSignals } from '@preact/signals-react/runtime';
 import {  Grid, List, Tabs } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
-import { Message, User, chatData, currentRoom, userLogged } from '../../contexts/ChatContext';
+import { Message, User, chatData, currentRoom, invitationIdList, userLogged } from '../../contexts/ChatContext';
 import MessageComponent from './chatTabs/message.component';
 import ChatUser from './chatTabs/chatUser.component';
 import RoomCreationComponent from './chatTabs/roomCreation.component';
@@ -19,6 +19,7 @@ const label = [
   {k: 2, id: "2", name: "Messsages", icon: ""},
   {k: 3, id: "3", name: "Users", icon: ""},
   {k: 4, id: "4", name: "Create Room", icon: ""},
+  {k: 5, id: "5", name: "Invitation", icon: ""},
 ]
 
 const ChatTabComponent = () => {
@@ -33,7 +34,12 @@ const ChatTabComponent = () => {
   return (
     <Box sx={{ width: '100%', bgcolor: 'background.paper' }}>
       <TabContext value={tabs}>
-        <Tabs value={tabs} onChange={handleChange} centered>
+        <Tabs
+          value={tabs}
+          onChange={handleChange}
+          variant="scrollable"
+          scrollButtons="auto"
+        >
           {
             userLogged.value ? 
             (
@@ -108,6 +114,17 @@ const ChatTabComponent = () => {
         >
           <RoomCreationForm />
         </TabPanel>
+        <TabPanel
+          sx={{
+            backgroundColor:"gray.200",
+            height: '90vh',
+            overflowY: 'auto'
+          }}
+          key="Invitation"
+          value="5"
+        >
+          <Invitation/>
+        </TabPanel>
       </TabContext>
     </Box>
   );
@@ -175,6 +192,14 @@ const RoomCreationForm = () => {
 const SearchRoom = () => {
   return (
     <SearchRoomComponent/>
+  );
+}
+
+const Invitation = () => {
+  return (
+    <Box>
+      This section will show invitations
+    </Box>
   );
 }
 

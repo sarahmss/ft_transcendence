@@ -53,7 +53,8 @@ export class InviteService {
 
   async getInvitation(userId: string) {
     return this.inviteRepository.find(
-      {where: {
+      {relations: ['room'],
+        where: {
         userId: userId,
         valid: true,
         timeLimit: MoreThan(new Date())

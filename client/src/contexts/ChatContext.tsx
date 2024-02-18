@@ -16,7 +16,7 @@ import { io } from "socket.io-client";
 const currentRoom: Signal<number> = signal(-1);
 const userLogged: Signal<boolean> = signal(false);
 const page: Signal<number> = signal(0);
-const invitationIdList: Signal<string[]> = signal([]);
+const invitationIdList: Signal<{invitationId: string, roomName: string, roomId: string}[]> = signal([]);
 
 const privilegedInRoom: {owner: Signal<boolean>, admin: Signal<boolean>} = {
   owner: signal(false),
@@ -183,18 +183,26 @@ const updatePrivateStatus = (response: any) => {
 const addInvitationToList = (response: any) => {
   invitationIdList.value = [
     ...invitationIdList.value,
-    response.inviteId
+    response
   ]
 }
 
 const updateProtectionStatus = (response: any) => {
-  console.log(response);
   const room = chatData.value.find((room) => room.roomId === response.roomId);
 
   if (!room)
     return;
   
   room.isProtected.value = response.isProtected;
+}
+
+const filterOutEveryRequest = (response: any) => {
+  if (invitationIdList.value.length < 0)
+    return;
+
+  invitationIdList.value = invitationIdList.value.filter(
+    (invite) => (response !== invite.roomId)
+  );
 }
 
 chatSocket.on('message-response', insertMessage);
@@ -209,7 +217,7 @@ chatSocket.on('private-toggle', updatePrivateStatus);
 chatSocket.on('password-update', updateProtectionStatus);
 
 chatSocket.on('invitation-send', addInvitationToList);
-chatSocket.on('invitation-send', addInvitationToList);
+chatSocket.on('invitation-used', filterOutEveryRequest);
 
 // Effect knows what event is triggered base on the signal
 effect(

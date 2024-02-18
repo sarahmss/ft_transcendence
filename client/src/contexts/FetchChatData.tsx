@@ -32,7 +32,7 @@ const addUser = (room: Room, user: User) => {
   
 }
 
-const addInvitation = (inviteId: string) => {
+const addInvitation = (inviteId: any) => {
   invitationIdList.value = [
     ...invitationIdList.value,
     inviteId

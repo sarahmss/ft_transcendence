@@ -1,4 +1,4 @@
-import { Button, IconButton, ListItem, TextField } from "@mui/material";
+import { Autocomplete, Button, IconButton, ListItem, TextField } from "@mui/material";
 import { Box } from "@mui/system";
 import inviteService from "../../../services/chat/invite.service";
 import authService from "../../../services/auth.service";
@@ -6,6 +6,7 @@ import { chatData, currentRoom } from "../../../contexts/ChatContext";
 import roomService from "../../../services/chat/room.service";
 import React from "react";
 import { useSignals } from "@preact/signals-react/runtime";
+import queryService from "../../../services/chat/query.service";
 
 
 const InviteComponent = () => {
@@ -25,13 +26,6 @@ const InviteComponent = () => {
     );
   }
 
-  const useInvitation = () => {
-    inviteService.useInvite(
-      authService.getIdFromToken(),
-      "invitationId"
-    );
-  }
-
   return (
     <Box>
       <ListItem>
@@ -45,15 +39,64 @@ const InviteComponent = () => {
   
 }
 
+
 const UserInviteComponent = () => {
 
+  const [userList, setUserList] = React.useState([{userName: "", userId: ""}]);
+  const [value, setValue] = React.useState<any | null>(null);
+  const [input, setInput] = React.useState("");
+
+  const handleChange = (event: any, value: any) => {
+
+    setValue(value);
+    setInput(value.userName);
+  }
+
+  const handleInputChange = (event: any, value: any) => {
+    let timeout: NodeJS.Timeout | undefined = undefined;
+
+    if (event) {
+      console.log(`input: ${value}`);
+      setInput(value);
+
+      clearTimeout(timeout);
+      setTimeout(async () => {
+        if (input.trim().length > 0) {
+
+          const users = await queryService.queryUser(input);
+
+          if (users.length === 0)
+            setUserList([{userName: "", userId: ""}]);
+
+          else
+            setUserList(users);
+      
+        }
+      }, 300);
+    }
+  }
+
   return (
-    <ListItem>
-      name
-      <IconButton>
-        Send Invitation
-      </IconButton>
-    </ListItem>
+    <Box sx={{label: {marginTop: 0}, witdth: '100%'}}>
+      <Button>
+        wow
+      </Button>
+      <Autocomplete
+        id="User-invite-search"
+
+        value={value}
+        onChange={handleChange}
+
+        inputValue={input}
+        onInputChange={handleInputChange}
+
+        options={userList}
+        getOptionLabel={(option: any) => option.userName}
+        isOptionEqualToValue={(option: any, value: any) => option.userId === value.userId}
+        sx={{ minWidth: 300 }}
+        renderInput={(params) => <TextField {...params} label="Users" />}
+      />
+    </Box>
   );
 }
 
@@ -160,8 +203,19 @@ const PassAndVisibilityComponent = () => {
 
 const RoomActionComponent = () => {
 
+  const handleDeleteRoom = () => {
+    roomService.deleteRoom(
+      chatData.value[currentRoom.value].roomId,
+      authService.getIdFromToken()
+    );
+  }
+
   return (
     <Box>
+
+      <Button onClick={handleDeleteRoom}>
+        Delete Room
+      </Button>
 
       <InviteComponent/>
 
