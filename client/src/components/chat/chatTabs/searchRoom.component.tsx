@@ -74,12 +74,12 @@ const ResultComponent = () => {
   );
 }
 
-const password = signal("");
 
 const RoomResultComponent = ({roomData} : {roomData: any}) => {
   useSignals();
 
   const room = roomData.room;
+  const [password, setPass] = React.useState("");
 
   const [showPrompt, setPrompt] = React.useState(false);
 
@@ -88,9 +88,9 @@ const RoomResultComponent = ({roomData} : {roomData: any}) => {
     roomService.joinRoom(
       room.roomId,
       authService.getIdFromToken(),
-      password.value
+      password
     );
-    password.value = "";
+    setPass("");
   }
 
   const togglePrompt = () => {
@@ -147,24 +147,26 @@ const RoomResultComponent = ({roomData} : {roomData: any}) => {
       </ListItem>
       {
         showPrompt ?
-          (<PasswordField roomId={room.roomId} />) : 
+          (<PasswordField data={{roomId: room.roomId, setPass: setPass, password: password}} />) : 
           (<span style={{ visibility: 'hidden' }} />)
       }
     </Box>
   );
 }
 
-const PasswordField = ({roomId} : {roomId: string}) => {
+const PasswordField = ({data} : {data: any}) => {
+
+  const {roomId, setPass, password} = data;
 
   const handleChangeText = (event: any) => {
-    password.value = event.target.value;
+    setPass(event.target.value);
   }
 
   const handleSendJoinRequest = () => {
     roomService.joinRoom(
       roomId,
       authService.getIdFromToken(),
-      password.value
+      password
     );
     
   }

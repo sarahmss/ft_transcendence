@@ -50,7 +50,7 @@ type Room = {
   userList: Signal<User[]>
   fetchStatus: boolean,
   creationDate: Date,
-  isProtected?: boolean,
+  isProtected: Signal<boolean | undefined>,
   isPrivate: Signal<boolean>
 };
 
@@ -145,8 +145,11 @@ const handleRemoveRoom = (response: any) => {
   const index = chatData.value.findIndex((room) => room.roomId !== response.roomId);
   chatData.value = chatData.value.filter((room) => room.roomId !== response.roomId);
 
-  for (let k: number = index; k < chatData.value.length; k++) {
-    chatData.value[k].index = k;
+  // Index again after a room delete
+  if (chatData.value.length > 0) {
+    for (let k: number = index; k < chatData.value.length; k++) {
+      chatData.value[k].index = k;
+    }
   }
 }
 
@@ -173,7 +176,7 @@ const updatePrivateStatus = (response: any) => {
   if (!room)
     return;
 
-  room.isPrivate.value = response.status;
+  room.isPrivate.value = response.isPrivate;
   
 }
 
@@ -184,19 +187,28 @@ const addInvitationToList = (response: any) => {
   ]
 }
 
+const updateProtectionStatus = (response: any) => {
+  console.log(response);
+  const room = chatData.value.find((room) => room.roomId === response.roomId);
+
+  if (!room)
+    return;
+  
+  room.isProtected.value = response.isProtected;
+}
+
 chatSocket.on('message-response', insertMessage);
 
-chatSocket.on('admin-toggle', adminUpdate);
 chatSocket.on('created', handleRoomCreation);
-
 chatSocket.on('joined', handleUserJoin);
 chatSocket.on('left', handleRemoveUser);
-
 chatSocket.on('chat-deleted', handleRemoveRoom);
+
+chatSocket.on('admin-toggle', adminUpdate);
 chatSocket.on('private-toggle', updatePrivateStatus);
+chatSocket.on('password-update', updateProtectionStatus);
 
 chatSocket.on('invitation-send', addInvitationToList);
-
 chatSocket.on('invitation-send', addInvitationToList);
 
 // Effect knows what event is triggered base on the signal

@@ -337,6 +337,23 @@ export class RoomController {
 			throw exception;
 
 		await this.roomService.setPassRoom(password, roomId);
+
+		const memberList = await this.membershipService.findParticipantsNotExclusive(roomId);
+
+		this.eventEmitter.emit(
+			'room.pass',
+			memberList,
+			"",
+			"password-update",
+			(_: any, __: any, rid: string = roomId ) => {
+				return (
+					{
+						roomId: rid,
+						isProtected: true,
+					}
+				)
+			}
+		);
 		return "Password set";
 	}
 
@@ -354,6 +371,22 @@ export class RoomController {
 
 
 		await this.roomService.unsetPassRoom(roomId);
+		const memberList = await this.membershipService.findParticipantsNotExclusive(roomId);
+
+		this.eventEmitter.emit(
+			'room.pass',
+			memberList,
+			"",
+			"password-update",
+			(_: any, __: any, rid: string = roomId ) => {
+				return (
+					{
+						roomId: rid,
+						isProtected: false,
+					}
+				)
+			}
+		);
 		return "password removed";
 	}
 

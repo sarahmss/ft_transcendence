@@ -73,7 +73,7 @@ const roomMaker = (
       roomId: roomId,
       roomName: signal(roomName),
       creationDate: creationDate,
-      isProtected: isProtected,
+      isProtected: signal(isProtected),
       messages: signal([]),
       userList: signal([]),
       fetchStatus: false,

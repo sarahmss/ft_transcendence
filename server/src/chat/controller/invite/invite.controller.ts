@@ -36,6 +36,8 @@ export class InviteController {
     if (userMembership)
       throw new ConflictException('User it\'s already in the room');
 
+    
+
     const room = await this.roomService.findRoom(roomId);
     const user = await this.userService.findById(userId);
 
@@ -69,26 +71,41 @@ export class InviteController {
     if (userId !== invitation.userId)
       throw new UnauthorizedException('Invition not meant for this user');
 
-    await this.memberService.joinSingleUser(invitation.user, invitation.room, false);
+    const member = await this.memberService.findMemberRoom(invitation.userId, invitation.roomId);
+    if (member)
+      throw new ConflictException('The user it\'s already in the room');
+
     await this.inviteService.useInvitation(inviteId, response);
 
-    const memberList = this.memberService.findParticipantsNotExclusive(invitation.roomId);
-    const roomId = invitation.roomId;
-    const usr = this.userService.findById(invitation.userId);
+    if (response) {
 
-    this.eventEmitter.emit("room.join",
-      memberList,
-      "",
-      "joined",
-      (_: any[], __: any, rid: string = roomId, user: any = usr) => {
-        return ({
-          userId: user.userId,
-          userName: user.userName,
-          profileImage: user.profilePicture,
-          roomId: rid
-        })
-      }
-    );
+      this.inviteService.invalidate(invitation.userId, invitation.roomId);
+      await this.memberService.joinSingleUser(invitation.user, invitation.room, false);
+      const memberList = this.memberService.findParticipantsNotExclusive(invitation.roomId);
+      const roomId = invitation.roomId;
+      const usr = this.userService.findById(invitation.userId);
+
+      
+      this.eventEmitter.emit('invitation-used',
+        invitation.userId,
+        invitation.roomId,
+        "invitation-used"
+      );
+
+      this.eventEmitter.emit("room.join",
+        memberList,
+        "",
+        "joined",
+        (_: any[], __: any, rid: string = roomId, user: any = usr) => {
+          return ({
+            userId: user.userId,
+            userName: user.userName,
+            profileImage: user.profilePicture,
+            roomId: rid
+          })
+        }
+      );
+    }
     return "invitation used";
   }
 

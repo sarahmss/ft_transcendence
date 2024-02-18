@@ -119,6 +119,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@OnEvent('room.admin')
 	@OnEvent('room.delete')
 	@OnEvent('room.private')
+	@OnEvent('room.pass')
 	emitRoomToAllMembers(users: any[], room: any, emission_event: string, cb: any) {
 
 		users.forEach((user: any) => {
@@ -143,11 +144,12 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@OnEvent('invite-send')
-	emitInvite(targetId: string, inviteId: string, emission_event: string) {
+	@OnEvent('invitation-used')
+	emitInvite(targetId: string, data: any, emission_event: string) {
 		const conn = this.connectedUserService.getConnection(targetId);
 
 		if (conn)
-			conn.emit(emission_event, { inviteId: inviteId });
+			conn.emit(emission_event, { data: data });
 		
 	}
 
@@ -175,7 +177,6 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					!banList.some((banEntry: Ban) =>
 						(banEntry.bannedId === participant.userId))
 				);
-			console.log(receivingClients);
 		}
 		else {
 			// If there is no one blocked

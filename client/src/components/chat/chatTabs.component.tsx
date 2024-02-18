@@ -4,7 +4,7 @@ import Tab from '@mui/material/Tab';
 import TabContext from '@mui/lab/TabContext';
 import TabPanel from '@mui/lab/TabPanel';
 import { useSignals } from '@preact/signals-react/runtime';
-import { Button, FormControl, Grid, IconButton, List, ListItem, Tabs } from '@mui/material';
+import {  Grid, List, Tabs } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
 
 import { Message, User, chatData, currentRoom, userLogged } from '../../contexts/ChatContext';
@@ -12,9 +12,7 @@ import MessageComponent from './chatTabs/message.component';
 import ChatUser from './chatTabs/chatUser.component';
 import RoomCreationComponent from './chatTabs/roomCreation.component';
 import SearchRoomComponent from './chatTabs/searchRoom.component';
-import roomService from '../../services/chat/room.service';
-import authService from '../../services/auth.service';
-import inviteService from '../../services/chat/invite.service';
+import RoomActionComponent from './chatTabs/roomAction.component';
 
 const label = [
   {k: 1, id: "1", name: "", icon: SearchIcon},
@@ -140,52 +138,6 @@ const MessageTabComponent = () => {
 
 const ParticipantTabComponent = () => {
 
-  // Invite people
-  const sendInvitation = () => {
-    inviteService.createInvite(
-      authService.getIdFromToken(),
-      chatData.value[currentRoom.value].roomId,
-      "someone"
-    );
-  }
-
-  const useInvitation = () => {
-    inviteService.useInvite(
-      authService.getIdFromToken(),
-      "invitationId"
-    );
-  }
-
-  // Toggle room visibility
-  const togglePrivate = () => {
-    roomService.togglePrivate(
-      authService.getIdFromToken(),
-      chatData.value[currentRoom.value].roomId
-    );
-  }
-
-  // Password
-  const [pass, setPass] = React.useState("");
-
-  const handleChange = (event: any) => {
-    setPass(event.target.value);
-  }
-
-  const sendSetPassword = () => {
-    roomService.setPassword(
-      authService.getIdFromToken(),
-      chatData.value[currentRoom.value].roomId,
-      pass
-    );
-  }
-
-  const sendUnsetPassword = () => {
-    roomService.unsetPassword(
-      authService.getIdFromToken(),
-      chatData.value[currentRoom.value].roomId,
-    );
-  }
-
   return (
     <Box sx={{ flexGrow: 1, maxWidth: 752 }}>
         <Grid item xs={12} md={6}>
@@ -193,24 +145,7 @@ const ParticipantTabComponent = () => {
               currentRoom.value !== -1 ?
                 (
                   <List>
-                    <ListItem>
-                      <Box sx={{ display: 'grid', placeItems: 'center' }}>
-                        <Button>
-                          Invite User
-                        </Button>
-                      </Box>
-                    </ListItem>
-
-                    <ListItem>
-                      <IconButton onClick={togglePrivate}>
-                        Toggle Private
-                      </IconButton>
-
-                      <IconButton>
-                        Set/Unset password
-                      </IconButton>
-                    </ListItem>
-
+                    <RoomActionComponent/>
                     {
                       chatData.value[currentRoom.value].userList.value.map( (userData: User) => {
                         return (<ChatUser key={userData.userId} user={userData} />);

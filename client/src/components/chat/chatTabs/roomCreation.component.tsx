@@ -251,9 +251,6 @@ const AddUserMemberListComponent = () => {
     setQuery(event.target.value);
   }
 
-
-
-
   const handleUserQuery = async () => {
     const currId = authService.getIdFromToken();
 
