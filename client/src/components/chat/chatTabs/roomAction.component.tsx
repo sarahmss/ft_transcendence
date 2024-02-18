@@ -78,9 +78,6 @@ const UserInviteComponent = () => {
 
   return (
     <Box sx={{label: {marginTop: 0}, witdth: '100%'}}>
-      <Button>
-        wow
-      </Button>
       <Autocomplete
         id="User-invite-search"
 
