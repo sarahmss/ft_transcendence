@@ -1,7 +1,6 @@
 import { Injectable,
 	NotFoundException,
-	UnprocessableEntityException,
-	BadRequestException} from '@nestjs/common';
+	UnprocessableEntityException,} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
@@ -9,6 +8,7 @@ import { UpdateUserDto, CreateUserDto } from "./dto/user.dto";
 import { status } from "../helpers/types.helper"
 import { IntraUserData, UserHelper } from '../helpers/types.helper';
 import * as bcrypt from 'bcrypt';
+import * as xssFilters from 'xss-filters';
 
 @Injectable()
 export class UsersService {
@@ -215,7 +215,10 @@ export class UsersService {
 	}
 
 	async validateLocalUser(data: Partial<User>) {
-		const { userName, password } = data;
+		let { userName, password } = data;
+		userName = xssFilters.inHTMLData(userName);
+		password = xssFilters.inHTMLData(password);
+
 		const user = await this.usersRepository.findOne({ where:
 														{ userName } });
 		if (!user)
@@ -242,7 +245,11 @@ export class UsersService {
 	/********************************* TOOLS ******************************/
 
 	async createLocalUser(data: CreateUserDto, response: any) {
-		const { userName, password, email } = data;
+		let { userName, password, email } = data;
+		userName = xssFilters.inHTMLData(userName);
+		password = xssFilters.inHTMLData(password);
+		email = xssFilters.inHTMLData(email);
+
 		const user = await this.usersRepository.findOne({ where:
 														{ userName } });
 		if (user)

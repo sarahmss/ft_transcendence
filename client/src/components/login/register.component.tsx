@@ -50,11 +50,11 @@ export default class Register extends Component<Props, State> {
 			password: Yup.string()
 				.test(
 					"len",
-					"The password must be between 6 and 40 characters.",
+					"The password must be between 8 and 32 characters.",
 					(val: any) =>
 						val &&
-						val.toString().length >= 6 &&
-						val.toString().length <= 40
+						val.toString().length >= 8 &&
+						val.toString().length <= 32
 				)
 				.required("This field is required!"),
 			passwordConfirm: Yup.string()

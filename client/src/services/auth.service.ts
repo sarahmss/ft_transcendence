@@ -52,7 +52,7 @@ class AuthService {
 				userName,
 				email,
 				password,
-				passwordConfirm: passwordConfirm,
+				passwordConfirm,
 			});
 			return response;
 		} catch (error) {
