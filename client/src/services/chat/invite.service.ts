@@ -19,7 +19,6 @@ class InviteService {
       await axios.post(BackLink + "/invite", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
-      console.log(error);
     }
   }
 
@@ -37,7 +36,6 @@ class InviteService {
       return await axios.patch(BackLink + "/invite", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
-      console.log(error);
     }
     
   }
@@ -55,7 +53,6 @@ class InviteService {
       return res.data;
       
     } catch (error) {
-      console.log(error);
     }
   }
   

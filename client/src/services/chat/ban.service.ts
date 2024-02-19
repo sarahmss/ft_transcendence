@@ -24,8 +24,6 @@ class BanService {
       return await axios.post(BackLink + "/ban", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
-      console.log(error);
-      throw error;
 
     }
     
@@ -46,8 +44,6 @@ class BanService {
       return await axios.post(BackLink + "/ban/unban", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
-      console.log(error);
-      throw error;
 
     }
     

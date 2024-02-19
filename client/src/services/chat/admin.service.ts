@@ -18,9 +18,6 @@ class AdminService {
       await axios.patch(BackLink + "/admin", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
-      console.log(error);
-      throw error;
-
     }
     
   }

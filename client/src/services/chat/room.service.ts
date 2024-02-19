@@ -19,7 +19,6 @@ class RoomService {
       return roomList.data;
 
     } catch (error) {
-      console.log(error);
     }
   }
 
@@ -31,7 +30,6 @@ class RoomService {
       await axios.delete(BackLink + `/room/${roomId}/${userId}`, {headers: authService.getAuthToken()});
 
     } catch (error) {
-      console.log(error);
     }
   }
 
@@ -48,8 +46,6 @@ class RoomService {
       await axios.post(BackLink + "/room/leave", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
-      console.log(error);
-      throw error;
 
     }
   }
@@ -75,8 +71,6 @@ class RoomService {
       axios.post(BackLink + "/room", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
-      console.log(error);
-      throw error;
     }
   }
 
@@ -96,7 +90,6 @@ class RoomService {
 
     } catch (error) {
       
-      console.log(error);
     }
   }
 
@@ -114,8 +107,6 @@ class RoomService {
 
       await axios.patch(BackLink + "/room/set_pass", packaged, {headers: authService.getAuthToken()});
     } catch (error) {
-      console.log(error);
-      throw error;
     }
   }
 
@@ -131,8 +122,6 @@ class RoomService {
       await axios.patch(BackLink + "/room/unset_pass", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
-      console.log(error);
-      throw error;
 
     }
   }
@@ -149,7 +138,6 @@ class RoomService {
 
       await axios.patch(BackLink + "/room/toggle_private", packaged, {headers: authService.getAuthToken()});
     } catch (error) {
-      console.log(error);
     }
   }
 
@@ -160,7 +148,6 @@ class RoomService {
       const resp = await axios.get(BackLink + `/room/${roomId}`, {headers: authService.getAuthToken()});
       return resp.data;
     } catch (error) {
-      console.log(error);
     }
   }
 
@@ -176,7 +163,6 @@ class RoomService {
       )).data;
 
     } catch (error) {
-      console.log(error);
     }
   }
 
@@ -196,8 +182,6 @@ class RoomService {
       await axios.post(`${BackLink}/room/kick`, packaged,
         {headers: authService.getAuthToken()});
     } catch (error) {
-
-      console.log(error);
     }
   }
 
@@ -206,7 +190,6 @@ class RoomService {
       const room = await axios.get(`${BackLink}/room/s/${rid}`, {headers: authService.getAuthToken()});
       return room.data;
     } catch (error) {
-      console.log(error);
     }
     
   }
