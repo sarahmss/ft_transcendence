@@ -8,23 +8,33 @@ class QueryService {
     pattern: string
   ) {
 
-    const room = await axios.get(
-      `${BackLink}/room/query?q=${pattern}`,
-      {headers: authService.getAuthToken()}
-    );    
-    return room.data;
+    try {
+      const room = await axios.get(
+        `${BackLink}/room/query?q=${pattern}`,
+        {headers: authService.getAuthToken()}
+      );    
+      return room.data;
+      
+    } catch (error) {
+      
+    }
   }
 
   async queryUser(
     pattern: string
   ) {
 
-    const userList = await axios.get(
-      `${BackLink}/room/queryUser?q=${pattern}`,
-      {headers: authService.getAuthToken()}
-    );
+    try {
+      const userList = await axios.get(
+        `${BackLink}/room/queryUser?q=${pattern}`,
+        {headers: authService.getAuthToken()}
+      );
 
-    return userList.data;
+      return userList.data;
+      
+    } catch (error) {
+      
+    }
     
   }
 
@@ -32,12 +42,17 @@ class QueryService {
     pattern: string,
     setData: any
   ) {
-    axios.get(`${BackLink}/room/queryUser?q=${pattern}`,
-              {headers: authService.getAuthToken()}).then( (response: any) => {
-        setData.value = response.data;
-        // setData(response.data);
-      }
-    );
+
+    try {
+      axios.get(`${BackLink}/room/queryUser?q=${pattern}`,
+                {headers: authService.getAuthToken()}).then( (response: any) => {
+          setData.value = response.data;
+        }
+      );
+    } catch (error) {
+      
+    }
+
   }
 }
 

@@ -57,6 +57,10 @@ export class BanController {
     if (!user || !target || !room)
       throw new NotFoundException();
 
+    const targetMember = await this.membershipService.findMemberRoom(targetId, roomId);
+    if (targetMember.owner)
+      throw new UnauthorizedException('Owner cannot be banned');
+
     const ban = await this.banService.findBan(room, target);
     if (ban)
       throw new ConflictException("The user is already banned");

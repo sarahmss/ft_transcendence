@@ -4,10 +4,13 @@ import { BadRequestException, Body,
   Get,
   NotFoundException,
   Patch,
-  Post } from '@nestjs/common';
+  Post, 
+  UnauthorizedException} from '@nestjs/common';
 import { isEmpty } from 'class-validator';
+import { hasUncaughtExceptionCaptureCallback } from 'process';
 
 import { BlacklistService } from 'src/chat/service/blacklist/blacklist.service';
+import { MembershipService } from 'src/chat/service/membership/membership.service';
 import { RoomService } from 'src/chat/service/room/room.service';
 import { GLOBAL_BLOCK, LOCAL_BLOCK } from 'src/constants/blackListType.constant';
 import { User } from 'src/entity/user.entity';
@@ -18,6 +21,7 @@ export class BlacklistController {
 
   constructor(private readonly blackListService: BlacklistService,
     private readonly userService: UsersService,
+    private readonly memberService: MembershipService,
     private readonly roomService: RoomService) {}
 
   //Test endpoint
@@ -58,6 +62,10 @@ export class BlacklistController {
     const roomTarget = await this.roomService.findRoom(roomId);
     if (blockType === LOCAL_BLOCK && !roomTarget)
       throw new BadRequestException("If the block it's local a room must be provided");
+
+    const blockedMember = await this.memberService.findMemberRoom(blockedId, roomId);
+    if (blockedMember.owner)
+      throw new UnauthorizedException('You can\'t block the owner');
 
     const existingBlackList = await this.blackListService
                                           .checkExistence(blockerId,

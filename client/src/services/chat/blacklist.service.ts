@@ -20,7 +20,12 @@ class BlackListService {
       duration: duration,
     }
 
-    await axios.post(BackLink + "/blacklist/single", packaged, {headers: authService.getAuthToken()});
+    try {
+      await axios.post(BackLink + "/blacklist/single", packaged, {headers: authService.getAuthToken()});
+    }
+    catch (error) {
+      
+    }
     
   }
 
@@ -37,7 +42,11 @@ class BlackListService {
       roomId: roomId
     }
 
-    await axios.post(BackLink + "/ban/bulk", packaged, {headers: authService.getAuthToken()});
+    try {
+      await axios.post(BackLink + "/ban/bulk", packaged, {headers: authService.getAuthToken()});
+    } catch (error) {
+      
+    }
   }
 
   async unblock (

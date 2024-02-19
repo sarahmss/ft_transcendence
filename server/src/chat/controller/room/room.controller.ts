@@ -184,12 +184,13 @@ export class RoomController {
 		if (!req)
 			throw new NotFoundException("Requestor not found");
 
-		if (!req.admin && !req.owner )
-			throw new UnauthorizedException("Not allowed to kick");
 
 		const member = await this.membershipService.findMemberRoom(userId, roomId);
 		if (!member)
 			throw new NotFoundException("The user was not found in this room");
+
+		if ((!req.admin && !req.owner) || member.owner)
+			throw new UnauthorizedException("Not allowed to kick");
 
 		const memberList = await this.membershipService.findParticipantsNotExclusive(roomId);
 

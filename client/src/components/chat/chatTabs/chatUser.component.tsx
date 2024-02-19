@@ -19,6 +19,7 @@ import authService from "../../../services/auth.service";
 import adminService from "../../../services/chat/admin.service";
 import banService from "../../../services/chat/ban.service";
 import blackListService from "../../../services/chat/blacklist.service";
+import { Link } from "react-router-dom";
 
 const UserActionChatComponent = ({user}: {user: User}) => {
 
@@ -266,9 +267,11 @@ const ChatUser = ({user}:{user: User}) => {
         (<span style={{ visibility: 'hidden' }} />)
       }
 
-      <ListItemAvatar>
-        <Avatar src={profilePic}/>
-      </ListItemAvatar>
+      <Link to={`/profile?user=${user.userId}`}>
+        <ListItemAvatar>
+          <Avatar src={profilePic}/>
+        </ListItemAvatar>
+      </Link>
 
       <ListItemText
         primary={user.userName.value}
