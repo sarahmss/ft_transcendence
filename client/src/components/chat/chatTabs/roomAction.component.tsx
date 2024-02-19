@@ -10,6 +10,11 @@ import * as _ from 'lodash';
 import { signal } from "@preact/signals-react";
 import React from "react";
 
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+
+import LockIcon from '@mui/icons-material/Lock';
+import LockOpenIcon from '@mui/icons-material/LockOpen';
 
 const InviteComponent = () => {
 
@@ -151,10 +156,12 @@ const PassAndVisibilityComponent = () => {
           chatData.value[currentRoom.value].isProtected.value ? (
 
           <IconButton onClick={sendUnsetPassword}>
+            <LockOpenIcon/>
             Unset password
           </IconButton>
         ) : (
           <IconButton onClick={togglePrompt}>
+            <LockIcon/>
             Set password
           </IconButton>
         )
@@ -164,10 +171,12 @@ const PassAndVisibilityComponent = () => {
         {
           chatData.value[currentRoom.value].isPrivate.value ? (
             <IconButton onClick={togglePrivate}>
+              <VisibilityIcon/>
               Unset Private
             </IconButton>
           ) : (
             <IconButton onClick={togglePrivate}>
+              <VisibilityOffIcon/>
               Set Private
             </IconButton>
           )
@@ -215,9 +224,16 @@ const RoomActionComponent = () => {
   return (
     <Box>
 
-      <Button onClick={handleDeleteRoom}>
-        Delete Room
-      </Button>
+      {
+        privilegedInRoom.admin.value || privilegedInRoom.owner.value ?
+          (
+            <Button onClick={handleDeleteRoom}>
+              Delete Room
+            </Button>
+          ) : (
+            <span style={{visibility: 'hidden'}}/>
+          )
+      }
 
       <InviteComponent/>
 
