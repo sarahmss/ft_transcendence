@@ -23,7 +23,6 @@ const pagesLogged = [
   { label: 'Logout', link: '/logout' },
 	{ label: 'Profile', link: '/profile' },
 	{ label: 'Account', link: '/settings' },
-  { label: 'Game', link: '/game' },
   { label: 'Community', link: '/community' },
 ];
 

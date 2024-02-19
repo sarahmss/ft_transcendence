@@ -46,7 +46,6 @@ const Home: React.FC = () => {
 				</Grid>
 
 				<Grid item xs={12} md={6} lg={4} sx={{ paddingLeft: "0px"}}>
-					{isLogged ? (<ChatComponent/>):(<></>)}
 					<Box sx={{
 						display: "flex",
 						justifyContent:"center"}}>
@@ -56,15 +55,16 @@ const Home: React.FC = () => {
 							className="md-primary"
 							variant='contained'
 							size='large'
-							sx={{  backgroundColor: '#B700cc' }}
+							sx={{  backgroundColor: '#B700cc', 
+							marginTop:'10px' }}
 							>
 							Play !
 						</Button>
 					</Link>
 				) : (
-
+					
 					<Grid container spacing={3} sx={{ display: 'flex',
-					 			alignItems: 'center',
+					alignItems: 'center',
 								justifyContent: "center",
 								marginTop:"50%" }}>
 						<Grid item  >
@@ -97,6 +97,7 @@ const Home: React.FC = () => {
 					</Grid>
 				)}
 					</Box>
+				{isLogged ? (<ChatComponent/>):(<></>)}
 				</Grid>
 			</Grid>
 			</div>
