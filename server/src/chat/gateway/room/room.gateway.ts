@@ -131,6 +131,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		});
 	}
 
+	@OnEvent('game.invitation.send')
 	@OnEvent('room.create')
 	emitRoom(users: any[], room: any, emission_event: string, cb: any) {
 

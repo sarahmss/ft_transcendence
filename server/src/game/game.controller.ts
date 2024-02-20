@@ -1,10 +1,39 @@
-import { Controller, Get, Param, ParseUUIDPipe, Res } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, ParseUUIDPipe, Post, Res } from '@nestjs/common';
 import { GameService } from './game.service';
+import { UsersService } from 'src/users/users.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Controller('game')
 export class GameController {
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly gameService: GameService,
+    private readonly userService: UsersService,
+    private readonly eventEmitter: EventEmitter2
+  ) {}
 
+  @Post('invite')
+  async createInvitationGameRoom(
+    @Body('requestorId') requestorId : string,
+    @Body('secondPlayerId') secondPlayerId :string
+  ) {
+
+    const playerOne = await this.userService.findById(requestorId);
+    const playerTwo = await this.userService.findById(secondPlayerId);
+    if (!playerOne || !playerTwo)
+      throw new NotFoundException("Either or both users don't exist");
+
+    
+    // Dados que os jogadores irao receber
+    const sendDataToChatSocket = {}
+
+    // Emissor de eventos para o chat socket
+    this.emitDataToChatSocket(
+      'game.invitation.send',
+      [requestorId, secondPlayerId],
+      sendDataToChatSocket,
+      'game-invitation'
+    );
+  }
 
   @Get(':ownerId/:friendId/chat-match')
   async DenyFriendshipRequest(
@@ -16,4 +45,26 @@ export class GameController {
     // this.gameService.createRoom()
     return 
   }
+
+  private emitDataToChatSocket (
+    event: string,
+    recipients: string[],
+    data: any,
+    emission_event: string,
+  ) {
+
+    const cb = (_: any, __: any) => {
+        return ({
+          ...data
+        })
+      };
+    
+    this.eventEmitter.emit(event,
+      recipients,
+      "",
+      emission_event,
+      cb
+    );
+  }
+
 }

@@ -18,6 +18,8 @@ const userLogged: Signal<boolean> = signal(false);
 const page: Signal<number> = signal(0);
 const invitationIdList: Signal<{invitationId: string, roomName: string, roomId: string}[]> = signal([]);
 
+const gameInvitationList: Signal<any[]> = signal([]);
+
 const privilegedInRoom: {owner: Signal<boolean>, admin: Signal<boolean>} = {
   owner: signal(false),
   admin: signal(false)
@@ -215,6 +217,14 @@ const filterOutEveryRequest = (response: any) => {
   );
 }
 
+const addGameInvitation = (response: any) => {
+
+  console.log(response);
+  gameInvitationList.value = [];
+
+  return ;
+}
+
 chatSocket.on('message-response', insertMessage);
 
 chatSocket.on('created', handleRoomCreation);
@@ -228,6 +238,8 @@ chatSocket.on('password-update', updateProtectionStatus);
 
 chatSocket.on('invitation-send', addInvitationToList);
 chatSocket.on('invitation-used', filterOutEveryRequest);
+
+chatSocket.on('invitation-send', addGameInvitation);
 
 // Effect knows what event is triggered base on the signal
 effect(
