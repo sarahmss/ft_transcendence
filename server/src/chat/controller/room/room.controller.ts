@@ -69,9 +69,7 @@ export class RoomController {
 		const groom = await this.roomService.findGroup(roomId);
 
 		return ({
-			roomId: room.roomId,
-			roomName: room.roomName,
-			creationDate: room.creationDate,
+			...room,
 			isPrivate: groom.isPrivate,
 			isProtected: groom.protected
 		});

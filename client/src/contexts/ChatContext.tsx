@@ -47,6 +47,7 @@ type User = {
 type Room = {
   index: number,
   roomId: string,
+  roomType: number,
   roomName: Signal<string>,
   messages: Signal<Message[]>,
   userList: Signal<User[]>
@@ -110,6 +111,7 @@ const handleRoomCreation = (response: any) => {
     response.roomName,
     response.creationDate,
     response.isPrivate,
+    response.roomType,
     response.isProtected,
   );
 

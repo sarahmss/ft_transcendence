@@ -10,7 +10,7 @@ import PunchClockIcon from '@mui/icons-material/PunchClock';
 
 import { User, chatData, currentRoom, privilegedInRoom } from "../../../contexts/ChatContext";
 import React, {useState, useEffect} from "react";
-import { LOCAL_BLOCK } from "../../../common/constants";
+import { GROUP, LOCAL_BLOCK } from "../../../common/constants";
 import { useSignals } from "@preact/signals-react/runtime";
 
 import userService from "../../../services/user.service";
@@ -69,18 +69,7 @@ const UserActionChatComponent = ({user}: {user: User}) => {
   };
 
 
-  // Unprivileged actions
-  // const unprivilegedAction = [
-  //   {id: 1, action: togglePromptAndSet, label: 'Mute'},
-  //   {id: 2, action: () => {}, label: 'invite'},
-  // ];
-
-  // // With Privilege
-  // const privilegedAction = [
-  //   {id: 3, action: togglePromptAndSet, label: 'Ban'},
-  //   {id: 4, action: handleKick, label: 'Kick'},
-  //   {id: 5, action: handleToggleAdmin, label: 'Toggle admin'},
-  // ];
+  // Without privilege
   const unprivilegedAction = [
     {id: 1, action: togglePromptAndSet, label: 'Mute'},
   ];
@@ -124,7 +113,8 @@ const UserActionChatComponent = ({user}: {user: User}) => {
         ))}
 
         {
-          privilegedInRoom.admin.value || privilegedInRoom.owner.value ?
+          (privilegedInRoom.admin.value || privilegedInRoom.owner.value) &&
+            chatData.value[currentRoom.value].roomType === GROUP ?
             (
               privilegedAction.map((action) => (
                 <MenuItem value={action.id} key={action.label} onClick={action.action}>
