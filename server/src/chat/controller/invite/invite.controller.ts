@@ -4,6 +4,7 @@ import { BanService } from 'src/chat/service/ban/ban.service';
 import { InviteService } from 'src/chat/service/invite/invite.service';
 import { MembershipService } from 'src/chat/service/membership/membership.service';
 import { RoomService } from 'src/chat/service/room/room.service';
+import { DIRECT } from 'src/constants/roomType.constant';
 import { Invite } from 'src/entity/invite.entity';
 import { UsersService } from 'src/users/users.service';
 
@@ -37,13 +38,17 @@ export class InviteController {
     if (userMembership)
       throw new ConflictException('User it\'s already in the room');
 
-    
-
     const room = await this.roomService.findRoom(roomId);
     const user = await this.userService.findById(userId);
 
     if (!room || !user)
       throw new NotFoundException('User or room not found');
+
+    if (room.roomType === DIRECT) {
+      const participant = this.memberService.findParticipants(roomId, userId);
+      if (participant)
+        throw new UnauthorizedException('The direct room can only have 2 user maximum');
+    }
 
     const rawInvitation = await this.inviteService.createInvitation(room, user);
 
