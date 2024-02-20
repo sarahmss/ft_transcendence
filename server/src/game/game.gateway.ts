@@ -9,7 +9,7 @@ import { AppGateway } from 'src/app/app.gateway';
 @WebSocketGateway ({
 	namespace: '/game',
 	cors: {
-		origin: '*',
+		origin: [process.env.FRONT_URL, 'http://api.intra.42.fr', process.env.BACK_URL],
 		credentials: true,
 		methods: 'GET',
 	},
