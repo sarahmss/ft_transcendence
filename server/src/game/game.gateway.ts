@@ -25,6 +25,7 @@ export class GameGateway
 					) {}
 
 		async handleConnection(client: Socket) {
+			// precisa identificar aqui 
 			try {
 				const token = client.handshake.headers.cookie.split('=')[1];
 				const decodedToken = this.authService.IsValidJwt(token);
@@ -78,6 +79,18 @@ export class GameGateway
 			}else {
 				console.log(`Player ${reconnectedPlayer.name} not found`);
 			}
+		}
+
+	@SubscribeMessage('loginHostPrivateMatch')
+		handleLoginHostPrivateMatch(client: Socket, payload: {hostUserIdDB: string, userIdDataBase: string, typeUser: string}) {
+			//criar tudo o que precisa num fluxo normal até o ponto da tela de Customize
+			//usar o id desse client (que é o do host) pra criar a sala e entrar
+		}
+
+	@SubscribeMessage('loginGuestPrivateMatch')
+		handleLoginGuestPrivateMatch(client: Socket, payload: {hostUserIdDB: string, matchHostSocketID: string, userIdDataBase: string, typeUser: string}) {
+			//criar tudo o que precisa num fluxo normal até o ponto da tela de Customize
+			//usar o matchHostSocketID pra identificar a sala criada por ele e entrar 
 		}
 
 	@SubscribeMessage('login')

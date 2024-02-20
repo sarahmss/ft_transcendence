@@ -196,7 +196,39 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
             //de customização (passa para o emit os argumentos que foram resgatados anterior-
             //mente da url para que o servidor saiba criar/encontrar a sala e jogar os clients
             //lá dentro e já criar as estruturas, etc)
+            
+            //a gravação do id do socket do host (e do guest)
+            //só vai acontecer depois do login... e os dois vão
+            //ter que passar por aqui.
+            //Ou seja, vai ter que ter um tempinho a mais pro
+            //guest procurar o host no localStorage pra encontrar
+            //o id dele... um tempo de 5 segundos Será que é suficiente?
+            //e aí deixa ele numa tela de carregamento? (a do connecting mesmo,
+            //porque daí ele só seria conectado (dispatch CONNECTED) depois que conseguir
+            //resgatar o id do socket do host atraves do ID do banco
+            //e entrar na sala a partir do servidor)
 
+            //Então o código aqui ficaria algo como:
+            // if (args -> argumentos que esse método recebe && typeUser == 'host') {
+            //  const name = storedPlayer.userName;
+            //  const userIdDataBase = storedPlayer.userId;
+            //  gameSocket.emit('loginHostPrivateMatch', {hostUserIdDB, userIdDataBase, typeUser}) // daí lá no server é só usar o id do socket dele pra criar a sala
+            //}
+            // else if (args -> argumentos que esse método recebe && typeUser == 'guest') {
+            //  const name = storedPlayer.userName;
+            //  const userIdDataBase = storedPlayer.userId;
+            //  ---> dá um tempo de uns 5 segundos pra resgatar a instancia do host do localStorage?
+            //      const storedMatchHostSocket = await getStoredPlayerSocket(hostUserIdDB); -> espera uns 5 segundos pra fazer isso
+            //      const matchHostSocketID = storedMatchHostSocket?.id;
+            //  -- e depois chama:
+            //  if (matchHostSocketID) {
+            //    console.log(`Encontramos o socket do host. O id do socket é ${matchHostSocketID}`);
+            //    gameSocket.emit('loginGuestPrivateMatch', {hostUserIdDB, matchHostSocketID, userIdDataBase, typeUser});
+            //  }
+            //  else
+            //    console.log('Não foi possível resgatar o id do socket do Host. Seu usuário será logado no modo público');
+            //}
+            // else if (!args) --> condição pro login normal abaixo
             console.log('Jogador ainda não existe e precisa logar.');
             console.log('Nome: ', storedPlayer.userName, 'UserId do banco: ', storedPlayer.userId);
             const name = storedPlayer.userName;
