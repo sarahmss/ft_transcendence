@@ -443,9 +443,9 @@ export class GameService {
         this.refreshRooms(server);
     }
 
-	removePlayer(playerId: string, client: Socket, server: Server):void {
-		console.log(`${this.game.players[playerId]} disconnected`);
-		this.leaveRoomInit(client, server);
+	async removePlayer(playerId: string, client: Socket, server: Server) {
+		// console.log(`${JSON.stringify(this.game.players[playerId])} disconnected`);
+		await this.leaveRoomInit(client, server);
 		delete this.game.players[client.id];
 		this.refreshPlayers(server);
 		this.refreshRooms(server);
