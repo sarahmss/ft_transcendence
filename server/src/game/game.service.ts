@@ -181,7 +181,7 @@ export class GameService {
 
 		client.join(roomId);
 		console.log(`${player.name} rejoined room`);
-		this.refreshMatch(server, roomId); //essa ordem pode afetar? será melhor deixar no gateway em handleRecconect?
+		this.refreshMatch(server, roomId);
 	}
 
     joinRoom(client: Socket, roomId: string, server : Server) {
@@ -231,7 +231,7 @@ export class GameService {
             ...match[player],
             ready: true
         };
-        if (match.player1.ready && match.player2.ready) {''
+        if (match.player1.ready && match.player2.ready) {
             match.status = 'PLAY';
 			match.timeStartMatch = new Date();
             match.ball = {
@@ -243,7 +243,6 @@ export class GameService {
                 x: this.gameConfig.width / 2,
                 y: this.gameConfig.height / 2,
             };
-			console.log('GAME LOADED, OBJETO MATCH: ', JSON.stringify(match));
         }
     }
 
@@ -281,7 +280,7 @@ export class GameService {
 
 		Object.keys(this.game.rooms).forEach((key) => {
 			if( this.game.rooms[key].player1 == client.id || this.game.rooms[key].player2 == client.id){
-				console.log('este client [', client.id, '] ja esta presente na sala');
+				console.log('This client [', client.id, '] is already in the room.');
 				return;
 			} else {
 				if(!this.game.rooms[key].player1 || !this.game.rooms[key].player2)
@@ -289,8 +288,8 @@ export class GameService {
 					delete this.game.waiting[client.id];
 					this.refreshWaitingQueue(server, Object.keys(this.game.waiting).length);
 					this.joinRoom(client, key, server);
-					console.log('este client [', client.id, '] entrou numa sala com vaga');
-					console.log('Sala de ID: ', key);
+					console.log('The client [', client.id, '] entered in a vacant room');
+					console.log('Room ID: ', key);
 					return;
 				}
 			}
@@ -298,7 +297,7 @@ export class GameService {
 
 		if (this.game.players[client.id].state !== 'in_room' && this.game.players[client.id].state !== 'in_game') {
 			this.createRoom(client, client.id, server);
-			console.log('este client [', client.id, '] criou uma sala de ID: ', client.id);
+			console.log('The client [', client.id, '] created a room of ID: ', client.id);
 		}
 	}
 
@@ -319,8 +318,8 @@ export class GameService {
 			return 5;
 		} else {
 
-			const baseGame = 5;// quantidade inicial de partidas necessárias
-			const increment = 2;// incremento a cada 3 níveis
+			const baseGame = 5;
+			const increment = 2;
 			return baseGame + increment * Math.floor((currentLevel - 5) / 3);
 		}
 	}
@@ -329,8 +328,6 @@ export class GameService {
 		const user1 = await this.usersRepository.findOne({ where: { userId: this.game.players[match.player1SocketID].userIdDataBase }, relations: ['losingGames', 'winningGames'] });
 		const user2 = await this.usersRepository.findOne({ where: { userId: this.game.players[match.player2SocketID].userIdDataBase }, relations: ['losingGames', 'winningGames'] });
 
-		// const user1 = await this.usersService.findById(this.game.players[match.player1SocketID].userIdDataBase);
-		// const user2 = await this.usersService.findById(this.game.players[match.player2SocketID].userIdDataBase);
 		console.log('User1: ', user1);
 		console.log('User2: ', user2);
 		if (user1 && user2) {
@@ -354,7 +351,6 @@ export class GameService {
 				user2.winningGames.push(matchHist);
 				user1.losingGames.push(matchHist);
 			}
-			// await this.matchRepository.save(matchHist);
 			await this.usersRepository.save(user1);
 			await this.usersRepository.save(user2);
 			delete this.game.match[roomId];
@@ -386,14 +382,14 @@ export class GameService {
 				}
 			}
 			else {
-				console.log('Esse user não é o vencedor: ', user.userName);
+				console.log('This user IS NOT the winner: ', user.userName);
 				user.totalGamesLost += 1;
 			}
 			await this.usersRepository.save(user);
-			console.log('CONSEGUIMOS SALVAR O USUARIO VENCEDOR NO BANCO DEPOIS DA PARTIDA');
+			console.log('[UpdateWinnerScore] | WINNER SUCCESSFULLY SAVED IN DB AFTER MATCH');
 		}
 		else {
-			console.log('NÃO ENCONTRAMOS ESSE USER NO BANCO');
+			console.log('[UpdateWinnerScore] | WE COULD NOT FIND USER IN DB');
 		}
 	}
 
@@ -438,13 +434,12 @@ export class GameService {
             client.leave(roomId);
             this.refreshMatch(server, roomId);
         }
-		this.logger.log('Usuário saiu da partida: ', JSON.stringify(this.game.players[client.id]));
+		this.logger.log('User left the match: ', JSON.stringify(this.game.players[client.id]));
         this.refreshPlayers(server);
         this.refreshRooms(server);
     }
 
 	async removePlayer(playerId: string, client: Socket, server: Server) {
-		// console.log(`${JSON.stringify(this.game.players[playerId])} disconnected`);
 		await this.leaveRoomInit(client, server);
 		delete this.game.players[client.id];
 		this.refreshPlayers(server);
