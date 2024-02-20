@@ -175,6 +175,8 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
         });
       }
 
+    //por conta da possibilidade de convite para um jogo a partir do chat,
+    //essa função poderá receber argumentos... (idUser e typeUser)
     const fetchUserLocalStorage = async () => {
       try {
         const storedPlayer = await getStoredPlayerData();
@@ -187,6 +189,14 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
             console.log('StoredPlayerSocket: ', storedPlayerSocket);
             gameSocket.emit('reconnect', storedPlayerSocket);
           } else {
+
+            // aqui vai ter que verificar se argumentos (url vindos por parametro do método)
+            //existem/foram passados. Se sim, então não é um login normal que chama.. e sim
+            //um que faz todo o processo que o fluxo normal realizaria até chegar na tela
+            //de customização (passa para o emit os argumentos que foram resgatados anterior-
+            //mente da url para que o servidor saiba criar/encontrar a sala e jogar os clients
+            //lá dentro e já criar as estruturas, etc)
+
             console.log('Jogador ainda não existe e precisa logar.');
             console.log('Nome: ', storedPlayer.userName, 'UserId do banco: ', storedPlayer.userId);
             const name = storedPlayer.userName;
@@ -202,6 +212,9 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
     };
 
     gameSocket.on('connect', () => {
+      //aqui, consultar a url -> pra verificar se o socket se conectou nesse contexto
+      //porque foi CONVIDADO para uma SALA PRIVADA
+      //se sim, passar os argumentos (idUser e typeUser para o método abaixo)
       fetchUserLocalStorage();
 		// const storedPlayer = AuthService.getCurrentUserPlay();
 		// if (!storedPlayer){
