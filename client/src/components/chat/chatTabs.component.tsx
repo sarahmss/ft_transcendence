@@ -23,6 +23,8 @@ import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
 
 import {useSelector, useDispatch} from "react-redux";
 import {addUser, userLog} from "../../services/reduce";
+import { GamepadRoundDown } from 'mdi-material-ui';
+import GameInvitationComponent from './chatTabs/gameInvite.component';
 
 const label = [
   {k: 1, id: "1", name: "", icon: SearchIcon},
@@ -146,6 +148,7 @@ const ChatTabComponent = () => {
         >
           <RoomCreationForm />
         </TabPanel>
+
         <TabPanel
           sx={{
             backgroundColor:"gray.200",
@@ -157,6 +160,19 @@ const ChatTabComponent = () => {
         >
           <Invitation/>
         </TabPanel>
+
+        <TabPanel
+          sx={{
+            backgroundColor:"gray.200",
+            height: '90vh',
+            overflowY: 'auto'
+          }}
+          key="GameInvitation"
+          value="6"
+        >
+          <GameInvitation/>
+        </TabPanel>
+
       </TabContext>
     </Box>
   );
@@ -243,6 +259,15 @@ const Invitation = () => {
   return (
     <Box>
       <InvitationComponent/>
+    </Box>
+  );
+}
+
+const GameInvitation = () => {
+  
+  return (
+    <Box>
+      <GameInvitationComponent/>
     </Box>
   );
 }

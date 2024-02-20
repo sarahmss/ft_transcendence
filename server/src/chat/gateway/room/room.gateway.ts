@@ -125,7 +125,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		users.forEach((user: any) => {
 			const conn = this.connectedUserService.getConnection(user.userId);
 			if (conn) {
-				const data = cb(users, room);
+				const data = cb(user, room);
 				conn.emit(emission_event, data);
 			}
 		});
@@ -138,7 +138,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		users.forEach((user: any) => {
 			const conn = this.connectedUserService.getConnection(user);
 			if (conn) {
-				const data = cb(users, room);
+				const data = cb(user, room);
 				conn.emit(emission_event, data);
 			}
 		});

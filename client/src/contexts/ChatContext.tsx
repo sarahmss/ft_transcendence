@@ -219,10 +219,12 @@ const filterOutEveryRequest = (response: any) => {
 
 const addGameInvitation = (response: any) => {
 
-  console.log(response);
-  gameInvitationList.value = [];
+  response.id = gameInvitationList.value.length;
 
-  return ;
+  gameInvitationList.value = [
+    ...gameInvitationList.value,
+    response
+  ];
 }
 
 chatSocket.on('message-response', insertMessage);
@@ -239,7 +241,7 @@ chatSocket.on('password-update', updateProtectionStatus);
 chatSocket.on('invitation-send', addInvitationToList);
 chatSocket.on('invitation-used', filterOutEveryRequest);
 
-chatSocket.on('invitation-send', addGameInvitation);
+chatSocket.on('game-invitation', addGameInvitation);
 
 // Effect knows what event is triggered base on the signal
 effect(
@@ -292,6 +294,7 @@ export {
   chatData,
   chatSocket,
   invitationIdList,
+  gameInvitationList,
   privilegedInRoom,
   currentRoom,
   userLogged,

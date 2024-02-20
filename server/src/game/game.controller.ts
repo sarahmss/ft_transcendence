@@ -26,6 +26,7 @@ export class GameController {
     // Dados que os jogadores irao receber
     const sendDataToChatSocket = {
       requestorId: requestorId,
+      userName: playerOne.userName,
     }
 
     // Emissor de eventos para o chat socket
@@ -60,6 +61,7 @@ export class GameController {
           gameRoomId: sendData.requestorId,
           userType: sendData.requestorId === userId
                       ? 'host' : 'guest',
+          message: `Game Invitation: ${sendData.requestorId === userId ? 'me' : sendData.userName}`,
         })
       };
     
