@@ -124,8 +124,6 @@ const fetchRooms = async () => {
   if (authService.getIsLogged()){
     const roomRaw: any[] = await roomService.getRoom(authService.getIdFromToken());
 
-    console.log(roomRaw);
-
     roomRaw.forEach((room) => {
 
       addRoom(
