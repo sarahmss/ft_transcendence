@@ -6,11 +6,12 @@ import { UsersModule } from 'src/users/users.module';
 import { MatchHistory } from '../entity/match.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppGatewayModule } from 'src/app/app.gateway.module';
+import { GameController } from './game.controller';
 
 @Module({
     imports: [AuthModule, UsersModule, AppGatewayModule, TypeOrmModule.forFeature([MatchHistory])],
     providers: [GameGateway, GameService],
-    controllers: [],
+    controllers: [GameController],
 })
 
 export class GameModule {}
