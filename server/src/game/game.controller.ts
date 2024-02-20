@@ -24,7 +24,9 @@ export class GameController {
 
     
     // Dados que os jogadores irao receber
-    const sendDataToChatSocket = {}
+    const sendDataToChatSocket = {
+      requestorId: requestorId,
+    }
 
     // Emissor de eventos para o chat socket
     this.emitDataToChatSocket(
@@ -53,9 +55,11 @@ export class GameController {
     emission_event: string,
   ) {
 
-    const cb = (_: any, __: any) => {
+    const cb = (userId: string, __: any, sendData: any = data) => {
         return ({
-          ...data
+          gameRoomId: sendData.requestorId,
+          userType: sendData.requestorId === userId
+                      ? 'host' : 'guest',
         })
       };
     
