@@ -70,6 +70,17 @@ const UserActionChatComponent = ({user}: {user: User}) => {
 
 
   // Unprivileged actions
+  // const unprivilegedAction = [
+  //   {id: 1, action: togglePromptAndSet, label: 'Mute'},
+  //   {id: 2, action: () => {}, label: 'invite'},
+  // ];
+
+  // // With Privilege
+  // const privilegedAction = [
+  //   {id: 3, action: togglePromptAndSet, label: 'Ban'},
+  //   {id: 4, action: handleKick, label: 'Kick'},
+  //   {id: 5, action: handleToggleAdmin, label: 'Toggle admin'},
+  // ];
   const unprivilegedAction = [
     {id: 1, action: togglePromptAndSet, label: 'Mute'},
   ];
