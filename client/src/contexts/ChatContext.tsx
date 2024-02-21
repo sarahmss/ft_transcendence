@@ -12,6 +12,7 @@ import authService from "../services/auth.service";
 import roomService from "../services/chat/room.service";
 import { ChatLink } from "../common/constants";
 import { io } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 
 const currentRoom: Signal<number> = signal(-1);
 const userLogged: Signal<boolean> = signal(false);
@@ -229,21 +230,8 @@ const addGameInvitation = (response: any) => {
   ];
 }
 
-chatSocket.on('message-response', insertMessage);
+// chatSocket.on('redirTest', redirTest);
 
-chatSocket.on('created', handleRoomCreation);
-chatSocket.on('joined', handleUserJoin);
-chatSocket.on('left', handleRemoveUser);
-chatSocket.on('chat-deleted', handleRemoveRoom);
-
-chatSocket.on('admin-toggle', adminUpdate);
-chatSocket.on('private-toggle', updatePrivateStatus);
-chatSocket.on('password-update', updateProtectionStatus);
-
-chatSocket.on('invitation-send', addInvitationToList);
-chatSocket.on('invitation-used', filterOutEveryRequest);
-
-chatSocket.on('game-invitation', addGameInvitation);
 
 // Effect knows what event is triggered base on the signal
 effect(
@@ -254,6 +242,22 @@ effect(
         chatSocket.connect();
         fetchRooms();
         fetchInvitations();
+        //Keep the listeners alone!!!
+        chatSocket.on('message-response', insertMessage);
+
+        chatSocket.on('created', handleRoomCreation);
+        chatSocket.on('joined', handleUserJoin);
+        chatSocket.on('left', handleRemoveUser);
+        chatSocket.on('chat-deleted', handleRemoveRoom);
+
+        chatSocket.on('admin-toggle', adminUpdate);
+        chatSocket.on('private-toggle', updatePrivateStatus);
+        chatSocket.on('password-update', updateProtectionStatus);
+
+        chatSocket.on('invitation-send', addInvitationToList);
+        chatSocket.on('invitation-used', filterOutEveryRequest);
+
+        chatSocket.on('game-invitation', addGameInvitation);
         break;
       default:
         chatSocket.disconnect();

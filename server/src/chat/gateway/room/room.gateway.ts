@@ -101,13 +101,13 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('message')
 	handleMessage(client: Socket, payload: any) {
 		
-		// client.emit("client-response", payload);
-		const socket = this.connectedUserService
-													.getConnection(client.data.user.userId);
+		client.emit("redirTest", {gameId: "something"});
+		// const socket = this.connectedUserService
+		// 											.getConnection(client.data.user.userId);
 
-		socket.emit("client-response", "service working");
+		// socket.emit("client-response", "service working");
 
-		this.server.emit("message-response", payload);
+		// this.server.emit("message-response", payload);
 	}
 
 	// Join => event name: joined
