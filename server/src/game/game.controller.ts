@@ -2,13 +2,14 @@ import { Body, Controller, Get, NotFoundException, Param, ParseUUIDPipe, Post, R
 import { GameService } from './game.service';
 import { UsersService } from 'src/users/users.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EmissionToChatService } from './emissionToChat/emissionToChat.service';
 
 @Controller('game')
 export class GameController {
   constructor(
     private readonly gameService: GameService,
     private readonly userService: UsersService,
-    private readonly eventEmitter: EventEmitter2
+    private readonly chatEmitter: EmissionToChatService
   ) {}
 
   @Post('invite')
@@ -30,7 +31,7 @@ export class GameController {
     }
 
     // Emissor de eventos para o chat socket
-    this.emitDataToChatSocket(
+    this.chatEmitter.emitDataToChatSocket(
       'game.invitation.send',
       [requestorId, secondPlayerId],
       sendDataToChatSocket,
@@ -47,30 +48,6 @@ export class GameController {
     console.log("receive request to create room", ownerId, friendId);
     // this.gameService.createRoom()
     return 
-  }
-
-  private emitDataToChatSocket (
-    event: string,
-    recipients: string[],
-    data: any,
-    emission_event: string,
-  ) {
-
-    const cb = (userId: string, __: any, sendData: any = data) => {
-        return ({
-          gameRoomId: sendData.requestorId,
-          userType: sendData.requestorId === userId
-                      ? 'host' : 'guest',
-          message: `Game Invitation: ${sendData.requestorId === userId ? 'me' : sendData.userName}`,
-        })
-      };
-    
-    this.eventEmitter.emit(event,
-      recipients,
-      "",
-      emission_event,
-      cb
-    );
   }
 
 }
