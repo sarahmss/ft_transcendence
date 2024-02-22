@@ -65,6 +65,7 @@ const roomMaker = (
   roomName: string,
   creationDate: Date,
   isPrivate: boolean,
+  roomType: number,
   isProtected?: boolean,
 ) : Room => {
   return (
@@ -78,6 +79,7 @@ const roomMaker = (
       userList: signal([]),
       fetchStatus: false,
       isPrivate: signal(isPrivate),
+      roomType: roomType
     }
   );
 }
@@ -132,6 +134,7 @@ const fetchRooms = async () => {
           room.roomName,
           room.creationDate,
           room.isPrivate,
+          room.roomType,
           room.isProtected,
       ));
 

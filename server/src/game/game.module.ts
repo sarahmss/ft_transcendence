@@ -7,10 +7,11 @@ import { MatchHistory } from '../entity/match.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppGatewayModule } from 'src/app/app.gateway.module';
 import { GameController } from './game.controller';
+import { EmissionToChatService } from './emissionToChat/emissionToChat.service';
 
 @Module({
     imports: [AuthModule, UsersModule, AppGatewayModule, TypeOrmModule.forFeature([MatchHistory])],
-    providers: [GameGateway, GameService],
+    providers: [GameGateway, GameService, EmissionToChatService],
     controllers: [GameController],
 })
 

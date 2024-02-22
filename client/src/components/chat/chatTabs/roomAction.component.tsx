@@ -1,20 +1,27 @@
-import { Autocomplete, Button, IconButton, ListItem, TextField } from "@mui/material";
+import { Autocomplete,
+  Button,
+  IconButton,
+  ListItem,
+  TextField } from "@mui/material";
 import { Box } from "@mui/system";
-import inviteService from "../../../services/chat/invite.service";
-import authService from "../../../services/auth.service";
-import { chatData, currentRoom, privilegedInRoom } from "../../../contexts/ChatContext";
-import roomService from "../../../services/chat/room.service";
-import { useSignals } from "@preact/signals-react/runtime";
-import queryService from "../../../services/chat/query.service";
 import * as _ from 'lodash';
-import { signal } from "@preact/signals-react";
 import React from "react";
+import { signal } from "@preact/signals-react";
+import { useSignals } from "@preact/signals-react/runtime";
 
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 
 import LockIcon from '@mui/icons-material/Lock';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
+
+import inviteService from "../../../services/chat/invite.service";
+import authService from "../../../services/auth.service";
+import roomService from "../../../services/chat/room.service";
+import queryService from "../../../services/chat/query.service";
+import { chatData, currentRoom, privilegedInRoom } from "../../../contexts/ChatContext";
+import { GROUP } from "../../../common/constants";
+
 
 const InviteComponent = () => {
 
@@ -225,7 +232,8 @@ const RoomActionComponent = () => {
     <Box>
 
       {
-        privilegedInRoom.admin.value || privilegedInRoom.owner.value ?
+        (privilegedInRoom.admin.value || privilegedInRoom.owner.value) &&
+          chatData.value[currentRoom.value].roomType === GROUP ?
           (
             <Button onClick={handleDeleteRoom}>
               Delete Room
@@ -239,7 +247,8 @@ const RoomActionComponent = () => {
 
 
       {
-        privilegedInRoom.admin.value || privilegedInRoom.owner.value ?
+        (privilegedInRoom.admin.value || privilegedInRoom.owner.value) &&
+          chatData.value[currentRoom.value].roomType === GROUP ?
           (<PassAndVisibilityComponent/>) : 
           (<span style={{visibility: 'hidden'}}/>)
       }
