@@ -59,7 +59,7 @@ const ListElementComponent = ({invitation} : {invitation: any}) => {
 
   const acceptHandle = () => {
   
-    navigate(`${invitation.gameRoomId}/${invitation.userType}`);
+    navigate(`game/${invitation.gameRoomId}/${invitation.userType}`);
   }
 
   const declineHandle = () => {
