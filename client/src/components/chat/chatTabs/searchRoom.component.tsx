@@ -26,6 +26,10 @@ const SearchRoomComponent = () => {
   const handleSearch = async () => {
 
     const room: any[] = await queryService.queryRoom(query);
+    if (!room) {
+      console.log("Failure fetching rooms");
+      return ;
+    }
 
     queryRes.value = room;
   }

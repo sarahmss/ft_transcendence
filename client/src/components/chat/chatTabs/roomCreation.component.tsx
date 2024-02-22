@@ -263,6 +263,11 @@ const AddUserMemberListComponent = () => {
 
     const users: any[] = await queryService.queryUser(query);
 
+    if (!users) {
+      console.log('User query failure');
+      return ;
+    }
+
 
     queryRes.value = users.filter(
       (user) => user.userId !== currId);
