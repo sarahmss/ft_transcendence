@@ -2,6 +2,7 @@ import { UsersService } from "src/users/users.service";
 import { authenticator } from "otplib";
 import { BadRequestException, Injectable } from "@nestjs/common";
 import { MessagesHelper } from "src/helpers/messages.helpers";
+import * as xssFilters from 'xss-filters';
 
 @Injectable()
 	export class TwoFaAuthService {
@@ -34,8 +35,10 @@ import { MessagesHelper } from "src/helpers/messages.helpers";
 
 	/********************************* VALIDATE ******************************/
 	async checkQrCode(userId: string, code: string){
-		const secret = await this.usersService.get2FaSecret(userId);
-		return authenticator.verify({token: code, secret:secret});
+		const _secret = await this.usersService.get2FaSecret(userId);
+		const _code = xssFilters.inHTMLData(code);
+
+		return authenticator.verify({token: _code, secret: _secret});
 	}
 
 	/********************************* SET ******************************/
