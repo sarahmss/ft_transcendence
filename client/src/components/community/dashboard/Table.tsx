@@ -13,6 +13,7 @@ import{ Box,
         TableContainer,
         Avatar,
         Link,
+        Button
         } from '@mui/material';
 
 import IUserStats from '../../../types/userStats.type'
@@ -113,7 +114,6 @@ const DashboardTable: React.FC<DashboardTableProps> = ({ AllUserStats, setRedire
                     ownerId={authService.getIdFromToken()}
                   />
                 </TableCell>
-
                   </TableRow>
                 ))}
               </TableBody>

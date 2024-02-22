@@ -69,9 +69,7 @@ export class RoomController {
 		const groom = await this.roomService.findGroup(roomId);
 
 		return ({
-			roomId: room.roomId,
-			roomName: room.roomName,
-			creationDate: room.creationDate,
+			...room,
 			isPrivate: groom.isPrivate,
 			isProtected: groom.protected
 		});
@@ -87,19 +85,30 @@ export class RoomController {
 		let membershipList = await this.membershipService.findMemberRoomsWithJoinRoom(userId);
 		let roomList = [];
 
+		const user = await this.userService.findById(userId);
+		if (!user)
+			throw new NotFoundException('user not found');
+
 		for (let k = 0; k < membershipList.length; k++) {
 			let room: any = membershipList[k].room;
 
-			switch (room.roomType) {
-				case DIRECT:
-					const otherUser = (await this.membershipService.findParticipantsWithUserLeftJoin(room.roomId, userId))[0];
+			if (room.roomType === DIRECT) {
+				const userList = await this.membershipService.findParticipantsWithUserLeftJoin(room.roomId, userId);
+
+				if (!userList || userList.length === 0) {
+					room.roomName = user.userName;
+				}
+
+				else {
+					const otherUser = userList[0];
 					room.roomName = otherUser.user.userName;
-					break;
-				case GROUP:
-					const groupRoom = (await this.roomService.findGroup(room.roomId));
-					room.isProtected = groupRoom.protected;
-					room.isPrivate = groupRoom.isPrivate;
-					break;
+				}
+			}
+
+			else if (room.roomType === GROUP) {
+				const groupRoom = (await this.roomService.findGroup(room.roomId));
+				room.isProtected = groupRoom.protected;
+				room.isPrivate = groupRoom.isPrivate;
 			}
 			roomList.push(room);
 		}

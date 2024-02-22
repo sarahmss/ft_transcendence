@@ -175,6 +175,8 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
         });
       }
 
+    //por conta da possibilidade de convite para um jogo a partir do chat,
+    //essa função poderá receber argumentos... (idUser e typeUser)
     const fetchUserLocalStorage = async () => {
       try {
         const storedPlayer = await getStoredPlayerData();
@@ -187,6 +189,46 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
             console.log('StoredPlayerSocket: ', storedPlayerSocket);
             gameSocket.emit('reconnect', storedPlayerSocket);
           } else {
+
+            // aqui vai ter que verificar se argumentos (url vindos por parametro do método)
+            //existem/foram passados. Se sim, então não é um login normal que chama.. e sim
+            //um que faz todo o processo que o fluxo normal realizaria até chegar na tela
+            //de customização (passa para o emit os argumentos que foram resgatados anterior-
+            //mente da url para que o servidor saiba criar/encontrar a sala e jogar os clients
+            //lá dentro e já criar as estruturas, etc)
+            
+            //a gravação do id do socket do host (e do guest)
+            //só vai acontecer depois do login... e os dois vão
+            //ter que passar por aqui.
+            //Ou seja, vai ter que ter um tempinho a mais pro
+            //guest procurar o host no localStorage pra encontrar
+            //o id dele... um tempo de 5 segundos Será que é suficiente?
+            //e aí deixa ele numa tela de carregamento? (a do connecting mesmo,
+            //porque daí ele só seria conectado (dispatch CONNECTED) depois que conseguir
+            //resgatar o id do socket do host atraves do ID do banco
+            //e entrar na sala a partir do servidor)
+
+            //Então o código aqui ficaria algo como:
+            // if (args -> argumentos que esse método recebe && typeUser == 'host') {
+            //  const name = storedPlayer.userName;
+            //  const userIdDataBase = storedPlayer.userId;
+            //  gameSocket.emit('loginHostPrivateMatch', {hostUserIdDB, userIdDataBase, typeUser}) // daí lá no server é só usar o id do socket dele pra criar a sala
+            //}
+            // else if (args -> argumentos que esse método recebe && typeUser == 'guest') {
+            //  const name = storedPlayer.userName;
+            //  const userIdDataBase = storedPlayer.userId;
+            //  ---> dá um tempo de uns 5 segundos pra resgatar a instancia do host do localStorage?
+            //      const storedMatchHostSocket = await getStoredPlayerSocket(hostUserIdDB); -> espera uns 5 segundos pra fazer isso
+            //      const matchHostSocketID = storedMatchHostSocket?.id;
+            //  -- e depois chama:
+            //  if (matchHostSocketID) {
+            //    console.log(`Encontramos o socket do host. O id do socket é ${matchHostSocketID}`);
+            //    gameSocket.emit('loginGuestPrivateMatch', {hostUserIdDB, matchHostSocketID, userIdDataBase, typeUser});
+            //  }
+            //  else
+            //    console.log('Não foi possível resgatar o id do socket do Host. Seu usuário será logado no modo público');
+            //}
+            // else if (!args) --> condição pro login normal abaixo
             console.log('Jogador ainda não existe e precisa logar.');
             console.log('Nome: ', storedPlayer.userName, 'UserId do banco: ', storedPlayer.userId);
             const name = storedPlayer.userName;
@@ -202,6 +244,9 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
     };
 
     gameSocket.on('connect', () => {
+      //aqui, consultar a url -> pra verificar se o socket se conectou nesse contexto
+      //porque foi CONVIDADO para uma SALA PRIVADA
+      //se sim, passar os argumentos (idUser e typeUser para o método abaixo)
       fetchUserLocalStorage();
 		// const storedPlayer = AuthService.getCurrentUserPlay();
 		// if (!storedPlayer){

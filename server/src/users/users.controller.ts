@@ -53,12 +53,4 @@ export class UsersController {
 				@Body() userDto: UpdateUserDto): Promise<any> {
 		return this.usersService.update(userId, userDto);
 	}
-
-	/********************************* DELETE ******************************/
-
-	@Delete(':userId')
-	async delete(@Param('userId') userId: string): Promise<any> {
-		return this.usersService.delete(userId);
-	}
-
 }

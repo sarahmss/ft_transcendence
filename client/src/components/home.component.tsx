@@ -49,6 +49,8 @@ const Home: React.FC = () => {
 					<Box sx={{
 						display: "flex",
 						justifyContent:"center"}}>
+
+
 					{isLogged ? (
 						<Link href={FrontGame}>
 						<Button
@@ -61,6 +63,7 @@ const Home: React.FC = () => {
 							Play !
 						</Button>
 					</Link>
+					
 				) : (
 					
 					<Grid container spacing={3} sx={{ display: 'flex',

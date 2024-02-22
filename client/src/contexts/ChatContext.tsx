@@ -12,11 +12,14 @@ import authService from "../services/auth.service";
 import roomService from "../services/chat/room.service";
 import { ChatLink } from "../common/constants";
 import { io } from "socket.io-client";
+import { useNavigate } from "react-router-dom";
 
 const currentRoom: Signal<number> = signal(-1);
 const userLogged: Signal<boolean> = signal(false);
 const page: Signal<number> = signal(0);
 const invitationIdList: Signal<{invitationId: string, roomName: string, roomId: string}[]> = signal([]);
+
+const gameInvitationList: Signal<any[]> = signal([]);
 
 const privilegedInRoom: {owner: Signal<boolean>, admin: Signal<boolean>} = {
   owner: signal(false),
@@ -45,6 +48,7 @@ type User = {
 type Room = {
   index: number,
   roomId: string,
+  roomType: number,
   roomName: Signal<string>,
   messages: Signal<Message[]>,
   userList: Signal<User[]>
@@ -108,6 +112,7 @@ const handleRoomCreation = (response: any) => {
     response.roomName,
     response.creationDate,
     response.isPrivate,
+    response.roomType,
     response.isProtected,
   );
 
@@ -215,19 +220,18 @@ const filterOutEveryRequest = (response: any) => {
   );
 }
 
-chatSocket.on('message-response', insertMessage);
+const addGameInvitation = (response: any) => {
 
-chatSocket.on('created', handleRoomCreation);
-chatSocket.on('joined', handleUserJoin);
-chatSocket.on('left', handleRemoveUser);
-chatSocket.on('chat-deleted', handleRemoveRoom);
+  response.id = gameInvitationList.value.length;
 
-chatSocket.on('admin-toggle', adminUpdate);
-chatSocket.on('private-toggle', updatePrivateStatus);
-chatSocket.on('password-update', updateProtectionStatus);
+  gameInvitationList.value = [
+    ...gameInvitationList.value,
+    response
+  ];
+}
 
-chatSocket.on('invitation-send', addInvitationToList);
-chatSocket.on('invitation-used', filterOutEveryRequest);
+// chatSocket.on('redirTest', redirTest);
+
 
 // Effect knows what event is triggered base on the signal
 effect(
@@ -238,6 +242,22 @@ effect(
         chatSocket.connect();
         fetchRooms();
         fetchInvitations();
+        //Keep the listeners alone!!!
+        chatSocket.on('message-response', insertMessage);
+
+        chatSocket.on('created', handleRoomCreation);
+        chatSocket.on('joined', handleUserJoin);
+        chatSocket.on('left', handleRemoveUser);
+        chatSocket.on('chat-deleted', handleRemoveRoom);
+
+        chatSocket.on('admin-toggle', adminUpdate);
+        chatSocket.on('private-toggle', updatePrivateStatus);
+        chatSocket.on('password-update', updateProtectionStatus);
+
+        chatSocket.on('invitation-send', addInvitationToList);
+        chatSocket.on('invitation-used', filterOutEveryRequest);
+
+        chatSocket.on('game-invitation', addGameInvitation);
         break;
       default:
         chatSocket.disconnect();
@@ -280,6 +300,7 @@ export {
   chatData,
   chatSocket,
   invitationIdList,
+  gameInvitationList,
   privilegedInRoom,
   currentRoom,
   userLogged,

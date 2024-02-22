@@ -279,19 +279,18 @@ export class UsersService {
 		return this.usersRepository.save(newUser);
 		}
 
-		async update(userId: string, userDto: UpdateUserDto): Promise<User> {
-			const user = await this.checkUser(userId);
-			const invalidUpdate = await this.NameisNotUnique(userDto.userName, user.userName);
-			if (invalidUpdate){
-				throw new UnprocessableEntityException();
-			}
-			this.usersRepository.merge(user, userDto);
-			return this.usersRepository.save(user);
-		}
 
-		async delete(userId: string): Promise<void> {
-			const user = await this.checkUser(userId);
-			await this.usersRepository.delete(user.userId);
+	async update(userId: string, userDto: UpdateUserDto): Promise<User> {
+		const user = await this.checkUser(userId);
+		const _userName = xssFilters.inHTMLData(userDto.userName);
+		const _email = xssFilters.inHTMLData(userDto.email);
+
+		const invalidUpdate = await this.NameisNotUnique(_userName, user.userName);
+		if (invalidUpdate){
+			throw new UnprocessableEntityException();
 		}
+		this.usersRepository.merge(user, {userName: _userName, email: _email});
+		return this.usersRepository.save(user);
+	}
 
 }

@@ -12,24 +12,27 @@ import MessageComponent from './chatTabs/message.component';
 import RoomCreationComponent from './chatTabs/roomCreation.component';
 import SearchRoomComponent from './chatTabs/searchRoom.component';
 import RoomActionComponent from './chatTabs/roomAction.component';
+import InvitationComponent from './chatTabs/invite.component';
 
 import MailIcon from '@mui/icons-material/Mail';
 import SearchIcon from '@mui/icons-material/Search';
 import MessageIcon from '@mui/icons-material/Message';
 import Groups2Icon from '@mui/icons-material/Groups2';
 import MeetingRoomIcon from '@mui/icons-material/MeetingRoom';
-import InvitationComponent from './chatTabs/invite.component';
-
+import VideogameAssetIcon from '@mui/icons-material/VideogameAsset';
 
 import {useSelector, useDispatch} from "react-redux";
 import {addUser, userLog} from "../../services/reduce";
+import { GamepadRoundDown } from 'mdi-material-ui';
+import GameInvitationComponent from './chatTabs/gameInvite.component';
 
 const label = [
   {k: 1, id: "1", name: "", icon: SearchIcon},
   {k: 2, id: "2", name: "Messsages", icon: MessageIcon},
   {k: 3, id: "3", name: "Users", icon: Groups2Icon},
   {k: 4, id: "4", name: "Create Room", icon: MeetingRoomIcon},
-  {k: 5, id: "5", name: "Invitation", icon: MailIcon},
+  {k: 5, id: "5", name: "Room Invite", icon: MailIcon},
+  {k: 6, id: "6", name: "Game Invite", icon: VideogameAssetIcon}
 ]
 
 const MessageStyle = ({ message }: { message: string }) => {
@@ -145,6 +148,7 @@ const ChatTabComponent = () => {
         >
           <RoomCreationForm />
         </TabPanel>
+
         <TabPanel
           sx={{
             backgroundColor:"gray.200",
@@ -156,6 +160,19 @@ const ChatTabComponent = () => {
         >
           <Invitation/>
         </TabPanel>
+
+        <TabPanel
+          sx={{
+            backgroundColor:"gray.200",
+            height: '90vh',
+            overflowY: 'auto'
+          }}
+          key="GameInvitation"
+          value="6"
+        >
+          <GameInvitation/>
+        </TabPanel>
+
       </TabContext>
     </Box>
   );
@@ -242,6 +259,15 @@ const Invitation = () => {
   return (
     <Box>
       <InvitationComponent/>
+    </Box>
+  );
+}
+
+const GameInvitation = () => {
+  
+  return (
+    <Box>
+      <GameInvitationComponent/>
     </Box>
   );
 }

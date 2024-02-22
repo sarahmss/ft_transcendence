@@ -41,17 +41,23 @@ const RoomCreationComponent = () => {
 
   const checkData = (): boolean => {
 
-    if (roomType.value === 0)
+    if (roomType.value === 0) {
       errorState.roomType.value = true;
-    if (roomName.value === "")
+      return true;
+    }
+
+    if (roomName.value === "") {
       errorState.roomName.value = true;
+      return true;
+    }
+
     if ((members.value.length !== 1 && roomType.value === DIRECT) ||
       (members.value.length === 0 && roomType.value === GROUP)
-    )
+    ) {
       errorState.members.value = true;
-
-    if (errorState.members.value || errorState.roomName.value || errorState.roomType.value)
       return true;
+    }
+
     return false;
   }
 
@@ -88,6 +94,7 @@ const RoomCreationComponent = () => {
       isPrivate.value,
       password.value
     );
+
     resetState();
   }
 

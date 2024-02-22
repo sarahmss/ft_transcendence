@@ -101,13 +101,13 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('message')
 	handleMessage(client: Socket, payload: any) {
 		
-		// client.emit("client-response", payload);
-		const socket = this.connectedUserService
-													.getConnection(client.data.user.userId);
+		client.emit("redirTest", {gameId: "something"});
+		// const socket = this.connectedUserService
+		// 											.getConnection(client.data.user.userId);
 
-		socket.emit("client-response", "service working");
+		// socket.emit("client-response", "service working");
 
-		this.server.emit("message-response", payload);
+		// this.server.emit("message-response", payload);
 	}
 
 	// Join => event name: joined
@@ -125,19 +125,20 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		users.forEach((user: any) => {
 			const conn = this.connectedUserService.getConnection(user.userId);
 			if (conn) {
-				const data = cb(users, room);
+				const data = cb(user, room);
 				conn.emit(emission_event, data);
 			}
 		});
 	}
 
+	@OnEvent('game.invitation.send')
 	@OnEvent('room.create')
 	emitRoom(users: any[], room: any, emission_event: string, cb: any) {
 
 		users.forEach((user: any) => {
 			const conn = this.connectedUserService.getConnection(user);
 			if (conn) {
-				const data = cb(users, room);
+				const data = cb(user, room);
 				conn.emit(emission_event, data);
 			}
 		});

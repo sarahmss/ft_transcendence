@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { BackLink, FriendsLink, UserContentLink } from '../common/constants';
+import { BackLink, FriendsLink, GameLink, UserContentLink } from '../common/constants';
 import AuthService from './auth.service';
 
 class UserService {		
@@ -205,6 +205,19 @@ class UserService {
 			return ("YourSelf");
 		} catch (error) {
 			console.error("Error GettingFriendshipStatus", error);
+			throw error;
+		}
+	}
+
+	async CreateMatchFromChat(friendId: string) {
+		try {
+			if (AuthService.getIsLogged() && AuthService.getIdFromToken() !== friendId) {
+				const ownerId = AuthService.getIdFromToken();
+				const authTokenQr = AuthService.getAuthToken();
+				const response = await axios.get(`${GameLink}/${ownerId}/${friendId}/chat-match`, { headers: authTokenQr });
+			}
+		} catch (error) {
+			console.error("Error CreateMatchFromChat", error);
 			throw error;
 		}
 	}
