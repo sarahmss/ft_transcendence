@@ -151,7 +151,7 @@ const RoomResultComponent = ({roomData} : {roomData: any}) => {
       </ListItem>
       {
         showPrompt ?
-          (<PasswordField data={{roomId: room.roomId, setPass: setPass, password: password}} />) : 
+          (<PasswordField data={{roomId: room.roomId, setPass: setPass, password: password, setPrompt: setPrompt}} />) : 
           (<span style={{ visibility: 'hidden' }} />)
       }
     </Box>
@@ -160,7 +160,7 @@ const RoomResultComponent = ({roomData} : {roomData: any}) => {
 
 const PasswordField = ({data} : {data: any}) => {
 
-  const {roomId, setPass, password} = data;
+  const {roomId, setPass, password, setPrompt} = data;
 
   const handleChangeText = (event: any) => {
     setPass(event.target.value);
@@ -172,7 +172,7 @@ const PasswordField = ({data} : {data: any}) => {
       authService.getIdFromToken(),
       password
     );
-    
+    setPrompt(false);
   }
 
   return (
