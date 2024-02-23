@@ -2,6 +2,7 @@
 import { Autocomplete, Box,
   Button,
   Grid,
+  Link,
   List,
   ListItem,
   ListItemText,
@@ -18,7 +19,7 @@ import * as _ from 'lodash';
 import gameService from '../../../services/game.service';
 import authService from '../../../services/auth.service';
 import { useNavigate } from 'react-router-dom';
-import { FrontLink } from '../../../common/constants';
+import { FrontGame } from '../../../common/constants';
 
 const GameInvitationComponent = () => {
 
@@ -78,6 +79,7 @@ const ListElementComponent = ({invitation} : {invitation: any}) => {
     }
   }
   
+      // <Button  onClick={acceptHandle} sx={{backgroundColor:"#B700cc", marginRight: 3, color: 'white'}}>
   return (
     <ListItem>
 
@@ -85,9 +87,11 @@ const ListElementComponent = ({invitation} : {invitation: any}) => {
         primary={invitation.message}
       />
 
-      <Button  onClick={acceptHandle} sx={{backgroundColor:"#B700cc", marginRight: 3, color: 'white'}}>
-        <b>Join</b>
-      </Button>
+      <Link href={`${FrontGame}/${invitation.gameRoomId}/${invitation.userType}`}>
+        <Button sx={{backgroundColor:"#B700cc", marginRight: 3, color: 'white'}}>
+          <b>Join</b>
+        </Button>
+      </Link>
 
       <Button onClick={declineHandle} sx={{backgroundColor:"#B700cc", color: 'white'}}>
         <b>Decline</b>

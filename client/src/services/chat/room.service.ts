@@ -68,7 +68,7 @@ class RoomService {
         isPrivate: isPrivate,
         password: password
       }
-      axios.post(BackLink + "/room", packaged, {headers: authService.getAuthToken()});
+      const res = axios.post(BackLink + "/room", packaged, {headers: authService.getAuthToken()});
 
     } catch (error) {
     }
