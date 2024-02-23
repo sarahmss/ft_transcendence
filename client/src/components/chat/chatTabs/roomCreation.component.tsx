@@ -86,14 +86,19 @@ const RoomCreationComponent = () => {
       ownerId
     ];
 
-    roomService.createRoom(
-      roomType.value,
-      members.value,
-      ownerId,
-      roomName.value,
-      isPrivate.value,
-      password.value
-    );
+    try {
+      roomService.createRoom(
+        roomType.value,
+        members.value,
+        ownerId,
+        roomName.value,
+        isPrivate.value,
+        password.value
+      );
+      
+    } catch (error) {
+      
+    }
 
     resetState();
   }
