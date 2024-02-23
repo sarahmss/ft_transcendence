@@ -441,7 +441,7 @@ export class GameService {
 
 	async removePlayer(playerId: string, client: Socket, server: Server) {
 		await this.leaveRoomInit(client, server);
-		delete this.game.players[client.id];
+		// delete this.game.players[client.id];
 		this.refreshPlayers(server);
 		this.refreshRooms(server);
 	}
