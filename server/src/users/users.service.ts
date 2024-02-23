@@ -284,12 +284,15 @@ export class UsersService {
 		const user = await this.checkUser(userId);
 		const _userName = xssFilters.inHTMLData(userDto.userName);
 		const _email = xssFilters.inHTMLData(userDto.email);
+		const _profilePicture =  userDto.profilePicture;
 
 		const invalidUpdate = await this.NameisNotUnique(_userName, user.userName);
 		if (invalidUpdate){
 			throw new UnprocessableEntityException();
 		}
-		this.usersRepository.merge(user, {userName: _userName, email: _email});
+		this.usersRepository.merge(user, {userName: _userName,
+											email: _email,
+											profilePicture: _profilePicture});
 		return this.usersRepository.save(user);
 	}
 
