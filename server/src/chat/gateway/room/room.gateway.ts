@@ -101,7 +101,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('message')
 	handleMessage(client: Socket, payload: any) {
 		
-		client.emit("redirTest", {gameId: "something"});
+		client.emit("redir-private-match", {gameId: "something"});
 		// const socket = this.connectedUserService
 		// 											.getConnection(client.data.user.userId);
 

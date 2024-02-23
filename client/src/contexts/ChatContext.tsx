@@ -242,6 +242,10 @@ effect(
         chatSocket.connect();
         fetchRooms();
         fetchInvitations();
+
+        // Remove this
+        // chatSocket.emit("message", {});
+
         //Keep the listeners alone!!!
         chatSocket.on('message-response', insertMessage);
 
