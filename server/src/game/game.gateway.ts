@@ -25,7 +25,9 @@ export class GameGateway
 					) {}
 
 		async handleConnection(client: Socket) {
-			// precisa identificar aqui 
+			// precisa identificar aqui
+			const transport = client.conn.transport.name;
+			console.log('Tipo de transport: ', transport);
 			try {
 				const token = client.handshake.headers.cookie.split('=')[1];
 				const decodedToken = this.authService.IsValidJwt(token);
@@ -42,15 +44,16 @@ export class GameGateway
 			console.log(`Client disconnected: ${client.id}`);
 		}
 
-		handleDisconnect(client: Socket) {
+		async handleDisconnect(client: Socket) {
 			if (this.gameService.game.players[client.id]) {
 			console.log(`${this.gameService.game.players[client.id].name} disconnected`);
 			this.gameService.game.players[client.id].disconnected = new Date().getTime();
-			const timerId = setTimeout(() => {
-				this.gameService.removePlayer(client.id, client, this.server);
+			await this.gameService.removePlayer(client.id, client, this.server);
+			// const timerId = setTimeout(() => {
+			// 	this.gameService.removePlayer(client.id, client, this.server);
 
-			}, 5000);
-			this.gameService.game.players[client.id].timerId = timerId;
+			// }, 5000);
+			// this.gameService.game.players[client.id].timerId = timerId;
 		} else {
 			console.log(`${client.id} disconnected`);
 		}
@@ -98,7 +101,7 @@ export class GameGateway
 			this.gameService.game.players[client.id] = new PlayerModel({name: payload.name, id: client.id});
 			this.gameService.game.players[client.id].userIdDataBase = payload.userIdDataBase;
 			this.gameService.refreshPlayers(this.server);
-			this.gameService.refreshRooms(this.server);
+			// this.gameService.refreshRooms(this.server);
 		}
 
 	@SubscribeMessage('exitQueue')
