@@ -126,6 +126,11 @@ const fetchRooms = async () => {
   if (authService.getIsLogged()){
     const roomRaw: any[] = await roomService.getRoom(authService.getIdFromToken());
 
+    if (!roomRaw) {
+      console.log('Failure fetching rooms');
+      return ;
+    }
+
     roomRaw.forEach((room) => {
 
       addRoom(
@@ -151,6 +156,11 @@ const fetchMessageByRoom = async (index: number, roomId: string, pageNumber: num
     -1,
     -1
   );
+
+  if (!messageRaw) {
+    console.log("Failure fetching rooms");
+    return ;
+  }
 
   if (messageRaw.length <= 0)
     return ;
@@ -181,7 +191,12 @@ const fetchParticipants = async (index: number, roomId: string) => {
     const participants: any[] = await roomService.getParticipants(roomId);
     const currentMember: any = await roomService.getCurrentUser(roomId);
 
-    if (!participants || participants.length === 0)
+    if (!participants) {
+      console.log("Failure fetching participants");
+      return ;
+    }
+
+    if (participants.length === 0) 
       return ;
 
     const room = chatData.value[index];
@@ -221,8 +236,10 @@ const fetchInvitations = async () => {
 
   const invites: any[] = await inviteService.getInvitation(authService.getIdFromToken());
 
-  if (!invites)
+  if (!invites) {
+    console.log("Failure fetching participants");
     return;
+  }
 
   invites.forEach( (inv) => {
     addInvitation(inv);

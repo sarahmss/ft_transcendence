@@ -46,6 +46,10 @@ class QueryService {
     try {
       axios.get(`${BackLink}/room/queryUser?q=${pattern}`,
                 {headers: authService.getAuthToken()}).then( (response: any) => {
+
+          if (!response || !response.data)
+            return;
+
           setData.value = response.data;
         }
       );
