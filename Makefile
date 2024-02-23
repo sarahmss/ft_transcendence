@@ -21,7 +21,7 @@ watch:
 down:
 	@docker-compose -f ./docker-compose.yml down
 
-re:
+re: clean
 	@docker-compose -f ./docker-compose.yml up -d --build
 
 list:
@@ -29,10 +29,6 @@ list:
 
 list-networks:
 	@docker network ls
-
-clean-db:
-	@echo "Cleaning database..."
-	@docker-compose -f ./docker-compose.yml down -v
 
 clean: down
 	@-docker rmi -f `docker images -qa`
