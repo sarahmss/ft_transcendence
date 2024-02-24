@@ -43,7 +43,7 @@ class App extends Component<Props, State> {
 						<Route path="/profile" element={<Profile />} />
 						<Route path="/community" element={<Community />} />
 						<Route path="/error" element={<Error />} />
-						<Route path="/game" element={
+						<Route path="/game/*" element={
 							<div>
 									<GameProvider>
 										<Pong />
