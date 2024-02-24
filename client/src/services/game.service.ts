@@ -17,7 +17,7 @@ class GameService {
       }
       
       const req = await axios.post(
-        `${BackLink}/game/invite`,
+        `${BackLink}/invitation/invite`,
         packaged,
         { headers: authService.getAuthToken() }
       );

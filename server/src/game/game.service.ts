@@ -130,7 +130,8 @@ export class GameService {
     createRoom(client: Socket, roomId: string, server : Server): void {
 
         client.join(client.id);
-		delete this.game.waiting[client.id];
+		if (this.game.waiting[client.id])
+			delete this.game.waiting[client.id];
 		this.game.rooms[client.id] = new RoomModel(`Room of ${this.game.players[client.id].name}`, client.id, undefined, this.game.players[client.id].name, undefined);
         this.game.players[client.id].room = client.id;
 		this.game.players[client.id].state = 'in_room';

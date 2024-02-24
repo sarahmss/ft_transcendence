@@ -177,7 +177,7 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
 
     //por conta da possibilidade de convite para um jogo a partir do chat,
     //essa função poderá receber argumentos... (idUser e typeUser)
-    const fetchUserLocalStorage = async () => {
+    const fetchUserLocalStorage = async (gameId?: string, role?: string) => {
       try {
         const storedPlayer = await getStoredPlayerData();
   
@@ -196,7 +196,6 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
             //de customização (passa para o emit os argumentos que foram resgatados anterior-
             //mente da url para que o servidor saiba criar/encontrar a sala e jogar os clients
             //lá dentro e já criar as estruturas, etc)
-            
             //a gravação do id do socket do host (e do guest)
             //só vai acontecer depois do login... e os dois vão
             //ter que passar por aqui.
@@ -229,11 +228,26 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
             //    console.log('Não foi possível resgatar o id do socket do Host. Seu usuário será logado no modo público');
             //}
             // else if (!args) --> condição pro login normal abaixo
-            console.log('Jogador ainda não existe e precisa logar.');
-            console.log('Nome: ', storedPlayer.userName, 'UserId do banco: ', storedPlayer.userId);
-            const name = storedPlayer.userName;
-            const userIdDataBase = storedPlayer.userId;
-            gameSocket.emit('login', {name, userIdDataBase});
+            if (gameId && role)
+            {
+              const name = storedPlayer.userName;
+              const userIdDataBase = storedPlayer.userId;
+              if (role === 'guest') {
+                console.log('O método disparado no server será o login Guest -> criará a sala e emitirá para o chat socket do host');
+                gameSocket.emit('loginGuestPrivateMatch', {gameId, role, name, userIdDataBase});
+              }
+              else if (role === 'host') {
+                console.log('O método disparado no server será o login Host -> entrará na sala já existente.');
+                // DEPOIS DESCOMENTA PRA TESTAR O RESTO:
+                gameSocket.emit('loginHostPrivateMatch', {gameId, role, name, userIdDataBase});
+              }
+            } else {
+              console.log('Jogador ainda não existe e precisa logar.');
+              console.log('Nome: ', storedPlayer.userName, 'UserId do banco: ', storedPlayer.userId);
+              const name = storedPlayer.userName;
+              const userIdDataBase = storedPlayer.userId;
+              gameSocket.emit('login', {name, userIdDataBase});
+            }
           }
           dispatch({ type: 'CONNECTED', payload: true });
         }
@@ -243,11 +257,31 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
       }
     };
 
-    gameSocket.on('connect', () => {
+    gameSocket.on('connect', async () => {
       //aqui, consultar a url -> pra verificar se o socket se conectou nesse contexto
       //porque foi CONVIDADO para uma SALA PRIVADA
       //se sim, passar os argumentos (idUser e typeUser para o método abaixo)
-      fetchUserLocalStorage();
+      console.log('URL ao entrar na pagina: ', window.location.href);
+      const url = window.location.href;
+      const parts = url.split("/");
+      console.log('A url tem ', parts.length, ' partes.');
+
+      //LEMBRAR QUE: precisa GARANTIR que não é a url pequena, mas a com os parametros
+      if (parts.length >= 6) {
+        const gameId = parts[4]; // "06f41cf1-166c-4e39-82f8-6a806b8785cd"
+        const role = parts[5];   // "guest"    
+        console.log("Game ID:", gameId);
+        console.log("Role:", role);
+        await fetchUserLocalStorage(gameId, role);
+      }
+      else {
+        console.log('Esse usuario não veio por convite');
+        await fetchUserLocalStorage();
+      }
+      //se bem sucedido, passar os parametros para a função fetch, para que ela possa
+      //repassar para o servidor e, assim, criar ja a sala
+      //daí fazemos a emissão para o socket do chat da pessoa que convidou
+      // await fetchUserLocalStorage();
 		// const storedPlayer = AuthService.getCurrentUserPlay();
 		// if (!storedPlayer){
 		// 	dispatch({ type: 'LOGGED', payload: false });
