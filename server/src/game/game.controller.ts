@@ -4,7 +4,7 @@ import { UsersService } from 'src/users/users.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EmissionToChatService } from './emissionToChat/emissionToChat.service';
 
-@Controller('game')
+@Controller('invitation')
 export class GameController {
   constructor(
     private readonly gameService: GameService,
