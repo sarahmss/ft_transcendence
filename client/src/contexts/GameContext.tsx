@@ -233,11 +233,11 @@ const GameProvider: React.FC<React.PropsWithChildren<{}>> = (props) => {
               const name = storedPlayer.userName;
               const userIdDataBase = storedPlayer.userId;
               if (role === 'guest') {
-                console.log('O método disparado no server será o login Guest -> criará a sala e emitirá para o chat socket do host');
+                console.log('Método disparado no server será o login Guest -> criará a sala e emitirá para o chat socket do host');
                 gameSocket.emit('loginGuestPrivateMatch', {gameId, role, name, userIdDataBase});
               }
               else if (role === 'host') {
-                console.log('O método disparado no server será o login Host -> entrará na sala já existente.');
+                console.log('Método disparado no server será o login Host -> entrará na sala já existente.');
                 // DEPOIS DESCOMENTA PRA TESTAR O RESTO:
                 gameSocket.emit('loginHostPrivateMatch', {gameId, role, name, userIdDataBase});
               }

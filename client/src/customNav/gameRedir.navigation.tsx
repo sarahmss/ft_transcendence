@@ -6,7 +6,7 @@ const GameRoomNavigationWrapper = ({ children } : {children: any}) => {
   const navigate = useNavigate();
 
 	chatSocket.on('redir-private-match', (response) => {
-    console.log('Em redir-private-match. Response: ', response);
+    console.log('Em [redir-private-match]. Response: ', response);
 		navigate(`/game/${response.gameRoomId}/host`);
 	});
 

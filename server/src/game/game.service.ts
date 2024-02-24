@@ -357,7 +357,7 @@ export class GameService {
 			delete this.game.match[roomId];
 		}
 		else
-			console.log('User1 e User2 ainda não chegaram....');
+			console.log('[STORE MATCH HISTORY] User1 e User2 ainda não chegaram....');
 	}
 
 	isCurrentUserTheWinner(match: MatchModel, playerNumbers: string): boolean {

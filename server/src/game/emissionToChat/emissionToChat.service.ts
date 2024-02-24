@@ -17,8 +17,7 @@ export class EmissionToChatService {
   ) {
 
     const cb = (userId: string, __: any, sendData: any = data) => {
-      console.log('EM cb, client id - data: ', data);
-      console.log('EM cb, client id - sendData: ', sendData);   
+      console.log('EM cb, client id - data: ', data); 
       return ({
           gameRoomId: sendData.requestorId,
           userType: sendData.requestorId === userId

@@ -95,7 +95,7 @@ export class GameGateway
 			// this.gameService.refreshPlayers(this.server); // manter isso aqui? porque vai ter o joinRoom...
 			this.gameService.joinRoom(client, payload.gameId, this.server);
 			console.log('The HOST client [', client.id, '] entered in a vacant room');
-			console.log('Room ID: ', payload.gameId);
+			console.log('Private Room ID: ', payload.gameId);
 		}
 
 	@SubscribeMessage('loginGuestPrivateMatch')
