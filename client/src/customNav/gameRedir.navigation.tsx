@@ -7,7 +7,7 @@ const GameRoomNavigationWrapper = ({ children } : {children: any}) => {
 
 	chatSocket.on('redir-private-match', (response: any) => {
 		// navigate(`/game/${response.gameid}`);
-    window.location.href = `/game/${response.gameId}`;
+    window.location.href = `/game/${response.gameRoomId}/host`;
 	});
 
   return (
