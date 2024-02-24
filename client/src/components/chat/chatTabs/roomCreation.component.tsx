@@ -41,23 +41,27 @@ const RoomCreationComponent = () => {
 
   const checkData = (): boolean => {
 
+    var flag: boolean = false;
+
     if (roomType.value === 0) {
       errorState.roomType.value = true;
-      return true;
+      flag = true;
     }
 
     if (roomName.value === "") {
       errorState.roomName.value = true;
-      return true;
+      flag = true;
     }
 
     if ((members.value.length !== 1 && roomType.value === DIRECT) ||
       (members.value.length === 0 && roomType.value === GROUP)
     ) {
       errorState.members.value = true;
-      return true;
+      flag = true;
     }
 
+    if (flag)
+      return true;
     return false;
   }
 
