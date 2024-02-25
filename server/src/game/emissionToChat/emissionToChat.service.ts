@@ -22,6 +22,7 @@ export class EmissionToChatService {
           userType: sendData.requestorId === userId
                       ? 'host' : 'guest',
           message: `Game Invitation: ${sendData.requestorId === userId ? 'me' : sendData.userName}`,
+          invitationId: data.invitation ? data.invitation : undefined,
         })
       };
     

@@ -12,7 +12,6 @@ import authService from "../services/auth.service";
 import roomService from "../services/chat/room.service";
 import { ChatLink } from "../common/constants";
 import { io } from "socket.io-client";
-import { useNavigate } from "react-router-dom";
 
 const currentRoom: Signal<number> = signal(-1);
 const userLogged: Signal<boolean> = signal(false);
@@ -230,8 +229,12 @@ const addGameInvitation = (response: any) => {
   ];
 }
 
-// chatSocket.on('redirTest', redirTest);
+const removeGameInvitation = (response: any) => {
 
+  gameInvitationList.value = gameInvitationList.value.filter(
+    (inv) => (inv.invitationId !== response.inviteId)
+  );
+}
 
 // Effect knows what event is triggered base on the signal
 effect(
@@ -242,9 +245,6 @@ effect(
         chatSocket.connect();
         fetchRooms();
         fetchInvitations();
-
-        // Remove this
-        // chatSocket.emit("message", {});
 
         //Keep the listeners alone!!!
         chatSocket.on('message-response', insertMessage);
@@ -262,7 +262,9 @@ effect(
         chatSocket.on('invitation-used', filterOutEveryRequest);
 
         chatSocket.on('game-invitation', addGameInvitation);
+        chatSocket.on('cancel-game-invitation', removeGameInvitation);
         break;
+
       default:
         chatSocket.disconnect();
         currentRoom.value = -1;

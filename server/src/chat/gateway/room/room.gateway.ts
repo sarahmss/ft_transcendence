@@ -23,6 +23,8 @@ import { ForbiddenException } from '@nestjs/common';
 import { ConnectedUserService } from 'src/chat/service/connected-user/connected-user.service';
 import { BlackList } from 'src/entity/blacklist.entity';
 import { Ban } from 'src/entity/ban.entity';
+import { GameInviteService } from 'src/chat/service/game-invite/game-invite.service';
+import { InterceptorsContextCreator } from '@nestjs/core/interceptors';
 
 // Handling blacklist will happen
 // in two fashions:
@@ -44,6 +46,7 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		private readonly authService: AuthService,
 		private readonly userService: UsersService,
 		private readonly connectedUserService: ConnectedUserService,
+		private readonly gameInvitationService: GameInviteService,
 	) {}
 
 	@WebSocketServer() server: Server;
@@ -97,18 +100,37 @@ export class RoomGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		console.log("User disconnected");
 	}
 
-	// Test listener
-	@SubscribeMessage('message')
-	handleMessage(client: Socket, payload: any) {
+	@SubscribeMessage('invalidate-invite')
+ 	async handleCancellation(client: Socket, payload: any) {
+
+		if (!payload && !payload.inviteId)
+			return;
 		
-		client.emit("redir-private-match", {gameId: "something"});
-		// const socket = this.connectedUserService
-		// 											.getConnection(client.data.user.userId);
+		const otherUserId: string = await this.gameInvitationService.getOtherUserFromInvitation(
+			payload.inviteId,
+			client.data.user.userId
+		);
 
-		// socket.emit("client-response", "service working");
+		this.gameInvitationService.invalidateInvite(payload.inviteId);
 
-		// this.server.emit("message-response", payload);
+		const conn = this.connectedUserService.getConnection(otherUserId);
+		if (conn) {
+			return conn.emit('cancel-game-invitation', {inviteId: payload.inviteId});
+		}
 	}
+
+	// Test listener
+	// @SubscribeMessage('message')
+	// handleMessage(client: Socket, payload: any) {
+		
+	// 	client.emit("redir-private-match", {gameId: "something"});
+	//  const socket = this.connectedUserService
+	//  											.getConnection(client.data.user.userId);
+
+	//  socket.emit("client-response", "service working");
+
+	//  this.server.emit("message-response", payload);
+	// }
 
 	// Join => event name: joined
 	// Leave => event name: left

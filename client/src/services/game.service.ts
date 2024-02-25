@@ -26,6 +26,12 @@ class GameService {
       
     }
   }
+
+  async getInvitationList(userId: string) {
+    
+    const data = await axios.get(`${BackLink}/invitation/${userId}`);
+    return data.data;
+  }
 }
 
 const gameService = new GameService();

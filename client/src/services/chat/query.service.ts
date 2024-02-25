@@ -50,7 +50,9 @@ class QueryService {
           if (!response || !response.data)
             return;
 
-          setData.value = response.data;
+          const currId = authService.getIdFromToken();
+
+          setData.value = response.data.filter((user: any) => user.userId !== currId);
         }
       );
     } catch (error) {

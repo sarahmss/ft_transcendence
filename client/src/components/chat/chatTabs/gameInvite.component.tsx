@@ -11,14 +11,13 @@ import { Autocomplete, Box,
 
 import { useSignals } from '@preact/signals-react/runtime';
 
-import { gameInvitationList } from '../../../contexts/ChatContext';
+import { chatSocket, gameInvitationList } from '../../../contexts/ChatContext';
 import { signal } from '@preact/signals-react';
 import React from 'react';
 import queryService from '../../../services/chat/query.service';
 import * as _ from 'lodash';
 import gameService from '../../../services/game.service';
 import authService from '../../../services/auth.service';
-import { useNavigate } from 'react-router-dom';
 import { FrontGame } from '../../../common/constants';
 
 const GameInvitationComponent = () => {
@@ -56,11 +55,11 @@ const GameInvitationComponent = () => {
 const ListElementComponent = ({invitation} : {invitation: any}) => {
 
   useSignals();
-  const navigate = useNavigate();
 
   const acceptHandle = () => {
-  
-    navigate(`game/${invitation.gameRoomId}/${invitation.userType}`);
+
+    chatSocket.emit('invalidate-invite', {inviteId: invitation.invitationId});
+    window.location.href = `${FrontGame}/${invitation.gameRoomId}/${invitation.userType}`;
   }
 
   const declineHandle = () => {
@@ -77,9 +76,10 @@ const ListElementComponent = ({invitation} : {invitation: any}) => {
         gameInvitationList.value[i].id = i;
       }
     }
+
+    chatSocket.emit('invalidate-invite', {inviteId: invitation.invitationId});
   }
   
-      // <Button  onClick={acceptHandle} sx={{backgroundColor:"#B700cc", marginRight: 3, color: 'white'}}>
   return (
     <ListItem>
 
@@ -87,11 +87,16 @@ const ListElementComponent = ({invitation} : {invitation: any}) => {
         primary={invitation.message}
       />
 
-      <Link href={`${FrontGame}/${invitation.gameRoomId}/${invitation.userType}`}>
-        <Button sx={{backgroundColor:"#B700cc", marginRight: 3, color: 'white'}}>
-          <b>Join</b>
-        </Button>
-      </Link>
+      {
+        invitation.gameRoomId === authService.getIdFromToken() ?
+          (
+            <span style={{visibility: 'hidden'}} />
+          ) : (
+              <Button onClick={acceptHandle} sx={{backgroundColor:"#B700cc", marginRight: 3, color: 'white'}}>
+                <b>Join</b>
+              </Button>
+          )
+      }
 
       <Button onClick={declineHandle} sx={{backgroundColor:"#B700cc", color: 'white'}}>
         <b>Decline</b>
@@ -121,8 +126,9 @@ const UserInviteComponent = () => {
 
       queryService.queryUserSync(input, userList);
 
-      if (userList.value.length === 0)
+      if (userList.value.length === 0) {
         userList.value = [{userName: "", userId: ""}]
+      }
     }
   }
 

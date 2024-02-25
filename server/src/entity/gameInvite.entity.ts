@@ -1,0 +1,29 @@
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "./user.entity";
+
+
+@Entity()
+export class GameInvite {
+  @PrimaryGeneratedColumn('uuid', {name: "game_invite"})
+  gameInviteId: string;
+
+  @Column({name: 'invited'})
+  invitedId: string;
+
+  @Column({name: 'inviter'})
+  inviterId: string;
+
+  @ManyToOne(() => User, (entity: User) => entity.userId, {onDelete: "CASCADE"})
+  @JoinColumn({name: 'invited'})
+  invited: User;
+
+  @ManyToOne(() => User, (entity: User) => entity.userId, {onDelete: "CASCADE"})
+  @JoinColumn({name: 'inviter'})
+  inviter: User;
+
+  @Column({default: true})
+  status: boolean;
+
+  @Column({name: 'time_limit', default: new Date(Date.now() + 120000), type: 'timestamptz'})
+  time_limit: Date;
+}

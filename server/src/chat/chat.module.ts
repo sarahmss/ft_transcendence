@@ -26,6 +26,8 @@ import { InviteController } from './controller/invite/invite.controller';
 import { Invite } from 'src/entity/invite.entity';
 import { AdminController } from './controller/admin/admin.controller';
 import { Friends } from 'src/entity/friends.entity';
+import { GameInviteService } from './service/game-invite/game-invite.service';
+import { GameInvite } from 'src/entity/gameInvite.entity';
 
 @Module({
 	imports: [ 
@@ -41,7 +43,7 @@ import { Friends } from 'src/entity/friends.entity';
 										Ban,
 										Friends,
 										User,
-
+										GameInvite
 		]),
 		AuthModule
 	],
@@ -66,6 +68,7 @@ import { Friends } from 'src/entity/friends.entity';
 		ConnectedUserService,
 		BanService,
 		InviteService,
+		GameInviteService,
 	],
 
 })

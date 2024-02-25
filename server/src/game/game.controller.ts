@@ -1,15 +1,15 @@
-import { Body, Controller, Get, NotFoundException, Param, ParseUUIDPipe, Post, Res } from '@nestjs/common';
+import { Body, ConflictException, Controller, Get, NotFoundException, Param, ParseUUIDPipe, Post, Res } from '@nestjs/common';
 import { GameService } from './game.service';
 import { UsersService } from 'src/users/users.service';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EmissionToChatService } from './emissionToChat/emissionToChat.service';
+import { GameInviteService } from 'src/chat/service/game-invite/game-invite.service';
 
 @Controller('invitation')
 export class GameController {
   constructor(
-    private readonly gameService: GameService,
     private readonly userService: UsersService,
-    private readonly chatEmitter: EmissionToChatService
+    private readonly chatEmitter: EmissionToChatService,
+    private readonly gameInviteService: GameInviteService
   ) {}
 
   @Post('invite')
@@ -23,12 +23,20 @@ export class GameController {
     if (!playerOne || !playerTwo)
       throw new NotFoundException("Either or both users don't exist");
 
+    const workingInvitation = await this.gameInviteService.getInviteByUserPair(requestorId);
+    if (workingInvitation)
+      throw new ConflictException("An user can only issue one invite! Please wait...");
+
     
+    const invitation = await this.gameInviteService.createInvite(playerOne, playerTwo);
+
     // Dados que os jogadores irao receber
     const sendDataToChatSocket = {
       requestorId: requestorId,
       userName: playerOne.userName,
-    }
+      invitation: invitation.gameInviteId
+    };
+
 
     // Emissor de eventos para o chat socket
     this.chatEmitter.emitDataToChatSocket(
@@ -48,6 +56,13 @@ export class GameController {
     console.log("receive request to create room", ownerId, friendId);
     // this.gameService.createRoom()
     return 
+  }
+
+  @Get(':userId')
+  async getInvitation(@Param('userId') userId: string) {
+    const inviteList: any[] = await this.gameInviteService.getInvitationList(userId);
+
+    return inviteList;
   }
 
 }
