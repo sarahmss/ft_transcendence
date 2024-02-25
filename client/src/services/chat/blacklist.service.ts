@@ -1,6 +1,7 @@
 import axios from "axios"
 import { BackLink } from "../../common/constants";
 import authService from "../auth.service";
+import { chatError } from "../../contexts/ChatContext";
 
 class BlackListService {
 
@@ -22,9 +23,11 @@ class BlackListService {
 
     try {
       await axios.post(BackLink + "/blacklist/single", packaged, {headers: authService.getAuthToken()});
-    }
-    catch (error) {
-      
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
     
   }
@@ -44,8 +47,11 @@ class BlackListService {
 
     try {
       await axios.post(BackLink + "/ban/bulk", packaged, {headers: authService.getAuthToken()});
-    } catch (error) {
-      
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -63,8 +69,11 @@ class BlackListService {
 
     await axios.patch(BackLink + "/ban/unblock", packaged, {headers: authService.getAuthToken()});
       
-    } catch (error) {
-      
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
     
   }

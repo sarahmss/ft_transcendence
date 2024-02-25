@@ -186,7 +186,7 @@ export class RoomController {
 		let user = await this.userService.findById(userId);
 		let room = await this.roomService.findRoom(roomId);
 		if (!room || !user)
-			throw new NotFoundException();
+			throw new NotFoundException("Room or User not found");
 
 
 		const req = await this.membershipService.findMemberRoom(requestorId, roomId);
@@ -447,7 +447,7 @@ export class RoomController {
 
 		const requestor = await this.membershipService.findMemberRoom(requestorId, roomId);
 		if (!requestor.admin && !requestor.owner)
-			throw new UnauthorizedException();
+			throw new UnauthorizedException("Not enough privileges");
 
 		const status = await this.roomService.togglePrivate(roomId);
 

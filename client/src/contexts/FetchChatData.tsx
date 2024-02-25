@@ -2,7 +2,8 @@ import authService from "../services/auth.service";
 import inviteService from "../services/chat/invite.service";
 import messageService from "../services/chat/message.service";
 import roomService from "../services/chat/room.service";
-import { Message, Room, User, chatData, invitationIdList } from "./ChatContext";
+import gameService from "../services/game.service";
+import { Message, Room, User, chatData, gameInvitationList, invitationIdList } from "./ChatContext";
 import { signal } from "@preact/signals-react";
 
 const addRoom = (room: Room) => {
@@ -246,6 +247,15 @@ const fetchInvitations = async () => {
   })     
 }
 
+const fetchGameInvitations = async () => {
+  const gameInvites: any[] = await gameService.getInvitationList(authService.getIdFromToken());
+
+  if (!gameInvites)
+    return;
+
+  gameInvitationList.value = gameInvites;
+}
+
 export {
   messageMaker,
   roomMaker,
@@ -253,5 +263,6 @@ export {
   fetchMessageByRoom,
   fetchParticipants,
   fetchInvitations,
+  fetchGameInvitations,
   fetchRooms
 };

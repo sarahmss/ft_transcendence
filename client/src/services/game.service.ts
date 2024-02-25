@@ -1,6 +1,7 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { BackLink } from "../common/constants";
 import authService from "./auth.service";
+import { chatError } from "../contexts/ChatContext";
 
 
 class GameService {
@@ -22,15 +23,28 @@ class GameService {
         { headers: authService.getAuthToken() }
       );
       return req.data;
-    } catch (error) {
-      
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
   async getInvitationList(userId: string) {
     
-    const data = await axios.get(`${BackLink}/invitation/${userId}`);
-    return data.data;
+    try {
+      const data = await axios.get(`${BackLink}/invitation/${userId}`,
+                                  {headers: authService.getAuthToken()});
+      if (!data)
+        throw new AxiosError();
+      return data.data;
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: "Error at fetching invitation data"
+      }
+    }
   }
 }
 

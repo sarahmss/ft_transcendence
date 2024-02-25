@@ -2,16 +2,24 @@
 import {
 	Box,
 	Card,
+    Snackbar,
 } from "@mui/material";
 
 import { useSignals } from "@preact/signals-react/runtime";
 import PromptComponent from "./prompt.component";
 import RoomSelectionComponent from "./room_selection.component";
 import ChatTabComponent from "./chatTabs.component";
+import { chatError } from "../../contexts/ChatContext";
 
 
 const ChatComponent = () => {
 	useSignals();
+
+
+	const handleClose = () => {
+
+		chatError.value.open = false;
+	}
 
 	return (
 
@@ -31,6 +39,12 @@ const ChatComponent = () => {
 				<PromptComponent/>
 			</Box>
 
+			<Snackbar
+				open={chatError.value.open}
+				autoHideDuration={5000}
+				onClose={handleClose}
+				message={chatError.value.message}
+				/>
 		</Card>
 	);
 };

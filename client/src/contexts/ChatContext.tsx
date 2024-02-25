@@ -1,6 +1,6 @@
 import { Signal, effect, signal } from "@preact/signals-react";
 import { getToken } from "../common/helper";
-import { fetchInvitations,
+import { fetchGameInvitations, fetchInvitations,
   fetchMessageByRoom,
   fetchParticipants,
   fetchRooms,
@@ -15,6 +15,7 @@ import { io } from "socket.io-client";
 
 const currentRoom: Signal<number> = signal(-1);
 const userLogged: Signal<boolean> = signal(false);
+const chatError: Signal<{open: boolean, message: string}> = signal({open: false, message: ""});
 const page: Signal<number> = signal(0);
 const invitationIdList: Signal<{invitationId: string, roomName: string, roomId: string}[]> = signal([]);
 
@@ -245,6 +246,7 @@ effect(
         chatSocket.connect();
         fetchRooms();
         fetchInvitations();
+        fetchGameInvitations();
 
         //Keep the listeners alone!!!
         chatSocket.on('message-response', insertMessage);
@@ -305,9 +307,14 @@ export type {
 export {
   chatData,
   chatSocket,
+  chatError,
+
   invitationIdList,
+
   gameInvitationList,
+
   privilegedInRoom,
   currentRoom,
+
   userLogged,
 };

@@ -2,6 +2,7 @@
 import axios from "axios";
 import { BackLink } from "../../common/constants";
 import authService from "../auth.service";
+import { chatError } from "../../contexts/ChatContext";
 
 
 class BanService {
@@ -22,10 +23,13 @@ class BanService {
       }
 
       return await axios.post(BackLink + "/ban", packaged, {headers: authService.getAuthToken()});
-
-    } catch (error) {
-
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
+
     
   }
 
@@ -43,8 +47,11 @@ class BanService {
       }
       return await axios.post(BackLink + "/ban/unban", packaged, {headers: authService.getAuthToken()});
 
-    } catch (error) {
-
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
     
   }

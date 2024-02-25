@@ -1,6 +1,7 @@
 import axios from "axios";
 import { BackLink } from "../../common/constants";
 import authService from "../auth.service";
+import { chatError } from "../../contexts/ChatContext";
 
 class RoomService {
 
@@ -18,7 +19,11 @@ class RoomService {
       );
       return roomList.data;
 
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -29,7 +34,11 @@ class RoomService {
     try {
       await axios.delete(BackLink + `/room/${roomId}/${userId}`, {headers: authService.getAuthToken()});
 
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -45,8 +54,11 @@ class RoomService {
       }
       await axios.post(BackLink + "/room/leave", packaged, {headers: authService.getAuthToken()});
 
-    } catch (error) {
-
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -70,7 +82,11 @@ class RoomService {
       }
       const res = await axios.post(BackLink + "/room", packaged, {headers: authService.getAuthToken()});
 
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -88,8 +104,11 @@ class RoomService {
       }
       await axios.post(BackLink + "/room/join", packaged, {headers: authService.getAuthToken()});
 
-    } catch (error) {
-      
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -106,7 +125,11 @@ class RoomService {
       }
 
       await axios.patch(BackLink + "/room/set_pass", packaged, {headers: authService.getAuthToken()});
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -121,8 +144,11 @@ class RoomService {
       }
       await axios.patch(BackLink + "/room/unset_pass", packaged, {headers: authService.getAuthToken()});
 
-    } catch (error) {
-
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -137,7 +163,11 @@ class RoomService {
       }
 
       await axios.patch(BackLink + "/room/toggle_private", packaged, {headers: authService.getAuthToken()});
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -147,7 +177,11 @@ class RoomService {
     try {
       const resp = await axios.get(BackLink + `/room/${roomId}`, {headers: authService.getAuthToken()});
       return resp.data;
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -162,7 +196,11 @@ class RoomService {
         {headers: authService.getAuthToken()}
       )).data;
 
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -181,7 +219,11 @@ class RoomService {
 
       await axios.post(`${BackLink}/room/kick`, packaged,
         {headers: authService.getAuthToken()});
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -189,9 +231,12 @@ class RoomService {
     try {
       const room = await axios.get(`${BackLink}/room/s/${rid}`, {headers: authService.getAuthToken()});
       return room.data;
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
-    
   }
 }
 

@@ -60,9 +60,18 @@ export class GameController {
 
   @Get(':userId')
   async getInvitation(@Param('userId') userId: string) {
-    const inviteList: any[] = await this.gameInviteService.getInvitationList(userId);
+    const inviteList = await this.gameInviteService.getInvitationList(userId);
 
-    return inviteList;
+    const inviteFormatted: any[] = inviteList.map((inv) => {
+      return {
+        gameRoomId: inv.inviterId,
+        userType: inv.inviterId === userId
+                    ? 'host' : 'guest',
+        message: `Game invitation ${inv.inviterId === userId ? 'me': inv.inviter.userName}`
+      }
+    });
+
+    return inviteFormatted;
   }
 
 }

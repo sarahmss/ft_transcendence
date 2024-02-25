@@ -79,6 +79,9 @@ export class GameInviteService {
   async getInvitationList(userId: string) {
     return this.gameInviteRepository.find(
      {
+  			relations:{
+          inviter: true
+        },
         where:[
           {
             invitedId: userId,
@@ -93,6 +96,5 @@ export class GameInviteService {
         ]
       }
     );
-    
   }
 }

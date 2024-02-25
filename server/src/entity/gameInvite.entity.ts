@@ -21,9 +21,10 @@ export class GameInvite {
   @JoinColumn({name: 'inviter'})
   inviter: User;
 
+  @Column({name: 'time_limit', default: new Date(Date.now() + 120000), type: 'timestamptz'})
+  time_limit: Date;
+
   @Column({default: true})
   status: boolean;
 
-  @Column({name: 'time_limit', default: new Date(Date.now() + 120000), type: 'timestamptz'})
-  time_limit: Date;
 }

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { BackLink } from "../../common/constants";
 import authService from "../auth.service";
+import { chatError } from "../../contexts/ChatContext";
 
 class InviteService {
 
@@ -18,7 +19,11 @@ class InviteService {
       }
       await axios.post(BackLink + "/invite", packaged, {headers: authService.getAuthToken()});
 
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -35,7 +40,11 @@ class InviteService {
       }
       return await axios.patch(BackLink + "/invite", packaged, {headers: authService.getAuthToken()});
 
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
     
   }
@@ -52,7 +61,11 @@ class InviteService {
       );
       return res.data;
       
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
   

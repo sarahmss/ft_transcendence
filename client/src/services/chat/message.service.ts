@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { BackLink } from '../../common/constants';
 import authService from '../auth.service';
+import { chatError } from '../../contexts/ChatContext';
 
 
 class ChatMessageService {
@@ -31,7 +32,11 @@ class ChatMessageService {
 
       const packaged = this.formatMessage(message, userId, roomId);
       await axios.post(BackLink + '/message', packaged, {headers: authService.getAuthToken()});
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -50,7 +55,11 @@ class ChatMessageService {
       
       const resp = await axios.patch(BackLink + "/message", packaged, {headers: authService.getAuthToken()});
       return resp;
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -60,7 +69,11 @@ class ChatMessageService {
     try {
   
       await axios.delete(BackLink + `/message/${messageId}`, {headers: authService.getAuthToken()});
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -82,7 +95,11 @@ class ChatMessageService {
       
       const messageList = await axios.post(BackLink + "/message/get", packaged, {headers: authService.getAuthToken()});
       return messageList.data;
-    } catch (error) {
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
 
   }

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { BackLink } from "../../common/constants";
 import authService from "../auth.service";
+import { chatError } from "../../contexts/ChatContext";
 
 class QueryService {
 
@@ -15,8 +16,11 @@ class QueryService {
       );    
       return room.data;
       
-    } catch (error) {
-      
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
   }
 
@@ -31,11 +35,12 @@ class QueryService {
       );
 
       return userList.data;
-      
-    } catch (error) {
-      
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
-    
   }
 
   queryUserSync(
@@ -55,10 +60,12 @@ class QueryService {
           setData.value = response.data.filter((user: any) => user.userId !== currId);
         }
       );
-    } catch (error) {
-      
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message
+      }
     }
-
   }
 }
 
