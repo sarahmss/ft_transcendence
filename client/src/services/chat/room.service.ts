@@ -17,7 +17,9 @@ class RoomService {
                                       packaged,
                                       { headers: authService.getAuthToken() }
       );
-      return roomList.data;
+
+      if (roomList.data)
+        return roomList.data;
 
     } catch (error: any) {
       chatError.value = {
