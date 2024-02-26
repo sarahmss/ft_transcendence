@@ -47,26 +47,27 @@ const AccountSettings = () => {
   const [redirect, setRedirect] = useState<string>('');
   const [currentUser, setCurrentUser] = useState<IUser | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const user = await authService.getCurrentUser();
-        if (user) {
-          setCurrentUser(user);
-        } else {
-          setRedirect('home');
-        }
-      } catch (error) {
-        console.error("Error fetching user data:", error);
+  const fetchData = async () => {
+    try {
+      const user = await authService.getCurrentUser();
+      if (user) {
+        setCurrentUser(user);
+      } else {
+        setRedirect('home');
       }
-    };
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+    }
+  };
 
+  useEffect(() => {
     fetchData();
   }, []);
 
   const handleChange = (event: SyntheticEvent, newValue: string) => {
-    setValue(newValue)
-  }
+    setValue(newValue);
+    fetchData();
+  };
 
   if (redirect === 'home') {
     return <Navigate to={'/'} />;
