@@ -149,40 +149,6 @@ const RoomNameAndPassFieldComponent = () => {
       }}
     >
       {
-        roomType.value === GROUP ? (
-          <Box 
-            sx={{
-              '& > :not(style)': { marginTop: 1, width: "100%", label:{ marginTop: 0} },
-            }}
-          >
-            <TextField id="RoomName" label="Room name"
-              onChange={handleRoomNameChange}
-              value={roomName.value}
-              variant="standard" />
-            {
-              errorState.roomName.value ? (
-
-                  <FormHelperText error>
-                    This field cannot be left empty
-                  </FormHelperText>
-  
-                ) : (
-
-                  <span style={{visibility: 'hidden'}}/>
-                )
-            }
-          </Box>
-        
-        ) : (
-            <TextField id="RoomName" label="Room name"
-              disabled
-              onChange={handleRoomNameChange}
-              value=""
-              variant="standard" />
-        )
-      }
-
-      {
         roomType.value === DIRECT ?
           (
             <>
@@ -206,6 +172,18 @@ const RoomNameAndPassFieldComponent = () => {
                 onChange={handleRoomNameChange}
                 value={roomName.value}
                 variant="standard" />
+              {
+                errorState.roomName.value ? (
+
+                    <FormHelperText error>
+                      This field cannot be left empty
+                    </FormHelperText>
+  
+                  ) : (
+
+                    <span style={{visibility: 'hidden'}}/>
+                  )
+              }
 
               <TextField id="Password" label="Password"
               sx={{marginTop: 0}}
