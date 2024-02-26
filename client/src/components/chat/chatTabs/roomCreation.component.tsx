@@ -98,10 +98,10 @@ const RoomCreationComponent = () => {
         roomName.value,
         isPrivate.value,
         password.value
-      );
-      
+        );
+        alert(`${roomName.value} room created !!`);
     } catch (error) {
-      
+        alert(`Unable to create ${roomName.value}: ${error}`);
     }
 
     resetState();
@@ -115,8 +115,8 @@ const RoomCreationComponent = () => {
         '& > :not(style)': { m: 1, width: "80%", label:{ marginTop: 0} },
       }}
       >
-      <RoomNameAndPassFieldComponent/>
       <SelectComponent/>
+      <RoomNameAndPassFieldComponent/>
       <CheckBoxComponent/>
       <AddUserMemberListComponent/>
   		<Button
@@ -148,28 +148,40 @@ const RoomNameAndPassFieldComponent = () => {
         '& > :not(style)': { m: 1, width: "100%", label:{ marginTop: 0} },
       }}
     >
-      <TextField id="RoomName" label="Room name"
-        onChange={handleRoomNameChange}
-        value={roomName.value}
-        variant="standard" />
-
       {
         roomType.value === DIRECT ?
           (
-            <TextField id="Password" label="Password"
-              sx={{marginTop: 0}}
-              variant="standard"
-              value=""
-              type='password'
-              disabled />
+            <>
+              <TextField id="RoomName" label="Room name"
+                value=""
+                variant="standard"
+                disabled />
+            
+              <TextField id="Password" label="Password"
+                sx={{marginTop: 0}}
+                variant="standard"
+                value=""
+                type='password'
+                disabled />
+            </>
+            
           ) :
           (
-            <TextField id="Password" label="Password"
+            <>              
+              <TextField id="RoomName" label="Room name"
+                onChange={handleRoomNameChange}
+                value={roomName.value}
+                variant="standard" />
+
+              <TextField id="Password" label="Password"
               sx={{marginTop: 0}}
               onChange={handlePasswordChange}
               variant="standard"
               value={password.value}
               type='password' />
+            </>
+            
+           
           )
       
       }
@@ -185,6 +197,7 @@ const SelectComponent = () => {
     roomType.value = event.target.value;
     if (roomType.value === DIRECT) {
       password.value = "";
+      roomName.value = "Direct";
       isPrivate.value = false;
     }
   }

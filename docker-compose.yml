@@ -2,7 +2,7 @@ version: '3.9'
 services:
   postgres:
     container_name: postgres
-    image: postgres:latest
+    image: postgres:12
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -50,6 +50,17 @@ services:
       - server
     networks:
       - transcendence
+    develop:
+      watch:
+        - action: sync
+          path: ./client
+          target: /client
+          ignore:
+            - node-modules/
+        - action:
+            rebuild
+          path: ./client/package.json
+
 
 networks:
     transcendence:
