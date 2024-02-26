@@ -1,5 +1,4 @@
-import { Body, ConflictException, Controller, Get, NotFoundException, Param, ParseUUIDPipe, Post, Res } from '@nestjs/common';
-import { GameService } from './game.service';
+import { BadRequestException, Body, ConflictException, Controller, Get, NotFoundException, Param, ParseUUIDPipe, Post, Res, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { EmissionToChatService } from './emissionToChat/emissionToChat.service';
 import { GameInviteService } from 'src/chat/service/game-invite/game-invite.service';
@@ -18,12 +17,15 @@ export class GameController {
     @Body('secondPlayerId') secondPlayerId :string
   ) {
 
+    if (!requestorId || !secondPlayerId)
+      throw new BadRequestException("Incomplete information given");
+
     const playerOne = await this.userService.findById(requestorId);
     const playerTwo = await this.userService.findById(secondPlayerId);
     if (!playerOne || !playerTwo)
       throw new NotFoundException("Either or both users don't exist");
 
-    const workingInvitation = await this.gameInviteService.getInviteByUserPair(requestorId);
+    const workingInvitation = await this.gameInviteService.getInviteByUser(requestorId);
     if (workingInvitation)
       throw new ConflictException("An user can only issue one invite! Please wait...");
 
@@ -72,6 +74,22 @@ export class GameController {
     });
 
     return inviteFormatted;
+  }
+
+  @Post('useGameInvite')
+  async useGameInvite(
+    @Body('invitedId') invitedId: string,
+    @Body('inviteId') inviteId: string) {
+    
+    const invite = await this.gameInviteService.getInvite(inviteId);
+
+    if (!invite)
+      throw new NotFoundException('Expired or not valid invitation');
+
+    if (invite.invitedId !== invitedId)
+      throw new UnauthorizedException('This invited it\'s not meant for this user');
+
+    return 'ok';
   }
 
 }

@@ -19,6 +19,7 @@ export class GameInviteService {
       invitedId: invited.userId,
       inviter: inviter,
       inviterId: inviter.userId,
+      time_limit: new Date(Date.now() + 120000),
     });
 
     await this.gameInviteRepository.insert(inviteEntry);
@@ -50,7 +51,7 @@ export class GameInviteService {
     });
   }
 
-  async getInviteByUserPair(inviterId: string) {
+  async getInviteByUser(inviterId: string) {
 
     return this.gameInviteRepository.findOne({
       where: 

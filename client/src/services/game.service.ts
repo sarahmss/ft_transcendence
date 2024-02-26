@@ -46,6 +46,35 @@ class GameService {
       }
     }
   }
+
+  async useInvite(
+    invitedId: string,
+    inviteId: string
+  ) {
+    try {
+
+      const packaged = {
+        invitedId: invitedId,
+        inviteId: inviteId,
+      }
+
+      await axios.post(
+        `${BackLink}/invitation/useGameInvite`,
+        packaged,
+        {headers: authService.getAuthToken()}
+      );
+
+      return true;
+      
+    } catch (error: any) {
+      chatError.value = {
+        open: true,
+        message: error.response.data.message,
+      }
+      return false;
+    }
+    
+  }
 }
 
 const gameService = new GameService();

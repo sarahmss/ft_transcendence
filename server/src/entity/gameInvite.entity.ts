@@ -7,19 +7,19 @@ export class GameInvite {
   @PrimaryGeneratedColumn('uuid', {name: "game_invite"})
   gameInviteId: string;
 
-  @Column({name: 'invited'})
-  invitedId: string;
-
-  @Column({name: 'inviter'})
-  inviterId: string;
-
   @ManyToOne(() => User, (entity: User) => entity.userId, {onDelete: "CASCADE"})
   @JoinColumn({name: 'invited'})
   invited: User;
 
+  @Column({name: 'invited'})
+  invitedId: string;
+
   @ManyToOne(() => User, (entity: User) => entity.userId, {onDelete: "CASCADE"})
   @JoinColumn({name: 'inviter'})
   inviter: User;
+
+  @Column({name: 'inviter'})
+  inviterId: string;
 
   @Column({name: 'time_limit', default: new Date(Date.now() + 120000), type: 'timestamptz'})
   time_limit: Date;

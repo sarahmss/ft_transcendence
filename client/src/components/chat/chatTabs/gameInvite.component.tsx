@@ -19,6 +19,7 @@ import * as _ from 'lodash';
 import gameService from '../../../services/game.service';
 import authService from '../../../services/auth.service';
 import { FrontGame } from '../../../common/constants';
+import { fetchGameInvitations } from '../../../contexts/FetchChatData';
 
 const GameInvitationComponent = () => {
 
@@ -40,7 +41,7 @@ const GameInvitationComponent = () => {
             {
 
               gameInvitationList.value.map( (invite: any) => {
-                  return (<ListElementComponent key={invite.id} invitation={invite}/>);
+                  return (<ListElementComponent key={invite.invitationId} invitation={invite}/>);
                 }
               )
 
@@ -56,27 +57,20 @@ const ListElementComponent = ({invitation} : {invitation: any}) => {
 
   useSignals();
 
-  const acceptHandle = () => {
+  const acceptHandle = async () => {
 
-    chatSocket.emit('invalidate-invite', {inviteId: invitation.invitationId});
-    window.location.href = `${FrontGame}/${invitation.gameRoomId}/${invitation.userType}`;
+    const status = await gameService.useInvite(authService.getIdFromToken(), invitation.invitationId);
+
+    if (status)
+      window.location.href = `${FrontGame}/${invitation.gameRoomId}/${invitation.userType}`;
   }
 
   const declineHandle = () => {
 
-    const index = invitation.id;
-
     gameInvitationList.value = gameInvitationList.value.filter(
       (invite) => 
-        invite.id !== invitation.id
+        invite.invitationId !== invitation.invitationId
     );
-
-    if (gameInvitationList.value.length > 0) {
-      for (let i = index; i < gameInvitationList.value.length; i++ ) {
-        gameInvitationList.value[i].id = i;
-      }
-    }
-
     chatSocket.emit('invalidate-invite', {inviteId: invitation.invitationId});
   }
   

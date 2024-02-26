@@ -1,7 +1,7 @@
 
 import {
-	Box,
-	Card,
+		Box,
+		Card,
     Snackbar,
 } from "@mui/material";
 
@@ -15,10 +15,11 @@ import { chatError } from "../../contexts/ChatContext";
 const ChatComponent = () => {
 	useSignals();
 
-
 	const handleClose = () => {
-
-		chatError.value.open = false;
+		chatError.value = {
+			open: false,
+			message: ""
+		}
 	}
 
 	return (
@@ -40,8 +41,8 @@ const ChatComponent = () => {
 			</Box>
 
 			<Snackbar
-				open={chatError.value.open}
-				autoHideDuration={5000}
+				open={chatError.value.open ? true : false}
+				autoHideDuration={1000}
 				onClose={handleClose}
 				message={chatError.value.message}
 				/>
