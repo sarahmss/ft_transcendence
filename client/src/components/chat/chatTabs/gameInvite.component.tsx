@@ -63,6 +63,11 @@ const ListElementComponent = ({invitation} : {invitation: any}) => {
 
     if (status)
       window.location.href = `${FrontGame}/${invitation.gameRoomId}/${invitation.userType}`;
+    else
+      gameInvitationList.value = gameInvitationList.value.filter(
+        (invite) => 
+          invite.invitationId !== invitation.invitationId
+      );
   }
 
   const declineHandle = () => {
