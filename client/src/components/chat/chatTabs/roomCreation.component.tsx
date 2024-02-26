@@ -199,6 +199,8 @@ const SelectComponent = () => {
       password.value = "";
       roomName.value = "Direct";
       isPrivate.value = false;
+    }  else {
+      roomName.value = "";
     }
   }
   

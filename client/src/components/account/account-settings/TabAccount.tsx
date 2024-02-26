@@ -76,7 +76,7 @@ const ProfilePicComponent: React.FC<ProfilePicProps> = ({ setImgSrc, setUrl }) =
 			const fileExtension = file.name.split('.').pop()?.toLowerCase();
 			
 			if (fileExtension && !['png', 'jpeg', 'jpg'].includes(fileExtension)) {
-				alert('Only PNG and JPEG files are allowed');
+				alert("Transcendence", 'Only PNG and JPEG files are allowed');
 				return;
 			}
 	
