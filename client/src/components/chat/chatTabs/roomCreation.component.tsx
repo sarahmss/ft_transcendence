@@ -48,7 +48,7 @@ const RoomCreationComponent = () => {
       flag = true;
     }
 
-    if (roomName.value === "") {
+    if (roomName.value === "" && roomType.value === GROUP) {
       errorState.roomName.value = true;
       flag = true;
     }
@@ -148,10 +148,39 @@ const RoomNameAndPassFieldComponent = () => {
         '& > :not(style)': { m: 1, width: "100%", label:{ marginTop: 0} },
       }}
     >
-      <TextField id="RoomName" label="Room name"
-        onChange={handleRoomNameChange}
-        value={roomName.value}
-        variant="standard" />
+      {
+        roomType.value === GROUP ? (
+          <Box 
+            sx={{
+              '& > :not(style)': { marginTop: 1, width: "100%", label:{ marginTop: 0} },
+            }}
+          >
+            <TextField id="RoomName" label="Room name"
+              onChange={handleRoomNameChange}
+              value={roomName.value}
+              variant="standard" />
+            {
+              errorState.roomName.value ? (
+
+                  <FormHelperText error>
+                    This field cannot be left empty
+                  </FormHelperText>
+  
+                ) : (
+
+                  <span style={{visibility: 'hidden'}}/>
+                )
+            }
+          </Box>
+        
+        ) : (
+            <TextField id="RoomName" label="Room name"
+              disabled
+              onChange={handleRoomNameChange}
+              value=""
+              variant="standard" />
+        )
+      }
 
       {
         roomType.value === DIRECT ?
@@ -210,6 +239,15 @@ const SelectComponent = () => {
           </MenuItem>
 
         </Select>
+      {
+        errorState.roomType.value ? (
+            <FormHelperText error>
+              You must select the type of the room you want to create
+            </FormHelperText>
+          ) : (
+            <span style={{visibility: 'hidden'}}/>
+          )
+      }
     </FormControl>
   );
 }
@@ -329,7 +367,7 @@ const AddUserMemberListComponent = () => {
       </Box>
       {
         errorState.members.value ?
-        (<FormHelperText >You should choose the appropriate amount of members for the room choosen</FormHelperText>) :
+        (<FormHelperText error >You should choose the appropriate amount of members for the room choosen</FormHelperText>) :
         (<span style={{ visibility: 'hidden' }} />)
       }
     </Box>
