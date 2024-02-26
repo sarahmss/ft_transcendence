@@ -65,6 +65,8 @@ class MatchModel {
 	score2: number;
 	player1SocketID: string;
 	player2SocketID: string;
+	player1IdDb: string;
+	player2IdDb: string;
 	gameConfig: any;
 	player1: any;
 	player2: any;
@@ -74,7 +76,7 @@ class MatchModel {
 	message: string;
 	accelerated: boolean;
 
-	constructor(gameConfig: any, player1SocketID: string, player2SocketID: string) {
+	constructor(gameConfig: any, player1SocketID: string, player2SocketID: string, IdDb1: string, IdDb2: string) {
 		this.score1 = 0;
 		this.score2 = 0;
 		this.gameConfig = gameConfig;
@@ -82,6 +84,8 @@ class MatchModel {
 		this.player2 = { ready: false, x: this.gameConfig.width - 10, y: this.gameConfig.height / 2, height: 80, width: 10, speed: 5 };
 		this.player1SocketID = player1SocketID;
 		this.player2SocketID = player2SocketID;
+		this.player1IdDb = IdDb1;
+		this.player2IdDb = IdDb2;
 		this.status = 'CUSTOM';
 		this.timeStartMatch = '';
 		this.ball = '';
@@ -192,9 +196,12 @@ export class GameService {
 		this.game.rooms[roomId][`player${position}Name`] = this.game.players[client.id].name;
         this.game.players[client.id].room = roomId;
 		this.game.players[client.id].state = 'in_room';
+		
         const room = this.game.rooms[roomId];
         if (room.player1 && room.player2) {
-			this.game.match[roomId] = new MatchModel(this.gameConfig, room.player1, room.player2);
+			const IdDb1 = this.game.players[room.player1].userIdDataBase;
+			const IdDb2 = this.game.players[room.player2].userIdDataBase;
+			this.game.match[roomId] = new MatchModel(this.gameConfig, room.player1, room.player2, IdDb1, IdDb2);
           this.gameInProgress(roomId, server);
         }
         this.refreshPlayers(server);
@@ -325,8 +332,8 @@ export class GameService {
 	}
 
 	async storeMatchHistory(match: MatchModel, roomId: string) {
-		const user1 = await this.usersRepository.findOne({ where: { userId: this.game.players[match.player1SocketID].userIdDataBase }, relations: ['losingGames', 'winningGames'] });
-		const user2 = await this.usersRepository.findOne({ where: { userId: this.game.players[match.player2SocketID].userIdDataBase }, relations: ['losingGames', 'winningGames'] });
+		const user1 = await this.usersRepository.findOne({ where: { userId: match.player1IdDb }, relations: ['losingGames', 'winningGames'] });
+		const user2 = await this.usersRepository.findOne({ where: { userId: match.player2IdDb }, relations: ['losingGames', 'winningGames'] });
 
 		console.log('User1: ', user1);
 		console.log('User2: ', user2);

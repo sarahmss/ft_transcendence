@@ -32,6 +32,8 @@ score1?: number;
 score2?: number;
 player1SocketID?: string;
 player2SocketID?: string;
+player1IdDb: string;
+player2IdDb: string;
 gameConfig?: any;
 player1?: any;
 player2?: any;
@@ -135,7 +137,7 @@ current_player: { name: '' },
 current_room: { name: '', player1Name: '', player2Name: '' },
 rooms: {},
 messages: [],
-match: {},
+match: {player1IdDb: '', player2IdDb: ''},
 in_waiting: 0,
 };
 
@@ -359,7 +361,7 @@ dispatch({type: 'WAITING_QUEUE', payload: waitingLength});
 });
 
 gameSocket.on('RemoveMatch', () => {
-dispatch({type: 'MATCH', payload: {}});
+dispatch({type: 'MATCH', payload: {player1IdDb: '', player2IdDb: ''}});
 })
 gameSocket.open();
 
