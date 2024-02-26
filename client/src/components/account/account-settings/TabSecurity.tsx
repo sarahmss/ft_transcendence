@@ -180,7 +180,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 				);
 				const imgElement = document.createElement('img');
 				imgElement.src = `data:image/png;base64,${imageBase64}`;
-				setState({ ...state, QrCodeImg: imgElement, QrCodeImgAvailable: true });
+				setState({ ...state, QrCodeImg: imgElement, QrCodeImgAvailable: true, errorCode: '' });
 				resolve();
 				} else {
 				setState({ ...state, QrCodeImgAvailable: false });
@@ -249,6 +249,7 @@ const TabSecurity: React.FC<TabSecurityProps> = ({ currentUser }) => {
 												setErrorCode={setState}
 											/>
 										</Grid>
+										{state.errorCode ? (<Alert severity="error"> {state.errorCode} </Alert>):(<label></label>)}
 									</div>
 								)
 								:

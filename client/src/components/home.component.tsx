@@ -8,6 +8,7 @@ import authService from "../services/auth.service";
 import { appSocket } from "./../common/constants";
 import { userLogged } from "../contexts/ChatContext";
 import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
+import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 
 const Home: React.FC = () => {
 	const [isLogged, setIsLogged] = React.useState(false);
@@ -60,6 +61,7 @@ const Home: React.FC = () => {
 							sx={{  backgroundColor: '#B700cc', 
 							marginTop:'10px' }}
 							>
+							<SportsEsportsIcon/>
 							Play !
 						</Button>
 					</Link>

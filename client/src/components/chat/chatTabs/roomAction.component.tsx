@@ -87,6 +87,8 @@ const UserInviteComponent = () => {
       currentRoom.value === -1 ?  "" : chatData.value[currentRoom.value].roomId,
       value.userId
     );
+
+    alert(`Invitation sent`);
   }
 
 

@@ -8,15 +8,14 @@ import {Card,
         Grid,
         Paper,
         CardMedia,
-        styled} from '@mui/material/';
+        Divider} from '@mui/material/';
 
-import MuiDivider, { DividerProps } from '@mui/material/Divider';
 import IUserStats from '../../../types/userStats.type';
 import CloseIcon from '@mui/icons-material/Close';
 import { DefaultPic } from '../../../common/constants';
 import userService from '../../../services/user.service';
 import MatchHistory from '../../../types/matchHistory.type';
-
+import TimerSharpIcon from '@mui/icons-material/TimerSharp';
 import  winner  from '../../../assets/winner.png';
 import  loser  from '../../../assets/loser.png';
 
@@ -24,15 +23,6 @@ interface MatchHistoryComponentProps {
   userStats: IUserStats | null;
 }
 
-const Divider = styled(MuiDivider)<DividerProps>(({ theme }) => ({
-  margin: theme.spacing(5, 0),
-  borderRight: `1px solid ${theme.palette.divider}`,
-  [theme.breakpoints.down('md')]: {
-    borderRight: 'none',
-    margin: theme.spacing(0, 5),
-    borderBottom: `1px solid ${theme.palette.divider}`
-  }
-}));
 
 interface MatchDisplayProps {
   stats: MatchHistory | null
@@ -65,44 +55,41 @@ const MatchDisplay: React.FC<MatchDisplayProps> = ({ stats }) => {
 
   return (
     <Paper elevation={3}>
-      <Grid container spacing={2} direction="row"  sx={{paddingLeft:"5px"}}>
-          <Grid item>
+        <Typography variant="subtitle1"
+          sx={{fontFamily: 'monospace',
+              display: 'flex',
+              justifyContent:'center',
+              marginTop:"3px"}}>
+          <TimerSharpIcon/> Match Time {stats?.gameTime} s
+        </Typography>
+        <Divider>
+      
+      </Divider>
+
+      <Grid container spacing={2} direction="row"  >
+          <Grid item sx={{ margin:"5px"}}>
             <Box sx={{ minWidth: 38, display: 'flex', justifyContent: 'center' }}>
               <Avatar alt="Winner" src={winnerPic} />
             </Box>
-            <Typography  variant="subtitle2" >
-              {stats?.winner.userName} score {stats?.winnerScore}
+            <Typography  variant="subtitle2" sx={{fontFamily: 'monospace'}}>
+            {stats?.winner.userName} score {stats?.winnerScore}
             </Typography>            
           </Grid>
+
           <Grid item>
-            <Box sx={{  position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center',}}>
+            <Box sx={{  position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'center', marginTop:"2.5vh"}}>
               <CloseIcon />
             </Box>
+          </Grid>
 
-          </Grid>          
-          <Grid item>
+          <Grid item sx={{ margin:"5px"}}>
+
             <Box sx={{ minWidth: 38, display: 'flex', justifyContent: 'center' }}>
                 <Avatar alt="Loser" src={loserPic} />
             </Box>
-            <Typography variant="subtitle2" >
-              {stats?.loser.userName} score {stats?.loserScore}
+            <Typography variant="subtitle2" sx={{fontFamily: 'monospace'}}>
+            {stats?.loser.userName}  score {stats?.loserScore}
             </Typography>    
-          </Grid>
-          <Grid item>
-            <Box
-              sx={{
-                position: 'relative',
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                width: '100%',
-                fontFamily: 'Arial, sans-serif'
-              }}
-              >
-            <Typography variant="subtitle1">
-              Match Time {stats?.gameTime}
-            </Typography> 
-            </Box>
           </Grid>
         </Grid>
     </Paper>
@@ -132,10 +119,7 @@ const MatchHistoryComponent: React.FC<MatchHistoryComponentProps> = ({ userStats
               <Box
                 key={victory.gameId}
                 sx={{ display: 'flex', alignItems: 'center', mb: 6 }}>
-                
-                <MatchDisplay
-                    stats={victory}
-                  />
+                <MatchDisplay stats={victory}/>
               </Box>
             ))}
           </CardContent>
@@ -155,9 +139,7 @@ const MatchHistoryComponent: React.FC<MatchHistoryComponentProps> = ({ userStats
           <CardContent sx={{ pb: theme => `${theme.spacing(5.5)} !important` }}>
             {defeats && defeats.map((defeat: MatchHistory) => (
               <Box key={defeat.gameId} sx={{ display: 'flex', alignItems: 'center', mb: 6 }}>
-                  <MatchDisplay
-                    stats={defeat}
-                  />
+                  <MatchDisplay stats={defeat} />
               </Box>
             ))}
           </CardContent>

@@ -12,7 +12,8 @@ import {
   StepLabel,
   StepContent,
   Paper,
-  Grid} from '@mui/material';
+  Grid,
+  Card} from '@mui/material';
 import './css/game_styles.css';
 import CustomIllustration from '../../common/Illustrations/CustomIllustration';
 interface StepAuxProps {
@@ -94,137 +95,141 @@ const Customizing: React.FC<CustomizingProps> = (props) => {
 
   return (
     <>
-    <Stack sx={{ margin: 'auto', gap:'1.5rem', width: '650px', minWIdth: '250px' }}>
-      <Box
-        className='flex-center preview'
-        sx={{
-          backgroundColor: color,
-          borderRadius: roundedMode === 'yes' ? '15px' : '0px'
-        }}
-      >
-        <Box
-          className='paddle'
-          sx={{
-            backgroundColor: colorPaddle,
-            borderRadius: roundedMode === 'yes' ? '15px' : '0px',
-            width: '10px',
-            height: '50px',
-            // margin: '285px'
-          }}
-        ></Box>
-        <Box className='preview-line'></Box>
-        <Box
-          className='paddle'
-          sx={{
-            backgroundColor: colorPaddle,
-            borderRadius: roundedMode === 'yes' ? '15px' : '0px',
-            width: '10px',
-            height: '50px',
-            // margin: '15px'
-          }}
-        ></Box>
-      </Box>
-      <Box display="flex" sx={{ flexDirection:"column", gap: '0.75rem', my: '2rem' }} >
-      <Stepper
-        activeStep={activeStep}
-        orientation="vertical" >
-        <Step sx={{ '& .MuiStepIcon-root': { color: "#B700cc", }, }} >
-          <StepLabel> Background </StepLabel>
-          <StepContent>
-          <Grid container spacing={2} direction="row" >
-            <Grid item > 
-              <Typography  variant="subtitle2" gutterBottom >Choose background color</Typography>
-            </Grid>
-            <Grid item> 
-             <input
+    <Box sx={{display: "flex", justifyContent: "center"}}>
+      <Card className="card-container">
+        <Stack sx={{ margin: 'auto', gap:'1.5rem', width: '650px', minWIdth: '250px' }}>
+          <Box
+            className='flex-center preview'
+            sx={{
+              backgroundColor: color,
+              borderRadius: roundedMode === 'yes' ? '15px' : '0px'
+            }}
+          >
+            <Box
+              className='paddle'
+              sx={{
+                backgroundColor: colorPaddle,
+                borderRadius: roundedMode === 'yes' ? '15px' : '0px',
+                width: '10px',
+                height: '50px',
+                // margin: '285px'
+              }}
+            ></Box>
+            <Box className='preview-line'></Box>
+            <Box
+              className='paddle'
+              sx={{
+                backgroundColor: colorPaddle,
+                borderRadius: roundedMode === 'yes' ? '15px' : '0px',
+                width: '10px',
+                height: '50px',
+                // margin: '15px'
+              }}
+            ></Box>
+          </Box>
+          <Box display="flex" sx={{ flexDirection:"column", gap: '0.75rem', my: '2rem' }} >
+          <Stepper
+            activeStep={activeStep}
+            orientation="vertical" >
+            <Step sx={{ '& .MuiStepIcon-root': { color: "#B700cc", }, }} >
+              <StepLabel> Background </StepLabel>
+              <StepContent>
+              <Grid container spacing={2} direction="row" >
+                <Grid item > 
+                  <Typography  variant="subtitle2" gutterBottom >Choose background color</Typography>
+                </Grid>
+                <Grid item> 
+                <input
+                        style={{
+                          backgroundColor: color,
+                          borderRadius: '15px',
+                          cursor: 'pointer',
+                        }}
+                        type='color'
+                        id='backgroundColorPicker'
+                        value={color}
+                        onChange={handleColorChange}
+                      />
+                </Grid>    
+              </Grid>
+                  <StepAux setActiveStep={setActiveStep} prevActiveStep={activeStep}/>
+              </StepContent>
+
+            </Step>
+            <Step sx={{ '& .MuiStepIcon-root': { color: "#B700cc", }, }} >
+            <StepLabel> Paddle </StepLabel>
+              <StepContent>
+              <Grid container spacing={2} direction="row" >
+                <Grid item > 
+                  <Typography  variant="subtitle2" gutterBottom >Choose paddle's color</Typography>
+                </Grid>
+                <Grid item> 
+                  <input
                     style={{
-                      backgroundColor: color,
+                      backgroundColor: colorPaddle,
                       borderRadius: '15px',
                       cursor: 'pointer',
                     }}
                     type='color'
-                    id='backgroundColorPicker'
-                    value={color}
-                    onChange={handleColorChange}
+                    id='paddleColorPicker'
+                    value={colorPaddle}
+                    onChange={(e) => setColorPaddle(e.target.value)}
                   />
-            </Grid>    
-          </Grid>
-              <StepAux setActiveStep={setActiveStep} prevActiveStep={activeStep}/>
-          </StepContent>
-
-        </Step>
-        <Step sx={{ '& .MuiStepIcon-root': { color: "#B700cc", }, }} >
-        <StepLabel> Paddle </StepLabel>
-          <StepContent>
-          <Grid container spacing={2} direction="row" >
-            <Grid item > 
-              <Typography  variant="subtitle2" gutterBottom >Choose paddle's color</Typography>
-            </Grid>
-            <Grid item> 
-              <input
-                style={{
-                  backgroundColor: colorPaddle,
-                  borderRadius: '15px',
-                  cursor: 'pointer',
-                }}
-                type='color'
-                id='paddleColorPicker'
-                value={colorPaddle}
-                onChange={(e) => setColorPaddle(e.target.value)}
-              />
-              </Grid>    
-              </Grid>
-              <StepAux setActiveStep={setActiveStep} prevActiveStep={activeStep}/>
-            </StepContent>
-        </Step>
-        <Step sx={{ '& .MuiStepIcon-root': { color: "#B700cc", }, }} >
-          <StepLabel>Accelerate the ball?</StepLabel>
-        <StepContent>
-            <FormControlLabel
-              control={
-              <Radio
-                name='speedMode'
-                value='yes'
-                checked={speedMode === 'yes'}
-                onChange={handleSpeedModeChange}
-              />
-              }
-              label='Yes'
-              />
-              <FormControlLabel
-                control={
-                <Radio
-                  name='speedMode'
-                  value='no'
-                  checked={speedMode === 'no'}
-                  onChange={handleSpeedModeChange}
-                />
-                }
-                label='No'
-                />
-                <StepAux setActiveStep={setActiveStep} prevActiveStep={activeStep}/>
-            </StepContent>
-        </Step>
-      </Stepper>
-      {activeStep === 3 && (
-        <Paper square elevation={0} sx={{ p: 3 }}>
-          <Typography>All steps completed - you&apos;re finished</Typography>
-        <Box display="flex" sx={{ gap:'1rem', justifyContent: 'center' }}>
-          <Button
-            disabled={alreadyCustomized === true}
-            onClick={preCustomizeAndPlay}
-            sx={{ backgroundColor:"#B700cc", color: "#fff" }}
-            >
-            Customize
-          </Button>
-          <Button onClick={handleReset} sx={{ mt: 1, mr: 1, color:"#B700cc"}} >
-            Reset
-          </Button>
+                  </Grid>    
+                  </Grid>
+                  <StepAux setActiveStep={setActiveStep} prevActiveStep={activeStep}/>
+                </StepContent>
+            </Step>
+            <Step sx={{ '& .MuiStepIcon-root': { color: "#B700cc", }, }} >
+              <StepLabel>Accelerate the ball?</StepLabel>
+            <StepContent>
+                <FormControlLabel
+                  control={
+                  <Radio
+                    name='speedMode'
+                    value='yes'
+                    checked={speedMode === 'yes'}
+                    onChange={handleSpeedModeChange}
+                  />
+                  }
+                  label='Yes'
+                  />
+                  <FormControlLabel
+                    control={
+                    <Radio
+                      name='speedMode'
+                      value='no'
+                      checked={speedMode === 'no'}
+                      onChange={handleSpeedModeChange}
+                    />
+                    }
+                    label='No'
+                    />
+                    <StepAux setActiveStep={setActiveStep} prevActiveStep={activeStep}/>
+                </StepContent>
+            </Step>
+          </Stepper>
+          {activeStep === 3 && (
+            <Paper square elevation={0} sx={{ p: 3 }}>
+              <Typography>All steps completed - you&apos;re finished</Typography>
+            <Box display="flex" sx={{ gap:'1rem', justifyContent: 'center' }}>
+              <Button
+                disabled={alreadyCustomized === true}
+                onClick={preCustomizeAndPlay}
+                sx={{ backgroundColor:"#B700cc", color: "#fff" }}
+                >
+                Customize
+              </Button>
+              <Button onClick={handleReset} sx={{ mt: 1, mr: 1, color:"#B700cc"}} >
+                Reset
+              </Button>
+          </Box>
+            </Paper>
+          )}
+          </Box>
+        </Stack>
+      </Card>
       </Box>
-        </Paper>
-      )}
-      </Box>
-    </Stack>
     <CustomIllustration/>
     </>
   );

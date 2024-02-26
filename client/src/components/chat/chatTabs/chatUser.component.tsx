@@ -58,6 +58,7 @@ const UserActionChatComponent = ({user}: {user: User}) => {
       authService.getIdFromToken()
     );
     handleClose();
+    alert(`Kicked ${user.userName} from ${chatData.value[currentRoom.value].roomName}`);
   }
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -159,6 +160,7 @@ const TimeSelectComponent = ({userData}: {userData: any}) => {
       LOCAL_BLOCK,
       time
     );
+    alert(`${user.userName} blocked`);
   }
 
   const handleBan = () => {
@@ -171,6 +173,7 @@ const TimeSelectComponent = ({userData}: {userData: any}) => {
       chatData.value[currentRoom.value].roomId,
       time
     );
+    alert(`${user.userName} banned`);
   }
 
   const banOrMuteTarget = () => {
