@@ -27,9 +27,6 @@ export class GameGateway
 					) {}
 
 		async handleConnection(client: Socket) {
-			// precisa identificar aqui
-			const transport = client.conn.transport.name;
-			console.log('Tipo de transport: ', transport);
 			try {
 				const token = client.handshake.headers.cookie.split('=')[1];
 				const decodedToken = this.authService.IsValidJwt(token);
@@ -51,14 +48,8 @@ export class GameGateway
 			console.log(`${this.gameService.game.players[client.id].name} disconnected`);
 			this.gameService.game.players[client.id].disconnected = new Date().getTime();
 			await this.gameService.removePlayer(client.id, client, this.server);
-			// const timerId = setTimeout(() => {
-			// 	this.gameService.removePlayer(client.id, client, this.server);
-
-			// }, 5000);
-			// this.gameService.game.players[client.id].timerId = timerId;
-		} else {
+		} else
 			console.log(`${client.id} disconnected`);
-		}
 		}
 
 		afterInit(server: Server) {
@@ -88,30 +79,16 @@ export class GameGateway
 
 	@SubscribeMessage('loginHostPrivateMatch')
 		handleLoginHostPrivateMatch(client: Socket, payload: {gameId: string, role: string, name: string, userIdDataBase: string}) {
-			//criar tudo o que precisa num fluxo normal até o ponto da tela de Customize
-			//usar o gameId (será a id da room nesse caso) para saber em que sala entrar
 			this.gameService.game.players[client.id] = new PlayerModel({name: payload.name, id: client.id});
 			this.gameService.game.players[client.id].userIdDataBase = payload.userIdDataBase;
-			// this.gameService.refreshPlayers(this.server); // manter isso aqui? porque vai ter o joinRoom...
 			this.gameService.joinRoom(client, payload.gameId, this.server);
-			console.log('The HOST client [', client.id, '] entered in a vacant room');
-			console.log('Private Room ID: ', payload.gameId);
 		}
 
 	@SubscribeMessage('loginGuestPrivateMatch')
 		handleLoginGuestPrivateMatch(client: Socket, payload: {gameId: string, role: string, name: string, userIdDataBase: string}) {
-			//criar tudo o que precisa num fluxo normal até o ponto da tela de Customize
-			//usar o proprio id pra criar a sala e entrar e emitir a mensagem pro chat socket de quem convidou
-			//lembrar que o Match só é criado a partir do momento que o outro jogador
-			//se junta à sala (em joinRoom), entao a tela de Customize só será desbloqueada
-			//quando o usuario que fez o convite se logar e entrar...
 			this.gameService.game.players[client.id] = new PlayerModel({name: payload.name, id: client.id});
 			this.gameService.game.players[client.id].userIdDataBase = payload.userIdDataBase;
-			//this.gameService.refreshPlayers(this.server); //mantem isso aqui agora ou deixa pra depois?
 			this.gameService.createRoom(client, client.id, this.server);
-			// agora precisa só emitir a mensagem de 'ok, sala criada' para o chat-socket do user
-			// que convidou e enviar juntamente o id da sala (que é o client.id)
-			console.log('Id de quem criou a sala: ', client.id);
 			this.chatEmitter.emitDataToChatSocket('game.invitation.send', [payload.gameId],  { requestorId: client.id, userName: payload.name }, 'redir-private-match');
 		}
 
@@ -120,7 +97,6 @@ export class GameGateway
 			this.gameService.game.players[client.id] = new PlayerModel({name: payload.name, id: client.id});
 			this.gameService.game.players[client.id].userIdDataBase = payload.userIdDataBase;
 			this.gameService.refreshPlayers(this.server);
-			// this.gameService.refreshRooms(this.server);
 		}
 
 	@SubscribeMessage('exitQueue')

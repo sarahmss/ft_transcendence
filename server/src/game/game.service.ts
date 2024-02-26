@@ -65,6 +65,8 @@ class MatchModel {
 	score2: number;
 	player1SocketID: string;
 	player2SocketID: string;
+	player1IdDb: string;
+	player2IdDb: string;
 	gameConfig: any;
 	player1: any;
 	player2: any;
@@ -74,7 +76,7 @@ class MatchModel {
 	message: string;
 	accelerated: boolean;
 
-	constructor(gameConfig: any, player1SocketID: string, player2SocketID: string) {
+	constructor(gameConfig: any, player1SocketID: string, player2SocketID: string, IdDb1: string, IdDb2: string) {
 		this.score1 = 0;
 		this.score2 = 0;
 		this.gameConfig = gameConfig;
@@ -82,6 +84,8 @@ class MatchModel {
 		this.player2 = { ready: false, x: this.gameConfig.width - 10, y: this.gameConfig.height / 2, height: 80, width: 10, speed: 5 };
 		this.player1SocketID = player1SocketID;
 		this.player2SocketID = player2SocketID;
+		this.player1IdDb = IdDb1;
+		this.player2IdDb = IdDb2;
 		this.status = 'CUSTOM';
 		this.timeStartMatch = '';
 		this.ball = '';
@@ -193,9 +197,12 @@ export class GameService {
 		this.game.rooms[roomId][`player${position}Name`] = this.game.players[client.id].name;
         this.game.players[client.id].room = roomId;
 		this.game.players[client.id].state = 'in_room';
+		
         const room = this.game.rooms[roomId];
         if (room.player1 && room.player2) {
-			this.game.match[roomId] = new MatchModel(this.gameConfig, room.player1, room.player2);
+			const IdDb1 = this.game.players[room.player1].userIdDataBase;
+			const IdDb2 = this.game.players[room.player2].userIdDataBase;
+			this.game.match[roomId] = new MatchModel(this.gameConfig, room.player1, room.player2, IdDb1, IdDb2);
           this.gameInProgress(roomId, server);
         }
         this.refreshPlayers(server);
@@ -220,7 +227,6 @@ export class GameService {
         this.refreshPlayers(server);
         this.refreshMatch(server, roomId);
         this.refreshRooms(server);
-
     }
 
     gameLoaded(client: Socket): void {
@@ -290,7 +296,6 @@ export class GameService {
 					this.refreshWaitingQueue(server, Object.keys(this.game.waiting).length);
 					this.joinRoom(client, key, server);
 					console.log('The client [', client.id, '] entered in a vacant room');
-					console.log('Room ID: ', key);
 					return;
 				}
 			}
@@ -326,11 +331,9 @@ export class GameService {
 	}
 
 	async storeMatchHistory(match: MatchModel, roomId: string) {
-		const user1 = await this.usersRepository.findOne({ where: { userId: this.game.players[match.player1SocketID].userIdDataBase }, relations: ['losingGames', 'winningGames'] });
-		const user2 = await this.usersRepository.findOne({ where: { userId: this.game.players[match.player2SocketID].userIdDataBase }, relations: ['losingGames', 'winningGames'] });
+		const user1 = await this.usersRepository.findOne({ where: { userId: match.player1IdDb }, relations: ['losingGames', 'winningGames'] });
+		const user2 = await this.usersRepository.findOne({ where: { userId: match.player2IdDb }, relations: ['losingGames', 'winningGames'] });
 
-		console.log('User1: ', user1);
-		console.log('User2: ', user2);
 		if (user1 && user2) {
 			const matchHist = new MatchHistory();
 			const timeEndMatch = new Date();
@@ -343,8 +346,7 @@ export class GameService {
 				matchHist.winnerScore = match.score1;
 				user1.winningGames.push(matchHist);
 				user2.losingGames.push(matchHist);
-			}
-			else if (match.score2 > match.score1) {
+			} else if (match.score2 > match.score1) {
 				matchHist.winner = user2;
 				matchHist.loser = user1;
 				matchHist.loserScore = match.score1;
@@ -356,8 +358,6 @@ export class GameService {
 			await this.usersRepository.save(user2);
 			delete this.game.match[roomId];
 		}
-		else
-			console.log('User1 e User2 ainda não chegaram....');
 	}
 
 	isCurrentUserTheWinner(match: MatchModel, playerNumbers: string): boolean {
@@ -382,15 +382,10 @@ export class GameService {
 					user.gamesWonToLevelUp = 0;
 				}
 			}
-			else {
-				console.log('This user IS NOT the winner: ', user.userName);
+			else
 				user.totalGamesLost += 1;
-			}
 			await this.usersRepository.save(user);
 			console.log('[UpdateWinnerScore] | WINNER SUCCESSFULLY SAVED IN DB AFTER MATCH');
-		}
-		else {
-			console.log('[UpdateWinnerScore] | WE COULD NOT FIND USER IN DB');
 		}
 	}
 
@@ -418,8 +413,7 @@ export class GameService {
 					}
 				}
             }
-			else
-			{
+			else {
 				delete room.spectators[client.id];
 				server.to(client.id).emit('RemoveMatch');
 			}
@@ -477,9 +471,7 @@ export class GameService {
         switch (player.direction) {
             case 'UP':
 				if (player.y < ((player.height / 2) + 10))
-				{
 					player.y = (player.height / 2) + 10;
-				}
 				else
                 	player.y -= player.speed;
                 break;
