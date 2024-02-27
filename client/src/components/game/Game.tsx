@@ -207,7 +207,7 @@ class PongGame extends React.Component<{}, PongGameState> {
                 <Stack>
 					<Box id="pong-game-container"></Box>
 					<Box>
-						<Typography variant="h2" color="#B700cc" fontWeight="bold" >{current_room.player1Name} vs {current_room.player2Name}</Typography>
+						<Typography variant="h2" color="#B700cc" fontWeight="bold" >{current_room?.player1Name} vs {current_room?.player2Name}</Typography>
 					</Box>
 				</Stack>
                 { (message && current_player.state === 'in_game') &&
