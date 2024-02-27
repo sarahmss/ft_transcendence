@@ -85,9 +85,21 @@ const Pong: React.FC = () => {
                   <Queue />
                 </Box>
               )}
-              {current_player?.name && match?.status === 'CUSTOM' && current_player?.state !== 'watching' && (
+              {current_player?.name && match?.status === 'CUSTOM' && current_player?.state === 'in_room' && (
                 <Box className='custom-game'>
                   <Customizing />
+                </Box>
+              )}
+              {current_player?.name && match?.status === 'CUSTOM' && current_player?.state !== 'in_room' && (
+                <Box className='custom-game' sx={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  paddingTop: '20px',
+                  fontFamily: 'Arial, sans-serif'
+                }}>
+                  Waiting for the other player to customize...
                 </Box>
               )}
               {current_player?.name && match?.status && match?.status !== 'CUSTOM' && (current_player?.state === 'watching' || current_player?.state === 'in_game') && (

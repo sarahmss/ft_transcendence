@@ -81,15 +81,22 @@ export class GameGateway
 		handleLoginHostPrivateMatch(client: Socket, payload: {gameId: string, role: string, name: string, userIdDataBase: string}) {
 			this.gameService.game.players[client.id] = new PlayerModel({name: payload.name, id: client.id});
 			this.gameService.game.players[client.id].userIdDataBase = payload.userIdDataBase;
-			this.gameService.joinRoom(client, payload.gameId, this.server);
+			if (this.gameService.game?.rooms[payload.gameId]) {
+				this.gameService.joinRoom(client, payload.gameId, this.server);
+			}
+			else {
+				delete this.gameService.game.players[client.id];
+				this.server.emit('redirect', `${process.env.FRONT_URL + '/game'}`);
+			}
 		}
 
 	@SubscribeMessage('loginGuestPrivateMatch')
 		handleLoginGuestPrivateMatch(client: Socket, payload: {gameId: string, role: string, name: string, userIdDataBase: string}) {
 			this.gameService.game.players[client.id] = new PlayerModel({name: payload.name, id: client.id});
 			this.gameService.game.players[client.id].userIdDataBase = payload.userIdDataBase;
-			this.gameService.createRoom(client, client.id, this.server);
-			this.chatEmitter.emitDataToChatSocket('game.invitation.send', [payload.gameId],  { requestorId: client.id, userName: payload.name }, 'redir-private-match');
+			const roomId = payload.userIdDataBase;
+			this.gameService.createRoom(client, roomId, this.server);
+			this.chatEmitter.emitDataToChatSocket('game.invitation.send', [payload.gameId],  { requestorId: roomId, userName: payload.name }, 'redir-private-match');
 		}
 
 	@SubscribeMessage('login')
@@ -105,7 +112,7 @@ export class GameGateway
 		}
 
 		@SubscribeMessage('addOnQueue')
-				handleAddOnQueue(client: Socket): void {	
+				handleAddOnQueue(client: Socket): void {
 					this.gameService.addOnQueue(client, this.server);
 				}
 
@@ -133,7 +140,7 @@ export class GameGateway
 
 	@SubscribeMessage('gameLoaded')
 		handleGameLoaded(client: Socket): void {
-			this.gameService.gameLoaded(client);
+			this.gameService.gameLoaded(client, this.server);
 		}
 
 	@SubscribeMessage('enterSpectator')

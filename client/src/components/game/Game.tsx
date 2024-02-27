@@ -207,7 +207,7 @@ class PongGame extends React.Component<{}, PongGameState> {
                 <Stack>
 					<Box>
 						<Divider>
-							<Typography variant="h2" color="#B700cc" fontWeight="bold" fontFamily="monospace" >{current_room.player1Name} vs {current_room.player2Name}</Typography>
+							<Typography variant="h2" color="#B700cc" fontWeight="bold" fontFamily="monospace" >{current_room?.player1Name} vs {current_room?.player2Name}</Typography>
 						</Divider>
 					</Box>
 					<Box id="pong-game-container"></Box>
