@@ -82,24 +82,12 @@ export class GameGateway
 			this.gameService.game.players[client.id] = new PlayerModel({name: payload.name, id: client.id});
 			this.gameService.game.players[client.id].userIdDataBase = payload.userIdDataBase;
 			if (this.gameService.game?.rooms[payload.gameId]) {
-				console.log('SALA CRIADA PELO CONVIDADO: ', JSON.stringify(this.gameService.game?.rooms[payload.gameId]));
 				this.gameService.joinRoom(client, payload.gameId, this.server);
 			}
 			else {
-				console.log('Usuário que criou a sala SAIU antes do convidado entrar.');
 				delete this.gameService.game.players[client.id];
 				this.server.emit('redirect', `${process.env.FRONT_URL + '/game'}`);
 			}
-			// else {
-			// 	if (this.gameService.game?.rooms[payload.gameId])
-			// 	{
-			// 		delete this.gameService.game.rooms[payload.gameId];
-			// 		this.gameService.refreshRooms(this.server);
-			// 	}
-			// 	console.log('Usuário que criou a sala SAIU antes do convidado entrar.')
-			// 	delete this.gameService.game.players[client.id];
-			// 	this.server.emit('redirect', `${process.env.FRONT_URL + '/game'}`);
-			//}
 		}
 
 	@SubscribeMessage('loginGuestPrivateMatch')
