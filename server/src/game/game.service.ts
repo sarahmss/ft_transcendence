@@ -238,7 +238,7 @@ export class GameService {
             ...match[player],
             ready: true
         };
-        if (match.player1.ready && match.player2.ready) {
+        if (match.player1.ready && match.player2.ready) { //colocar ? antes do ready pra proteger de leitura undefined dele?
             match.status = 'PLAY';
 			match.timeStartMatch = new Date();
             match.ball = {
@@ -436,7 +436,7 @@ export class GameService {
 
 	async removePlayer(playerId: string, client: Socket, server: Server) {
 		await this.leaveRoomInit(client, server);
-		// delete this.game.players[client.id];
+		delete this.game.players[client.id];
 		this.refreshPlayers(server);
 		this.refreshRooms(server);
 	}
