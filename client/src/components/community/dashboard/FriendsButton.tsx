@@ -83,7 +83,6 @@ const FriendsButton = ({ prevStatus, friendId, ownerId }: {
       onClickFunction(friendId); 
     }
   };
-  console.log(status);
 
   return (
     status === "RequestReceived" ? (

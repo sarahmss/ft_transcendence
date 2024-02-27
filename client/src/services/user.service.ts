@@ -124,14 +124,11 @@ class UserService {
 
 	async getFriends(userId: string) {
 		try {
-			if (AuthService.getIdFromToken() !== userId)
-				return (null);
 			const authTokenQr = AuthService.getAuthToken();
 			const response = await axios.get(`${FriendsLink}${userId}`, { headers: authTokenQr });
 			return response.data;
 		} catch (error) {
 			console.error('Error fetching friends:', error);
-			throw error;
 		}
 	}
 	

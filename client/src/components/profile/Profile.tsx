@@ -64,8 +64,14 @@ const Profile = () => {
     try {
       const user = await authService.getCurrentUser();     
       if (user) {
-        const userId = searchParams.get('user') || user.userId;
-        SetUserProfile(userId)  
+        const userId = searchParams.get('user');
+        if (userId){
+          SetUserProfile(userId);
+          setOwnerId("");          
+        } else {
+          SetUserProfile(user.userId);
+          setOwnerId(user.userId);
+        }
       } else {
         setRedirect('error');
       }
@@ -76,25 +82,18 @@ const Profile = () => {
 
   useEffect(() => {
     fetchData();
-  }, [ownerId]);
 
-  useEffect(() => {
-    const updateFriendsList = async (userId: string) => {
-      try {
-        if (userId) {
-            appSocket.off('refreshFriends').on('refreshFriends', async () => {
-            const FriendsList = await userService.getFriends(userId);
-            console.log("RefreshFriends");
-            setFriendsList(FriendsList);
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching user stats:', error);
-      }
-    };
+    if (ownerId !== null){
+      appSocket.on('refresh', async () => {
+        const FriendsList = await userService.getFriends(ownerId);
+        if (FriendsList)
+          setFriendsList(FriendsList);
+      });      
+    }
 
-    updateFriendsList(ownerId);
-  }, [ownerId]);
+    return () => {
+      appSocket.off(`refresh`);
+    };  }, [ownerId]);
 
   if (redirect === 'error') {
     return <Navigate to={'/error'} />;
@@ -124,7 +123,7 @@ const Profile = () => {
             <Grid item xs={12}>
               <MatchHistoryComponent userStats={userStats}/>
             </Grid>
-            {FriendsList ? (
+            {ownerId ? (
               <Grid item xs={12}>
                 <DashboardTable FriendsList={FriendsList} />
               </Grid>
