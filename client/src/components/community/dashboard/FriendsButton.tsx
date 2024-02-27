@@ -52,13 +52,6 @@ const Remove = async (friendId: string) => {
   }
 };
 
-const statusObj: StatusObj = {
-  AddFriend: { color: 'success', icon: <GroupAddIcon />, onClick: Send },
-  RequestSent: { color: 'info', icon: <OutboxIcon />, onClick: null },
-  Friends: { color: 'secondary', icon: <GroupIcon />, onClick: null },
-  YourSelf: { color: 'info', icon: <GroupIcon />, onClick: null },
-};
-
 const FriendsButton = ({ prevStatus, friendId, ownerId }: {
   prevStatus: string;
   friendId: string;
@@ -66,6 +59,19 @@ const FriendsButton = ({ prevStatus, friendId, ownerId }: {
 }) => {
 
   const [status, setStatus] = useState(prevStatus);
+
+  const ChangeToAdd = () => {
+    setStatus("AddFriend");
+  }
+
+  const statusObj: StatusObj = {
+    AddFriend: { color: 'success', icon: <GroupAddIcon />, onClick: Send },
+    RequestSent: { color: 'info', icon: <OutboxIcon />, onClick: null },
+    Friends: { color: 'secondary', icon: <GroupIcon />, onClick: null },
+    YourSelf: { color: 'info', icon: <GroupIcon />, onClick: null },
+    FriendRemoved:  { color: 'error', icon: <GroupRemoveIcon />, onClick: ChangeToAdd },
+    RequestDenied: { color: 'error', icon: <GroupRemoveIcon />, onClick: ChangeToAdd }
+  };
 
   useEffect(() => {
     appSocket.on(`friendshipStatusUpdate_${ownerId}_${friendId}`, (data: { status: string }) => {

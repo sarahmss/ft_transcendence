@@ -75,7 +75,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	async setStatunOn(user: User) {
 		this.usersService
-			.setStatusOn(user.userId);
+			.setStatusOn(user.userId)
+			.then(() => this.sendRefresh(`${user.userName} connect` ));
 	}
 
 	private async setStatusOff(user: User) {
@@ -85,7 +86,8 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		if (await this.connectionsService.hasConnections(user)  === false) {
 			return;
 		}
-		this.usersService.setStatusOff(user.userId);
+		this.usersService.setStatusOff(user.userId)
+		.then(() => this.sendRefresh(`${user.userName} disconnect` ));;
 	}
 
 	async setStatusPlaying(user: User) {
