@@ -87,6 +87,8 @@ export class GameGateway
 			}
 			else {
 				console.log('Usuário que criou a sala SAIU antes do convidado entrar.');
+				delete this.gameService.game.players[client.id];
+				this.server.emit('redirect', `${process.env.FRONT_URL + '/game'}`);
 			}
 			// else {
 			// 	if (this.gameService.game?.rooms[payload.gameId])
