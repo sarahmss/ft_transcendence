@@ -60,9 +60,10 @@ const ListElementComponent = ({invitation} : {invitation: any}) => {
   const acceptHandle = async () => {
 
     const status = await gameService.useInvite(authService.getIdFromToken(), invitation.invitationId);
-
-    if (status)
+    chatSocket.emit('invalidate-invite', {inviteId: invitation.invitationId});
+    if (status) {
       window.location.href = `${FrontGame}/${invitation.gameRoomId}/${invitation.userType}`;
+    }
     else
       gameInvitationList.value = gameInvitationList.value.filter(
         (invite) => 
