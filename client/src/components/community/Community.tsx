@@ -18,6 +18,7 @@ import userService from '../../services/user.service';
 import authService from '../../services/auth.service';
 import communityImg  from '../../assets/community.png';
 import { reducer } from "../../common/helper";
+import { appSocket } from '../../common/constants';
 
 const Community = () => {
   const [AllUserStats, setAllUserStats] = useState<IUserStats[] | null>(null);
@@ -70,6 +71,14 @@ const Community = () => {
 
   useEffect(() => {
     fetchData();
+    
+    appSocket.on('refresh', async () => {
+      await SetUserStats();    
+    });      
+
+    return () => {
+      appSocket.off(`refresh`);
+    }; 
   }, []);
 
   if (redirect.redirect) {

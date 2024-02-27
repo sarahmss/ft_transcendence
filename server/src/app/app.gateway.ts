@@ -59,8 +59,13 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	async UpdateFriendshipStatus(ownerId: string, friendId: string, status: string) {
 		this.server.emit(`friendshipStatusUpdate_${ownerId}_${friendId}`, { status });
+		this.server.emit(`refresh`);
 		this.logger.log(`friendshipStatusUpdate${ownerId}_${friendId}: ${status}`);
-		this.server.emit('refreshFriends');
+	}
+
+	async sendRefresh(message: string) {
+		this.server.emit(`refresh`, {message});
+		this.logger.log(`refresh`, {message});
 	}
 
 	private disconnect(client: Socket) {
@@ -68,15 +73,10 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		client.disconnect();
 	}
 
-	@SubscribeMessage('refreshFriends')
-	async handleRefreshFriends(client: Socket) {
-	  this.server.emit('refreshFriends');
-	  this.logger.log(`refreshFriends: ${client.id}`);
-	}
-
 	async setStatunOn(user: User) {
 		this.usersService
-			.setStatusOn(user.userId);
+			.setStatusOn(user.userId)
+			.then(() => this.sendRefresh(`${user.userName} connect` ));
 	}
 
 	private async setStatusOff(user: User) {
@@ -86,13 +86,14 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		if (await this.connectionsService.hasConnections(user)  === false) {
 			return;
 		}
-		this.usersService.setStatusOff(user.userId);
+		this.usersService.setStatusOff(user.userId)
+		.then(() => this.sendRefresh(`${user.userName} disconnect` ));;
 	}
 
 	async setStatusPlaying(user: User) {
 		this.usersService
 		  .setStatusPlaying(user.userId)
-		  .then(() => this.server.emit('refreshFriends'));
+		  .then(() => this.sendRefresh(`${user.userName} Playing` ));
 	  }
 
 }

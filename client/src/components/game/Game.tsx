@@ -5,9 +5,9 @@ import {
 	Button,
 	Stack,
 	Box,
-	Typography
+	Typography,
+	Divider
 } from '@mui/material';
-
 interface PongGameState {
 	eventListenerAdded: boolean;
 	handleKeyEvent: any;
@@ -205,10 +205,12 @@ class PongGame extends React.Component<{}, PongGameState> {
         return (
             <Box display="flex" sx={{ flexDirection:"column", alignItems:"center", margin:'auto', width:'fit-content'}}>
                 <Stack>
-					<Box id="pong-game-container"></Box>
 					<Box>
-						<Typography variant="h2" color="#B700cc" fontWeight="bold" >{current_room?.player1Name} vs {current_room?.player2Name}</Typography>
+						<Divider>
+							<Typography variant="h2" color="#B700cc" fontWeight="bold" fontFamily="monospace" >{current_room?.player1Name} vs {current_room?.player2Name}</Typography>
+						</Divider>
 					</Box>
+					<Box id="pong-game-container"></Box>
 				</Stack>
                 { (message && current_player.state === 'in_game') &&
                     <Box className='game-message'>
