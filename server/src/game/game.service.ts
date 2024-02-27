@@ -128,16 +128,15 @@ export class GameService {
 			}
 		}
 		this.refreshPlayers(server);
-		this.refreshMatch(server, client.id);
+		this.refreshMatch(server, roomId);
 	}
 
     createRoom(client: Socket, roomId: string, server : Server): void {
-
-        client.join(client.id);
-		if (this.game.waiting[client.id])
-			delete this.game.waiting[client.id];
-		this.game.rooms[client.id] = new RoomModel(`Room of ${this.game.players[client.id].name}`, client.id, undefined, this.game.players[client.id].name, undefined);
-        this.game.players[client.id].room = client.id;
+        client.join(roomId);
+		if (this.game.waiting[roomId])
+			delete this.game.waiting[roomId];
+		this.game.rooms[roomId] = new RoomModel(`Room of ${this.game.players[client.id].name}`, client.id, undefined, this.game.players[client.id].name, undefined);
+        this.game.players[client.id].room = roomId;
 		this.game.players[client.id].state = 'in_room';
         this.refreshPlayers(server);
 		this.refreshWaitingQueue(server, Object.keys(this.game.waiting).length);
@@ -215,7 +214,7 @@ export class GameService {
         client.join(roomId);
         const spectator = client.id;
         if (!this.game.rooms[roomId].spectators)
-        this.game.rooms[roomId].spectators = {};
+        	this.game.rooms[roomId].spectators = {};
 
         this.game.rooms[roomId].spectators[client.id] = {
             id:spectator,
@@ -229,16 +228,27 @@ export class GameService {
         this.refreshRooms(server);
     }
 
-    gameLoaded(client: Socket): void {
+    gameLoaded(client: Socket, server: Server): void {
 
-        const roomId = this.game.players[client.id].room;
+        const roomId = this.game?.players[client.id]?.room;
         const match = this.game.match[roomId];
         const player = 'player' + (this.game.rooms[roomId].player1 == client.id ? 1 : 2);
         match[player] = {
             ...match[player],
             ready: true
         };
-        if (match.player1.ready && match.player2.ready) { //colocar ? antes do ready pra proteger de leitura undefined dele?
+		if (!this.game.rooms[roomId].player1 || !this.game.rooms[roomId].player2) {
+			delete this.game.match[roomId];
+			this.game.players[client.id].room = '';
+			this.game.players[client.id].state = '';
+			client.leave(roomId);
+			delete this.game.rooms[roomId];
+			this.refreshPlayers(server);
+			this.refreshMatch(server, roomId);
+			this.refreshRooms(server);
+			return ;
+		}
+        if (match.player1?.ready && match.player2?.ready) { //colocar ? antes do ready pra proteger de leitura undefined dele?
             match.status = 'PLAY';
 			match.timeStartMatch = new Date();
             match.ball = {
@@ -302,8 +312,8 @@ export class GameService {
 		  });
 
 		if (this.game.players[client.id].state !== 'in_room' && this.game.players[client.id].state !== 'in_game') {
-			this.createRoom(client, client.id, server);
-			console.log('The client [', client.id, '] created a room of ID: ', client.id);
+			this.createRoom(client, this.game.players[client.id].userIdDataBase, server);
+			console.log('The client [', client.id, '] created a room of ID: ', this.game.players[client.id].userIdDataBase);
 		}
 	}
 

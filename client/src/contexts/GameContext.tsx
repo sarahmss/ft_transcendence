@@ -258,6 +258,11 @@ dispatch({type: 'WAITING_QUEUE', payload: waitingLength});
 gameSocket.on('RemoveMatch', () => {
 dispatch({type: 'MATCH', payload: {player1IdDb: '', player2IdDb: ''}});
 })
+
+gameSocket.on('redirect', (newRoute) => {
+  window.location.href = newRoute;
+  })
+
 gameSocket.open();
 
 }, []);
