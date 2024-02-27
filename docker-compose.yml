@@ -50,17 +50,6 @@ services:
       - server
     networks:
       - transcendence
-    develop:
-      watch:
-        - action: sync
-          path: ./client
-          target: /client
-          ignore:
-            - node-modules/
-        - action:
-            rebuild
-          path: ./client/package.json
-
 
 networks:
     transcendence:
