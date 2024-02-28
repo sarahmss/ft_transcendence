@@ -409,9 +409,16 @@ export class GameService {
 		const room = this.game.rooms[roomId];
 
 		if (room) {
+
 			const match = this.game.match[roomId];
 			if (this.game.players[client.id].state !== 'watching')
 			{
+				if (this.game.rooms[roomId].player1 && this.game.rooms[roomId].player2) {
+					if (this.game.players[this.game.rooms[roomId].player1].state === 'in_game'
+						&& this.game.players[this.game.rooms[roomId].player2].state === 'in_game') {
+						this.appGateway.setStatusOnline(this.game.rooms[roomId].player1Name, this.game.rooms[roomId].player2Name);
+					}
+				}
 				const playerNumbers = 'player' + (client.id === room.player1 ? 1 : 2);
 				room[playerNumbers] = undefined;
 				if (match) {
@@ -447,6 +454,7 @@ export class GameService {
         this.refreshPlayers(server);
         this.refreshRooms(server);
     }
+
 
 	async removePlayer(playerId: string, client: Socket, server: Server) {
 		await this.leaveRoomInit(client, server);
