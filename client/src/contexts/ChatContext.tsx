@@ -71,21 +71,26 @@ const chatSocket = io(ChatLink, {
 
 const insertMessage = (response: any) => {
   try {
-      if (currentRoom.value > chatData.value.length)
+
+    if (currentRoom.value > chatData.value.length)
       return;
 
-    const room = chatData.value[currentRoom.value];
+
+    const room = chatData.value.find((room) => room.roomId === response.roomId);
+
+    if (!room)
+      return;
 
     room.messages.value = [
       ...room.messages.value,
-    messageMaker(
-      response.author,
-      response.authorId,
-      response.messageId,
-      response.message,
-      response.messageTimestamp,
-      response.profileImage
-    )
+      messageMaker(
+        response.author,
+        response.authorId,
+        response.messageId,
+        response.message,
+        response.messageTimestamp,
+        response.profileImage
+      )
     ]  
   } catch (error){
     console.error(error);

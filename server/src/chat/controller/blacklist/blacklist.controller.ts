@@ -7,7 +7,6 @@ import { BadRequestException, Body,
   Post, 
   UnauthorizedException} from '@nestjs/common';
 import { isEmpty } from 'class-validator';
-import { hasUncaughtExceptionCaptureCallback } from 'process';
 
 import { BlacklistService } from 'src/chat/service/blacklist/blacklist.service';
 import { MembershipService } from 'src/chat/service/membership/membership.service';
@@ -85,7 +84,8 @@ export class BlacklistController {
       blockerUser,
       blockedUser,
       roomTarget,
-      blockType
+      blockType,
+      duration
     );
     return "blocked";
   }
@@ -140,7 +140,7 @@ export class BlacklistController {
     );
 
     await this.blackListService.updateDurationInBulk(renewUsers, duration);
-    await this.blackListService.createInBulk(blocker, newEntryUsers, roomTarget, blockType);
+    await this.blackListService.createInBulk(blocker, newEntryUsers, roomTarget, blockType, duration);
 
     return "Bulk blocking done";
    }
