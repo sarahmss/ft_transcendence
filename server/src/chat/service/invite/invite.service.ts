@@ -30,6 +30,7 @@ export class InviteService {
       userId: user.userId,
       room: room,
       roomId: room.roomId,
+      timeLimit: new Date(Date.now() + 3600000)
     });
 
     await this.inviteRepository.insert(instance);
