@@ -33,7 +33,9 @@ export class BlacklistService {
 		blocker: User,
 		blocked_user: User,
 		room: Room,
-		blockType: number) {
+		blockType: number,
+		time: number
+	) {
 
 		if (blocker.userId === blocked_user.userId)
 			return null;
@@ -44,7 +46,8 @@ export class BlacklistService {
 			blocker: blocker,
 		 	blocked_user: blocked_user,
 			blockType: blockType,
-			room: room
+			room: room,
+			block_end: new Date(Date.now() + time)
 		});
 
 		await this.blackListRepository.insert(blackListEntry);
@@ -55,13 +58,17 @@ export class BlacklistService {
 		blocker: User,
 		blocked_users: User[],
 		room: Room,
-		blockType: number) {
+		blockType: number,
+		time: number
+	) {
 
 		blocked_users.forEach(async (blocked: User) => {
 			await this.createBlackListEntry(blocker,
 																				blocked,
 																				room,
-																				blockType);
+																				blockType,
+																				time
+			);
 		});
 	}
 	

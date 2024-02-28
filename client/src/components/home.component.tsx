@@ -18,8 +18,8 @@ const Home: React.FC = () => {
 		  const user = await authService.getCurrentUser();
 			if (user) {
 				userLogged.value=true;
-			  setIsLogged(true);
-			  appSocket.connect();
+				setIsLogged(true);
+				appSocket.connect();
 			} else {
 				userLogged.value=false;
 			  setIsLogged(false);
