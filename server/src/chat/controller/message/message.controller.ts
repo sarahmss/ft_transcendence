@@ -99,9 +99,6 @@ export class MessageController {
 							))
 					);
 
-				console.log(banList);
-				console.log(participantList);
-
 				this.hideMessageService
 					.createHideEntryBulk(messageInstance,
 																room,
@@ -113,6 +110,7 @@ export class MessageController {
 				message: messageInstance.message,
 				messageId: messageInstance.messageId,
 				messsageTimestamp: messageInstance.timestamp,
+				roomId: message.roomId,
 				profileImage: user.profilePicture,
 				authorId: messageInstance.userId,
 				author: user.userName,
