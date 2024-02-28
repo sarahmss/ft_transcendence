@@ -124,7 +124,7 @@ export class GameGateway
 	@SubscribeMessage('customizeAndPlay')
 		handleCustomizeAndPlay(client: Socket, customChoices: any) : void {
 			this.gameService.customizeAndPlay(client, customChoices, this.server);
-			this.appGateway.setStatusPlaying(client.data.user);
+			this.appGateway.setStatusPlaying(this.gameService.game.players[client.id].userIdDataBase);
 		}
 
 	@SubscribeMessage('createRoom')
