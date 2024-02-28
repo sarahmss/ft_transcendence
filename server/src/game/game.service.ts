@@ -409,10 +409,13 @@ export class GameService {
 		const room = this.game.rooms[roomId];
 
 		if (room) {
-
 			const match = this.game.match[roomId];
 			if (this.game.players[client.id].state !== 'watching')
 			{
+				if (this.game.rooms[roomId].player1 && this.game.rooms[roomId].player2) {
+					this.appGateway.setStatusOnline(this.game.rooms[roomId].player1Name,
+													this.game.rooms[roomId].player2Name);
+				}			
 				const playerNumbers = 'player' + (client.id === room.player1 ? 1 : 2);
 				room[playerNumbers] = undefined;
 				if (match) {
