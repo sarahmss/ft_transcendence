@@ -159,8 +159,11 @@ const handleRemoveRoom = (response: any) => {
   const index = chatData.value.findIndex((room) => room.roomId !== response.roomId);
   chatData.value = chatData.value.filter((room) => room.roomId !== response.roomId);
 
+  if (chatData.value.length === 1)
+    chatData.value[0].index = 0;
+
   // Index again after a room delete
-  if (chatData.value.length > 0) {
+  else if (chatData.value.length > 0) {
     for (let k: number = index; k < chatData.value.length; k++) {
       chatData.value[k].index = k;
     }
