@@ -223,7 +223,7 @@ const SelectComponent = () => {
         <Select
           labelId="roomtype-select"
           id="roomtype-select"
-          value={roomType.value === 0 ? '' : roomType.value}
+          value={roomType.value === 0 ? '' : roomType.value.toString()}
           onChange = {handleRoomTypeChange}
           label="Room Type"
         >

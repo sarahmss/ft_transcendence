@@ -201,7 +201,7 @@ const TimeSelectComponent = ({userData}: {userData: any}) => {
         <Select
           labelId="roomtype-select"
           id="roomtype-select"
-          value={time === -1 ? '' : time}
+          value={time === -1 ? '' : time.toString()}
           onChange = {handleTimeChange}
           label="Interval"
         >
