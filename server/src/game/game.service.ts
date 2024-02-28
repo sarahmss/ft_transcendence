@@ -413,12 +413,6 @@ export class GameService {
 			const match = this.game.match[roomId];
 			if (this.game.players[client.id].state !== 'watching')
 			{
-				if (this.game.rooms[roomId].player1 && this.game.rooms[roomId].player2) {
-					if (this.game.players[this.game.rooms[roomId].player1].state === 'in_game'
-						&& this.game.players[this.game.rooms[roomId].player2].state === 'in_game') {
-						this.appGateway.setStatusOnline(this.game.rooms[roomId].player1Name, this.game.rooms[roomId].player2Name);
-					}
-				}
 				const playerNumbers = 'player' + (client.id === room.player1 ? 1 : 2);
 				room[playerNumbers] = undefined;
 				if (match) {

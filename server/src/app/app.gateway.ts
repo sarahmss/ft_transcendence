@@ -96,13 +96,4 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		await this.usersService.setStatusPlaying(user2)
 		.then(() => this.sendRefresh(`${user2} Playing` ));
 	}
-
-	async setStatusOnline(user1: string, user2: string) {
-		await this.usersService.setStatusOnline(user1)
-		.then(() => this.sendRefresh(`${user1} Playing`));
-		
-		await this.usersService.setStatusOnline(user2)
-		.then(() => this.sendRefresh(`${user2} Playing`));
-	}
-
 }

@@ -183,14 +183,6 @@ export class UsersService {
 		return this.setStatus(user.userId, status.PLAYING);
 	}
 
-	async setStatusOnline(userName: string): Promise<User> {
-		const user = await this.findByUserName(userName);
-		if (!user) {
-			throw new NotFoundException();
-		}
-		return this.setStatus(user.userId, status.ON);
-	}
-
 	async set2FaSecret(userId: string, secret: string): Promise<User> {
 		const user = await this.checkUser(userId);
 		user.secret2Fa = secret;
