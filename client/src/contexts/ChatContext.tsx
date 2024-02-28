@@ -156,14 +156,11 @@ const handleUserJoin = async (response: any) => {
 
 const handleRemoveRoom = (response: any) => {
   currentRoom.value = -1;
-  const index = chatData.value.findIndex((room) => room.roomId !== response.roomId);
+
+  const index = chatData.value.findIndex((room) => room.roomId === response.roomId);
   chatData.value = chatData.value.filter((room) => room.roomId !== response.roomId);
 
-  if (chatData.value.length === 1)
-    chatData.value[0].index = 0;
-
-  // Index again after a room delete
-  else if (chatData.value.length > 0) {
+  if (chatData.value.length > 0) {
     for (let k: number = index; k < chatData.value.length; k++) {
       chatData.value[k].index = k;
     }
