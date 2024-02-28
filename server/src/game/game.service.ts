@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { User } from '../entity/user.entity';
 import { UsersService } from '../users/users.service';
 import { MatchHistory } from '../entity/match.entity';
+import { AppGateway } from "src/app/app.gateway";
 
 class GameModel {
 	players: Record<string, PlayerModel>;
@@ -101,11 +102,12 @@ export class GameService {
 		@InjectRepository(User)
 		private readonly usersRepository: Repository<User>,
 		private readonly usersService: UsersService,
+		private readonly appGateway: AppGateway,
 		@InjectRepository(MatchHistory)
 		private readonly matchRepository: Repository<MatchHistory>,
 		) {}
 
-    public logger: Logger = new Logger('AppGateway');
+    public logger: Logger = new Logger('GameService');
     public gameConfig = {
         width: 640,
         height: 420,
@@ -125,10 +127,12 @@ export class GameService {
 				this.game.match[roomId].status = 'START';
 				if (this.game.players[this.game.rooms[roomId].player1].customizations.speedMode === 'yes' && this.game.players[this.game.rooms[roomId].player2].customizations.speedMode === 'yes')
 					this.game.match[roomId].accelerated = true;
+			this.appGateway.setStatusPlaying(this.game.rooms[roomId].player1Name, this.game.rooms[roomId].player2Name);
 			}
 		}
 		this.refreshPlayers(server);
 		this.refreshMatch(server, roomId);
+
 	}
 
     createRoom(client: Socket, roomId: string, server : Server): void {

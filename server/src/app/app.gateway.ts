@@ -1,6 +1,5 @@
-import { Logger, UnauthorizedException } from '@nestjs/common';
+import { Logger, OnModuleInit, UnauthorizedException } from '@nestjs/common';
 import {
-	SubscribeMessage,
 	WebSocketGateway,
 	OnGatewayInit,
 	OnGatewayConnection,
@@ -19,7 +18,7 @@ import { UsersService } from 'src/users/users.service';
 		credentials: true,
 	},
 })
-export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect, OnModuleInit {
 	@WebSocketServer() server: Server;
 	constructor(
 		private readonly authService: AuthService,
@@ -65,7 +64,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 
 	async sendRefresh(message: string) {
 		this.server.emit(`refresh`, {message});
-		this.logger.log(`refresh`, {message});
+		this.logger.log(`refresh ${message}`);
 	}
 
 	private disconnect(client: Socket) {
@@ -74,7 +73,7 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 	}
 
 	async setStatunOn(user: User) {
-		this.usersService
+		await this.usersService
 			.setStatusOn(user.userId)
 			.then(() => this.sendRefresh(`${user.userName} connect` ));
 	}
@@ -86,14 +85,16 @@ export class AppGateway implements OnGatewayInit, OnGatewayConnection, OnGateway
 		if (await this.connectionsService.hasConnections(user)  === false) {
 			return;
 		}
-		this.usersService.setStatusOff(user.userId)
+		await this.usersService.setStatusOff(user.userId)
 		.then(() => this.sendRefresh(`${user.userName} disconnect` ));;
 	}
 
-	async setStatusPlaying(user: User) {
-		this.usersService
-		  .setStatusPlaying(user.userId)
-		  .then(() => this.sendRefresh(`${user.userName} Playing` ));
-	  }
+	async setStatusPlaying(user1: string, user2: string) {
+		await this.usersService .setStatusPlaying(user1)
+		.then(() => this.sendRefresh(`${user1} Playing` ));
+		
+		await this.usersService.setStatusPlaying(user2)
+		.then(() => this.sendRefresh(`${user2} Playing` ));
+	}
 
 }

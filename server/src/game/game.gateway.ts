@@ -4,7 +4,6 @@ import { GameService } from './game.service';
 import { PlayerModel } from './game.service';
 import { Server, Socket } from 'socket.io';
 import { AuthService } from 'src/auth/auth.service';
-import { AppGateway } from 'src/app/app.gateway';
 import { EmissionToChatService } from './emissionToChat/emissionToChat.service';
 
 @WebSocketGateway ({
@@ -22,7 +21,6 @@ export class GameGateway
 		@WebSocketServer() server: Server;
 		constructor( private readonly gameService: GameService,
 					private readonly authService: AuthService,
-					private readonly appGateway: AppGateway,
 					private readonly chatEmitter: EmissionToChatService
 					) {}
 
@@ -124,7 +122,6 @@ export class GameGateway
 	@SubscribeMessage('customizeAndPlay')
 		handleCustomizeAndPlay(client: Socket, customChoices: any) : void {
 			this.gameService.customizeAndPlay(client, customChoices, this.server);
-			this.appGateway.setStatusPlaying(this.gameService.game.players[client.id].userIdDataBase);
 		}
 
 	@SubscribeMessage('createRoom')
