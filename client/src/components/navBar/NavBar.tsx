@@ -12,7 +12,7 @@ import SelfImprovementIcon from '@mui/icons-material/SelfImprovement';
 import authService from '../../services/auth.service';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
-import { Link} from 'react-router-dom';
+import { Link, useLocation} from 'react-router-dom';
 import { DefaultPic } from '../../common/constants';
 import {userLog} from "../../services/reduce";
 import userService from '../../services/user.service';
@@ -37,6 +37,7 @@ const NavBar: React.FC = () => {
   const [userName, setUserName] = React.useState('');
 
   let users = useSelector(userLog);
+  const location = useLocation();
 
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
@@ -84,6 +85,32 @@ const NavBar: React.FC = () => {
     <AppBar position="static" sx={{ backgroundColor: '#B700cc' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
+        
+
+          {location.pathname === "/game" ? (
+          <>
+        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flexGrow: 1 }}>
+          <SelfImprovementIcon sx={{ mr: 1 }} />
+          <Typography
+            variant="h6"
+            noWrap
+            component="a"
+            href="/"
+            sx={{
+              mr: 2,
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              letterSpacing: '.3rem',
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+            >
+            TRANSCENDENCE
+          </Typography>          
+          </Box>
+          </>
+          ) : (
+            <>
           <SelfImprovementIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h6"
@@ -102,7 +129,6 @@ const NavBar: React.FC = () => {
             >
             TRANSCENDENCE
           </Typography>
-
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
           <IconButton
             size="large"
@@ -150,9 +176,7 @@ const NavBar: React.FC = () => {
               ))
             )}
           </Menu>
-        </Box>
-
-
+          </Box>
           <SelfImprovementIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
@@ -232,6 +256,8 @@ const NavBar: React.FC = () => {
               )}
             </Menu>
           </Box>
+          </>
+          )}
 
         </Toolbar>
       </Container>
