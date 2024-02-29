@@ -131,8 +131,8 @@ export class GameGateway
 		}
 
 	@SubscribeMessage('leaveRoom')
-		async handleLeaveRoom(client: Socket) : Promise<void> {
-			await this.gameService.leaveRoomInit(client, this.server);
+		handleLeaveRoom(client: Socket) : void {
+			this.gameService.leaveRoomInit(client, this.server);
 		}
 
 	@SubscribeMessage('gameLoaded')
