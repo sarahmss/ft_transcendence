@@ -102,7 +102,7 @@ return {
 case 'ROOM':
 return {
   ...state,
-  current_room: state.rooms[state.players[action.payload].room!],
+  current_room: state.rooms[state.players[action.payload]?.room!],
 };
 case 'PLAYERS':
 return {

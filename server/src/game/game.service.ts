@@ -252,7 +252,7 @@ export class GameService {
 			this.refreshRooms(server);
 			return ;
 		}
-        if (match.player1?.ready && match.player2?.ready) { //colocar ? antes do ready pra proteger de leitura undefined dele?
+        if (match.player1?.ready && match.player2?.ready) {
             match.status = 'PLAY';
 			match.timeStartMatch = new Date();
             match.ball = {
@@ -457,7 +457,7 @@ export class GameService {
 		await this.leaveRoomInit(client, server);
 		delete this.game.players[client.id];
 		this.refreshPlayers(server);
-		this.refreshRooms(server);
+		//this.refreshRooms(server);
 	}
 
     gameInProgress(roomId: string, server: Server): void {
