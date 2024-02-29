@@ -75,13 +75,12 @@ const insertMessage = (response: any) => {
     if (currentRoom.value > chatData.value.length)
       return;
 
-    if (chatData.value[currentRoom.value].fetchStatus === false)
-      return;
-
-
     const room = chatData.value.find((room) => room.roomId === response.roomId);
 
     if (!room)
+      return;
+
+    if (room.fetchStatus === false)
       return;
 
     room.messages.value = [
