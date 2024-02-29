@@ -42,37 +42,15 @@ export class GameGateway
 		}
 
 		async handleDisconnect(client: Socket) {
-			if (this.gameService.game.players[client.id]) {
-			console.log(`${this.gameService.game.players[client.id].name} disconnected`);
-			this.gameService.game.players[client.id].disconnected = new Date().getTime();
+		if (this.gameService.game.players[client.id]) {
+			console.log(`[HANDLEDISCONNECT] | ${this.gameService.game.players[client.id].name} de id [ ${client.id} ] disconnected`);
 			await this.gameService.removePlayer(client.id, client, this.server);
 		} else
-			console.log(`${client.id} disconnected`);
+			console.log(`[HANDLEDISCONNECT] | ${client.id} disconnected`);
 		}
 
 		afterInit(server: Server) {
 				this.gameService.logger.log('Init');
-		}
-
-	@SubscribeMessage('reconnect')
-		handleReconnect(client: Socket, reconnectedPlayer: any): void {
-			console.log(`Player ${reconnectedPlayer.name} reconnected`);
-			const oldSocketId = reconnectedPlayer.id;
-			const existingPlayer = this.gameService.game.players[oldSocketId];
-			if (existingPlayer) {
-				clearTimeout(this.gameService.game.players[oldSocketId].timerId);
-				 this.gameService.game.players[client.id] = {
-					...existingPlayer,
-					disconnected: undefined,
-					id: client.id,
-				};
-				delete this.gameService.game.players[oldSocketId];
-				this.gameService.rejoinRoom(client, oldSocketId, this.server);
-				this.gameService.refreshPlayers(this.server);
-				this.gameService.refreshRooms(this.server);
-			}else {
-				console.log(`Player ${reconnectedPlayer.name} not found`);
-			}
 		}
 
 	@SubscribeMessage('loginHostPrivateMatch')
@@ -99,6 +77,7 @@ export class GameGateway
 
 	@SubscribeMessage('login')
 		handleLogin(client: Socket, payload: {name: any, userIdDataBase: any}): void {
+
 			this.gameService.game.players[client.id] = new PlayerModel({name: payload.name, id: client.id});
 			this.gameService.game.players[client.id].userIdDataBase = payload.userIdDataBase;
 			this.gameService.refreshPlayers(this.server);
@@ -116,7 +95,7 @@ export class GameGateway
 
 		@SubscribeMessage('execMatch')
 				handleExecMatch(client: Socket): void {
-						this.gameService.executeMatch(client, this.server);
+					this.gameService.executeMatch(client, this.server);
 				}
 
 	@SubscribeMessage('customizeAndPlay')
@@ -153,7 +132,6 @@ export class GameGateway
 	@SubscribeMessage('sendMessage')
 		sendMessage(client: Socket, payload: string): void {
 			const player = this.gameService.game.players[client.id];
-			console.log(payload);
 			this.server.emit('ReceiveMessage', `${player.name}: ${payload}`);
 		}
 

@@ -236,11 +236,7 @@ export class GameService {
 
         const roomId = this.game?.players[client.id]?.room;
         const match = this.game.match[roomId];
-        const player = 'player' + (this.game.rooms[roomId].player1 == client.id ? 1 : 2);
-        match[player] = {
-            ...match[player],
-            ready: true
-        };
+		
 		if (!this.game.rooms[roomId].player1 || !this.game.rooms[roomId].player2) {
 			delete this.game.match[roomId];
 			this.game.players[client.id].room = '';
@@ -252,6 +248,11 @@ export class GameService {
 			this.refreshRooms(server);
 			return ;
 		}
+		const player = 'player' + (this.game.rooms[roomId].player1 == client.id ? 1 : 2);
+        match[player] = {
+            ...match[player],
+            ready: true
+        };
         if (match.player1?.ready && match.player2?.ready) {
             match.status = 'PLAY';
 			match.timeStartMatch = new Date();
@@ -351,7 +352,7 @@ export class GameService {
 		if (user1 && user2) {
 			const matchHist = new MatchHistory();
 			const timeEndMatch = new Date();
-			const durationInSeconds = Math.floor((timeEndMatch.getTime() - match.timeStartMatch.getTime()) / 1000);
+			const durationInSeconds = Math.floor((timeEndMatch.getTime() - match?.timeStartMatch?.getTime()) / 1000);
 			matchHist.gameTime = durationInSeconds;
 			if (match.score1 > match.score2) {
 				matchHist.winner = user1;
@@ -360,6 +361,8 @@ export class GameService {
 				matchHist.winnerScore = match.score1;
 				user1.winningGames.push(matchHist);
 				user2.losingGames.push(matchHist);
+				await this.usersRepository.save(user1);
+				await this.usersRepository.save(user2);
 			} else if (match.score2 > match.score1) {
 				matchHist.winner = user2;
 				matchHist.loser = user1;
@@ -367,9 +370,9 @@ export class GameService {
 				matchHist.winnerScore = match.score2;
 				user2.winningGames.push(matchHist);
 				user1.losingGames.push(matchHist);
+				await this.usersRepository.save(user1);
+				await this.usersRepository.save(user2);
 			}
-			await this.usersRepository.save(user1);
-			await this.usersRepository.save(user2);
 			delete this.game.match[roomId];
 		}
 	}
@@ -399,7 +402,7 @@ export class GameService {
 			else
 				user.totalGamesLost += 1;
 			await this.usersRepository.save(user);
-			console.log('[UpdateWinnerScore] | WINNER SUCCESSFULLY SAVED IN DB AFTER MATCH');
+			console.log('[UPDATEWINNERSCORE] | Winner successfully saved in database');
 		}
 	}
 
@@ -426,7 +429,7 @@ export class GameService {
 						  this.game.players[client.id].name
 						} left the match.`;
 					}
-					else {
+					else if (match.timeStartMatch) {
 						await this.updateWinnerScoresInDB(client, match, playerNumbers);
 					}
 				}
@@ -439,25 +442,26 @@ export class GameService {
 			this.game.players[client.id].room = '';
 			this.game.players[client.id].state = '';
 			if (!room.player1 && !room.player2 && Object.keys(room.spectators).length === 0) {
-				if (match) {
+				if (match && match.timeStartMatch) {
 					await this.storeMatchHistory(match, roomId);
                 }
 				delete this.game.rooms[roomId];
             }
             client.leave(roomId);
+			console.log('USER LEFT THE MATCH: ', this.game.players[client.id].name);
             this.refreshMatch(server, roomId);
+			this.refreshPlayers(server);
+			this.refreshRooms(server);
         }
-		this.logger.log('User left the match: ', JSON.stringify(this.game.players[client.id]));
-        this.refreshPlayers(server);
-        this.refreshRooms(server);
     }
 
 
 	async removePlayer(playerId: string, client: Socket, server: Server) {
-		await this.leaveRoomInit(client, server);
+		if (this.game.players[client.id].room)
+			await this.leaveRoomInit(client, server);
 		delete this.game.players[client.id];
 		this.refreshPlayers(server);
-		//this.refreshRooms(server);
+		this.refreshRooms(server);
 	}
 
     gameInProgress(roomId: string, server: Server): void {
