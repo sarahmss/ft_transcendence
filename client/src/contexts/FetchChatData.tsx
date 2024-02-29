@@ -80,7 +80,7 @@ const roomMaker = (
       userList: signal([]),
       fetchStatus: false,
       isPrivate: signal(isPrivate),
-      roomType: roomType
+      roomType: roomType,
     }
   );
 }
