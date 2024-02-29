@@ -179,11 +179,6 @@ try {
   const storedPlayer = await getStoredPlayerData();
 
   if (storedPlayer !== null) {
-    const storedPlayerSocket = await getStoredPlayerSocket(storedPlayer.userId);
-
-    if (storedPlayerSocket !== null)
-      gameSocket.emit('reconnect', storedPlayerSocket);
-    else {
       if (gameId && role) {
         const name = storedPlayer.userName;
         const userIdDataBase = storedPlayer.userId;
@@ -196,10 +191,12 @@ try {
         const userIdDataBase = storedPlayer.userId;
         gameSocket.emit('login', {name, userIdDataBase});
       }
+      dispatch({ type: 'CONNECTED', payload: true });
     }
-    dispatch({ type: 'CONNECTED', payload: true });
+  else {
+    dispatch({ type: 'LOGGED', payload: false });
   }
-} catch (error) {
+  } catch (error) {
   dispatch({ type: 'LOGGED', payload: false });
 }
 };
