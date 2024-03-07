@@ -18,7 +18,7 @@ a community and friendship system.
 * Teamwork and coordination
 * The application of websocket and how can be used for real time event notification and behavior
 * Reactive frontend capable to of adapting himself to the size of the client monitor
-* What is a relational database
+* Relational database
 
 ## Screenshots
 ![image](https://github.com/sarahmss/ft_transcendence/assets/62228465/0e28be46-7e5a-4471-a604-680b2aed18a4)
