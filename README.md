@@ -1,5 +1,25 @@
 # ft_transcendence
 
+## Description
+This is the last project before finishing the common core from 42Sp, 
+this is a project, 
+the main challenge of this project is to develop a fullstack application capable of hosting a pong game between various clients, 
+chat capabilities, 
+private and public profile, 
+a community and friendship system.
+
+## Technologies used
+* NestJs
+* NodeJs
+* React
+* Postgresql
+
+## What we learned
+* Teamwork and coordination
+* The application of websocket and how can be used for real time event notification and behavior
+* Reactive frontend capable to of adapting himself to the size of the client monitor
+* What is a relational database
+
 ## Screenshots
 ![image](https://github.com/sarahmss/ft_transcendence/assets/62228465/0e28be46-7e5a-4471-a604-680b2aed18a4)
 ![image](https://github.com/sarahmss/ft_transcendence/assets/62228465/a1f2cd71-e791-4583-8f15-0f5f4b3bcff4)
